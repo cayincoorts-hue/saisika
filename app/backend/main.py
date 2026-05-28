@@ -7,6 +7,8 @@
   GET  /api/history             — 获取历史分析列表
   DELETE /api/history/{batch_id} — 删除某次分析
   GET  /api/nodes/{node_id}     — 获取节点详情
+  GET  /api/license/status      — 检查激活状态
+  POST /api/license/activate    — 输入激活码
   GET  /                        — 前端首页（static/）
 """
 
@@ -18,8 +20,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-import pandas as pd
-from fastapi import FastAPI, UploadFile, File, HTTPException, Query
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -28,14 +29,49 @@ from services.field_mapper import FieldMapper
 from services.data_merger import DataMerger
 from services.graph_builder import GraphBuilder
 from services.risk_engine import RiskEngine
+from services.decision_engine import DecisionEngine
 from services.analysis_engine import AnalysisEngine
 from services.prompt_builder import PromptBuilder
 from services.result_exporter import ResultExporter
 from utils.path_utils import app_path, data_path
+from utils.license import LicenseManager
 
 # ── 应用初始化 ──────────────────────────────────────────────
 
 app = FastAPI(title="Saisca — 供应链风险分析系统", version="1.3.0")
+
+# ── 序列号中间件 ──────────────────────────────────────────────
+
+EXEMPT_PREFIXES = ("/api/license", "/api/health", "/docs", "/openapi.json")
+
+@app.middleware("http")
+async def license_middleware(request: Request, call_next):
+    """拦截未激活的请求。
+
+    API 请求（/api/*）未激活时返回 403。
+    页面请求（/ 和静态资源）放行，让前端激活页面正常显示。
+    health、docs、license 端点始终放行。
+    """
+    path = request.url.path
+
+    # 安全端点始终放行
+    if any(path.startswith(p) for p in EXEMPT_PREFIXES):
+        return await call_next(request)
+
+    # API 请求需要检查激活状态
+    if path.startswith("/api/"):
+        license_mgr = LicenseManager()
+        if not license_mgr.is_activated():
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "error": "not_activated",
+                    "machine_id": license_mgr.get_machine_id(),
+                    "message": "产品未激活，请先输入激活码。",
+                },
+            )
+
+    return await call_next(request)
 
 UPLOAD_DIR = data_path("uploads")
 RESULT_DIR = data_path("results")
@@ -182,6 +218,12 @@ async def analyze(batch_id: str = Query(...)):
             yield _sse("progress", {"stage": "risk", "message": f"风险计算完成：高{high} 中{med} 低{low}",
                                      "details": {"high": high, "medium": med, "low": low}})
             await asyncio.sleep(0.2)
+
+            # Step 5b: decision — 动作建议
+            yield _sse("progress", {"stage": "decision", "message": "正在生成处置建议..."})
+            await asyncio.sleep(0.1)
+            dec_engine = DecisionEngine()
+            scores = dec_engine.decide(scores=scores, graph=graph)
 
             # Step 6-7: analysis + text
             yield _sse("progress", {"stage": "analysis", "message": "正在生成分析结果和文字结论..."})
@@ -348,6 +390,33 @@ async def get_node_detail(node_id: str, batch_id: Optional[str] = None):
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "version": "1.3.0"}
+
+
+# ── 路由：序列号激活 ──────────────────────────────────────────
+
+@app.get("/api/license/status")
+async def license_status():
+    """获取当前激活状态和机器 ID。"""
+    mgr = LicenseManager()
+    return mgr.get_status()
+
+
+@app.post("/api/license/activate")
+async def license_activate(payload: dict):
+    """输入激活码完成激活。
+
+    Request body: {"key": "SAISKA-XXXX-XXXX-XXXX"}
+    """
+    key = payload.get("key", "")
+    if not key:
+        raise HTTPException(status_code=400, detail="请输入激活码。")
+
+    mgr = LicenseManager()
+    ok, message = mgr.activate(key)
+    if not ok:
+        raise HTTPException(status_code=400, detail=message)
+
+    return {"status": "activated", "message": message}
 
 
 # ── 静态文件服务 ──────────────────────────────────────────

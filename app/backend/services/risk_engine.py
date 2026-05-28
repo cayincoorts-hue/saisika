@@ -1,7 +1,7 @@
 """风险分计算 + risk_causes 语义标注。
 
-阈值唯一源头。下游模块（prompt_builder、analysis_engine）只读 risk_causes 标签，
-不重新计算阈值。
+阈值唯一源头。下游模块（prompt_builder、analysis_engine、decision_engine）只读
+risk_causes 标签和 risk_components，不重新计算阈值。
 
 风险模型（第一版简化：Risk × Propagation）：
   Risk = 波动性(30%) + 库存健康度(25%) + 交付偏差(25%) + 历史标记(20%)
@@ -13,8 +13,9 @@
 v1.3 新增：
   - reasoning_trail：完整推理链条（每个计算步骤 + 数据来源）
   - risk_causes_detail：每个原因附带触发阈值对比
-  - action_type + action_justification：动作分类与追溯（论文 3.4 节落地）
   - domain_patterns：牛鞭效应 / VMI / QR 领域模式检测
+
+注意：动作分类与追溯已提取到 decision_engine.py，risk_engine 只负责风险计算和原因标注。
 """
 
 from collections import defaultdict
@@ -140,13 +141,6 @@ class RiskEngine:
             # 生成原因详情（阈值对比）
             causes_detail = self._generate_risk_causes_detail(comp, domain_patterns.get(nid, []))
 
-            # 动作分类与追溯
-            action_type = self._classify_action_type(level, causes, comp, propagation)
-            recommended_action = self._recommend_action(level, causes, action_type)
-            action_justification = self._build_action_justification(
-                nid, comp, propagation, level, action_type, graph
-            )
-
             # 推理链条
             reasoning_trail = self._build_reasoning_trail(
                 nid, node_metrics.get(nid, {}), comp, risk, propagation,
@@ -162,12 +156,9 @@ class RiskEngine:
                                              "delivery_delay_risk", "delay_flag_risk")},
                 "risk_causes": causes,
                 "propagation_coefficient": round(propagation, 4),
-                "recommended_action": recommended_action,
                 # v1.3 新增
                 "reasoning_trail": reasoning_trail,
                 "risk_causes_detail": causes_detail,
-                "action_type": action_type,
-                "action_justification": action_justification,
             }
 
         return scores
@@ -469,123 +460,6 @@ class RiskEngine:
             })
 
         return details
-
-    # ── 动作分类与追溯（论文 3.4 节落地）─────────────────────
-
-    def _classify_action_type(
-        self, level: str, causes: list[str], components: dict, propagation: float
-    ) -> str:
-        """将风险等级和原因映射为结构化动作类型。"""
-        if level == "low":
-            return "维持现状"
-
-        inv = components.get("inventory_risk", 0)
-        delay_flag = components.get("delay_flag_risk", 0)
-        delivery = components.get("delivery_delay_risk", 0)
-        vol = components.get("volatility_risk", 0)
-
-        # 库存异常优先 → 补货
-        if inv > self.INVENTORY_RISK_THRESHOLD:
-            return "补货"
-
-        # 交期偏差大 + 传播影响大 → 转单
-        if delivery > self.DELAY_VAL_THRESHOLD and propagation > 0.7:
-            return "转单"
-
-        # 历史延迟标记 → 切换供应商
-        if delay_flag > self.DELAY_FLAG_THRESHOLD:
-            return "切换供应商"
-
-        # 传播系数极高 → 调整运输路径
-        if propagation > 0.8:
-            return "调整运输路径"
-
-        # 轻度风险
-        if level == "medium":
-            if vol > self.VOLATILITY_THRESHOLD:
-                return "核查波动原因"
-            return "加强监控"
-
-        return "维持现状"
-
-    def _build_action_justification(
-        self, nid: str, components: dict, propagation: float,
-        level: str, action_type: str, graph: dict
-    ) -> dict:
-        """构建动作追溯信息：为什么推荐这个动作，哪些替代方案不可用及原因。"""
-        justification = {
-            "action_type": action_type,
-            "reasons": [],
-            "alternatives": [],
-        }
-
-        inv = components.get("inventory_risk", 0)
-        delivery = components.get("delivery_delay_risk", 0)
-        delay_flag = components.get("delay_flag_risk", 0)
-        vol = components.get("volatility_risk", 0)
-
-        if action_type == "补货":
-            justification["reasons"].append(
-                f"库存风险分 {inv} > 阈值 {self.INVENTORY_RISK_THRESHOLD}"
-            )
-            # 检查替代方案
-            if propagation < 0.7:
-                justification["alternatives"].append(
-                    f"转单（当前不适用：网络传播系数 {propagation} < 0.7，影响范围有限）"
-                )
-            else:
-                justification["alternatives"].append(
-                    f"转单（当前网络传播系数 {propagation} > 0.7，可考虑同步转单降低传播风险）"
-                )
-
-        elif action_type == "转单":
-            justification["reasons"].append(
-                f"交期偏差风险 {delivery} > 阈值 {self.DELAY_VAL_THRESHOLD}，"
-                f"且传播系数 {propagation} > 0.7"
-            )
-
-        elif action_type == "切换供应商":
-            justification["reasons"].append(
-                f"历史延迟标记 {delay_flag} > 阈值 {self.DELAY_FLAG_THRESHOLD}"
-            )
-            justification["alternatives"].append(
-                "转单（当前不适用：需先确认替代供应商的交期能力）"
-            )
-
-        elif action_type == "调整运输路径":
-            justification["reasons"].append(
-                f"传播系数 {propagation} > 0.8，该节点在网络中处于关键位置"
-            )
-
-        elif action_type == "核查波动原因":
-            justification["reasons"].append(
-                f"波动性 {vol} > 阈值 {self.VOLATILITY_THRESHOLD}"
-            )
-
-        elif action_type == "加强监控":
-            justification["reasons"].append("中风险等级，尚未触发具体动作阈值")
-
-        else:
-            justification["reasons"].append("低风险等级，维持现有监控频率")
-
-        return justification
-
-    def _recommend_action(self, level: str, causes: list[str], action_type: str) -> str:
-        """根据风险等级、原因和动作类型生成处置建议文案。"""
-        if action_type == "补货":
-            return "启动补货计划，根据库存消耗速率确定补货批量和优先级。"
-        elif action_type == "转单":
-            return "评估替代供应商交期能力，将部分订单重分配至可用供应源。"
-        elif action_type == "切换供应商":
-            return "评估备选供应商质量与交期记录，启动供应商切换评估流程。"
-        elif action_type == "调整运输路径":
-            return "核查该节点在网络中的关键程度，评估替代运输路径的可行性。"
-        elif action_type == "核查波动原因":
-            return "核查指标波动原因，确认是否为季节性因素或偶发事件。"
-        elif action_type == "加强监控":
-            return "提高监控频率，持续关注指标变化趋势。"
-        else:
-            return "维持正常监控节奏，定期复查。"
 
     # ── 领域模式检测 ────────────────────────────────────────
 

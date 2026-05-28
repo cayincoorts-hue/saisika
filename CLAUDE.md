@@ -11,7 +11,7 @@
 | v1.0 | 2026-05-02 | 初始版本 |
 | v1.1 | 2026-05-03 | 决策收口：图片识别、代码复用、优先级公式、流式展示、传播图、开发顺序 |
 | v1.2 | 2026-05-25 | 技术栈调整为纯静态部署、Excel+CSV双输入、数据自动持久化、三层数据流架构 |
-| v1.3 | 2026-05-28 | 推理链条、领域模式检测、动作分类追溯、可复现性指纹、GSAP动画、PyInstaller+Electron打包完成 |
+| v1.3 | 2026-05-28 | 推理链条、领域模式检测、动作分类追溯、可复现性指纹、GSAP动画、decision_engine模块提取、PyInstaller+Electron打包 |
 
 ---
 
@@ -96,7 +96,7 @@
 
 ---
 
-## 4.1 数据流架构（v1.2 新增）
+## 4.1 数据流架构（v1.2 新增，v1.3 更新）
 
 ```
 用户上传 Excel/CSV
@@ -111,7 +111,9 @@ graph_builder      节点+边 → 供应链网络图 → 推断层次关系
   ↓  dict
 risk_engine        计算风险分 → 生成 risk_causes 语义标注（阈值唯一源头）
   ↓  dict
-analysis_engine    组装五类结果对象
+decision_engine    动作分类追溯 → 生成 action_type + action_justification
+  ↓  dict
+analysis_engine    组装六类结果对象（含 domain_insights）
   ↓  dict
 prompt_builder     从 risk_causes 生成文字结论（只读语义标注，不碰原始数字）
   ↓
@@ -941,9 +943,24 @@ saisika.app / saisika.exe
 ### 32.3 待完成
 
 - [ ] macOS 公证（需 Apple Developer $99/年）
-- [ ] 生成 `.dmg` 安装包
 - [ ] 领域模式阈值用真实数据校准
 - [ ] Windows `.exe` 打包（需 Windows 机器或 CI）
+- [x] 生成 `.dmg` 安装包（`Saisca-1.3.0-arm64.dmg`，116MB，2026-05-28）
+
+### 32.4 decision_engine 模块提取 + 序列号系统（2026-05-28）
+
+**decision_engine 提取**：
+- 动作分类逻辑从 `risk_engine.py` 提取为独立的 `decision_engine.py`
+- risk_engine 不再包含动作分类代码
+- 数据流更新：risk_engine → decision_engine → analysis_engine
+
+**序列号系统**：
+- `utils/license.py`：机器指纹生成 + 激活码校验 + 离线激活
+- `keygen.py`：供应商激活码生成工具
+- 中间件拦截：未激活时所有业务 API 返回 403
+- 前端 `ActivatePage.tsx`：显示机器 ID + 输入激活码
+- 机器 ID 格式 `XXXX-XXXX-XXXX`，激活码格式 `XXXX-XXXX-XXXX-XXXX`
+- 绑机器不联网，换机器需重新申请激活码
 
 ---
 

@@ -1,0 +1,8 @@
+node_id,node_name,node_type,upstream_node_id,downstream_node_id,region
+N001,华东原材料供应商A,Supplier,,N002,上海
+N002,苏州制造工厂B,Plant,N001,N003,江苏
+N003,华南区域配送中心C,DC,N002,N004,广东
+N004,广州分销商D,Distributor,N003,N005,广东
+N005,深圳零售商E,Retailer,N004,,广东
+N006,华北原材料供应商F,Supplier,,N002,河北
+N007,备用制造工厂G,Plant,N006,N003,天津
