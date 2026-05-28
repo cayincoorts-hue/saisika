@@ -17,8 +17,8 @@ import subprocess
 import uuid
 from pathlib import Path
 
-# 激活码的加密盐 — 换掉这个就会让所有旧密钥失效
-_SECRET_SALT = "saisika-sc-supply-chain-2026"
+# 激活码的加密盐 — 从环境变量读取，不硬编码在代码里
+_SECRET_SALT = os.environ.get("SAISKA_LICENSE_SALT", "saisika-sc-supply-chain-2026")
 
 
 def _data_dir() -> Path:

@@ -20,3 +20,4 @@ build/
 electron/release/
 electron/node_modules/
 electron/package-lock.json
+data/license.json
