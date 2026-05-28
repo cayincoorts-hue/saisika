@@ -44,17 +44,17 @@ def app_path(*parts: str) -> Path:
 
 
 def data_path(*parts: str) -> Path:
-    """用户数据路径。
+    """用户数据路径（可读写）。
 
-    PyInstaller onefile：可执行文件同级目录下的 data/
-    PyInstaller onedir： 可执行文件同级目录下的 data/
+    PyInstaller onefile/onedir：可执行文件同级目录下的 data/
     开发模式：项目根目录下的 data/
     """
     meipass = getattr(sys, "_MEIPASS", None)
-    if meipass:
-        # PyInstaller onefile：用户数据放 exe 同级
-        exe_parent = Path(sys.executable).parent
-        return exe_parent / "data" / Path(*parts)
+    exe_dir = Path(sys.executable).parent
+
+    # PyInstaller 打包模式：数据放 exe 同级（不在只读的 _internal/ 里）
+    if meipass or (exe_dir / "_internal").exists():
+        return exe_dir / "data" / Path(*parts)
 
     # 开发模式：data/ 在项目根目录下
     return _base_path() / "data" / Path(*parts)

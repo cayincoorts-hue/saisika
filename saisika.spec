@@ -57,6 +57,10 @@ hiddenimports = [
     "utils.error_utils",
     "schemas",
     "schemas.mapping",
+    # numpy
+    "numpy",
+    "numpy.random",
+    "numpy.random._pickle",
     # pandas / openpyxl
     "pandas",
     "openpyxl",
@@ -91,7 +95,6 @@ if known_nodes.exists():
 excludes = [
     "tkinter",
     "matplotlib",
-    "numpy.random._pickle",
     "scipy",
     "PIL",
     "PyQt5",

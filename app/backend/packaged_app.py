@@ -4,22 +4,19 @@
 """
 
 import os
+import uvicorn
 
 from utils.path_utils import data_path
+from main import app
 
 
 def main():
     host = os.environ.get("SAISCA_HOST", "127.0.0.1")
     port = int(os.environ.get("SAISCA_PORT", "8000"))
 
-    # 确保数据目录存在
     for d in ("uploads", "results", "templates"):
         data_path(d).mkdir(parents=True, exist_ok=True)
 
-    print(f"Saisca v1.3 启动 → http://{host}:{port}")
-
-    import uvicorn
-    from main import app
     uvicorn.run(
         app,
         host=host,
