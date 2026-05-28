@@ -1,0 +1,5 @@
+node_type,description,typical_metrics
+Supplier,原材料/零部件供应商,供应可靠性、交期偏差、库存周转
+Plant,制造/组装工厂,产能利用率、产出波动、在制品库存
+DC,区域配送中心,配送时效、库存健康度、吞吐量
+Retailer,终端零售商,销售量、缺货率、补货频率

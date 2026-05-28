@@ -1,0 +1,11 @@
+node_id,node_name,node_type,level,region
+S001,华南原材料供应商,Supplier,0,广东
+S002,华东零部件供应商,Supplier,0,江苏
+P001,深圳制造工厂,Plant,1,广东
+P002,苏州组装工厂,Plant,1,江苏
+D001,华南区域配送中心,DC,2,广东
+D002,华东区域配送中心,DC,2,上海
+D003,华北区域配送中心,DC,2,北京
+R001,广州零售商A,Retailer,3,广东
+R002,上海零售商B,Retailer,3,上海
+R003,北京零售商C,Retailer,3,北京
