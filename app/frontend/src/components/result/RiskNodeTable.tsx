@@ -1,4 +1,5 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
 import gsap from '../../utils/animations';
 
@@ -68,7 +69,7 @@ export default function RiskNodeTable({ data }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
   const prevActiveRef = useRef<number | null>(null);
   const activeTweensRef = useRef<gsap.core.Tween[]>([]);
-  const [activeCause, setActiveCause] = useState<{ row: number; causeIdx: number } | null>(null);
+  const [activeCause, setActiveCause] = useState<{ row: number; causeIdx: number; x: number; y: number } | null>(null);
 
   // 清理动画
   useEffect(() => {
@@ -179,7 +180,7 @@ export default function RiskNodeTable({ data }: Props) {
           <div
             ref={listRef}
             onMouseMove={e => animateRows(e.clientY)}
-            onMouseLeave={() => { resetRows(); setActiveCause(null); }}
+            onMouseLeave={() => { resetRows(); }}
           >
             {nodes.map((n: any, i: number) => (
               <div
@@ -230,25 +231,18 @@ export default function RiskNodeTable({ data }: Props) {
                           className="cause-tag"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setActiveCause(
-                              activeCause?.row === i && activeCause?.causeIdx === ci
-                                ? null : { row: i, causeIdx: ci }
-                            );
+                            if (activeCause?.row === i && activeCause?.causeIdx === ci) {
+                              setActiveCause(null);
+                            } else {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setActiveCause({ row: i, causeIdx: ci, x: rect.left, y: rect.bottom });
+                            }
                           }}
                         >
                           {cause}
                         </span>
                         {activeCause?.row === i && activeCause?.causeIdx === ci && detail && (
-                          <div className="cause-detail-popover" style={{ top: '100%', left: 0 }}>
-                            <div>触发指标：{detail.triggered_by}</div>
-                            <div>实际值：{detail.actual_value}</div>
-                            <div>阈值：{detail.threshold}</div>
-                            {detail.excess_ratio && (
-                              <div style={{ color: 'var(--color-risk-high)', fontWeight: 600 }}>
-                                超出阈值 {detail.excess_ratio}%
-                              </div>
-                            )}
-                          </div>
+                          <span className="cause-tag-active" />
                         )}
                       </span>
                     );
@@ -266,6 +260,39 @@ export default function RiskNodeTable({ data }: Props) {
       {data.status === 'limited' && data.missing_reason && (
         <div className="notice notice-warning" style={{ marginTop: 12 }}>{data.missing_reason}</div>
       )}
+
+      {/* Portal 弹窗：渲染到 body 级别，不受表格滚动/层级限制 */}
+      {activeCause && nodes[activeCause.row]?.risk_causes_detail?.[activeCause.causeIdx] &&
+        createPortal(
+          <div
+            className="cause-detail-popover"
+            style={{
+              top: Math.min(activeCause.y + 6, window.innerHeight - 140),
+              left: Math.min(activeCause.x, window.innerWidth - 330),
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <div>触发指标：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].triggered_by}</div>
+            <div>实际值：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].actual_value}</div>
+            <div>阈值：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].threshold}</div>
+            {nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].excess_ratio && (
+              <div style={{ color: 'var(--color-risk-high)', fontWeight: 600 }}>
+                超出阈值 {nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].excess_ratio}%
+              </div>
+            )}
+          </div>,
+          document.body
+        )}
+
+      {/* 点击弹窗外部关闭 — 用 mousedown 避免和 click 事件冒泡冲突 */}
+      {activeCause &&
+        createPortal(
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+            onMouseDown={() => setActiveCause(null)}
+          />,
+          document.body
+        )}
     </div>
   );
 }
