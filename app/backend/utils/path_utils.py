@@ -44,10 +44,11 @@ def app_path(*parts: str) -> Path:
 
 
 def data_path(*parts: str) -> Path:
-    """用户数据路径（始终在可执行文件同级目录下）。
+    """用户数据路径。
 
-    打包后：saisika.app 同级目录下的 data/
-    开发时：项目根目录下的 data/
+    PyInstaller onefile：可执行文件同级目录下的 data/
+    PyInstaller onedir： 可执行文件同级目录下的 data/
+    开发模式：项目根目录下的 data/
     """
     meipass = getattr(sys, "_MEIPASS", None)
     if meipass:
@@ -55,5 +56,5 @@ def data_path(*parts: str) -> Path:
         exe_parent = Path(sys.executable).parent
         return exe_parent / "data" / Path(*parts)
 
-    # onedir 或开发模式：相对项目根目录
-    return _base_path().parent / "data" / Path(*parts)
+    # 开发模式：data/ 在项目根目录下
+    return _base_path() / "data" / Path(*parts)
