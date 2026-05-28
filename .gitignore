@@ -16,6 +16,7 @@ data/templates/*
 .env.local
 *.log
 dist/
+build/
 electron/release/
 electron/node_modules/
 electron/package-lock.json
