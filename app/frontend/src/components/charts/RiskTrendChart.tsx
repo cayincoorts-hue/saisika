@@ -23,13 +23,14 @@ export default function RiskTrendChart({ data }: Props) {
     legend: { data: data.series?.map((s: any) => s.name) || [] },
     xAxis: { type: 'category', data: data.x || [], axisLabel: { rotate: 30, fontSize: 11, margin: 14 } },
     yAxis: { type: 'value', name: '风险评分', nameTextStyle: { fontSize: 11 } },
-    series: (data.series || []).map((s: any, i: number) => ({
+    series: (data.series || []).map((s: any, si: number) => ({
       name: s.name, type: 'line', data: s.data,
       smooth: true,
       symbol: 'circle',
       symbolSize: 0,
-      animationDuration: 1600,
-      animationDelay: i * 180,
+      animationDuration: 2000,
+      animationDelay: (idx: number) => idx * 6 + si * 120,
+      animationEasing: 'linear',
       lineStyle: { width: 2.5, shadowBlur: 8, shadowColor: 'rgba(20,20,19,0.10)' },
       emphasis: {
         focus: 'series',

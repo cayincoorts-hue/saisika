@@ -1,6 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
-import gsap, { shouldAnimate } from '../../utils/animations';
+import gsap from '../../utils/animations';
 
 interface Props {
   data: any;
@@ -36,24 +36,32 @@ const ANIM_STYLE = `
 }
 .cause-tag:hover { background: #e0e0e0; }
 .cause-detail-popover {
-  position: absolute;
+  position: fixed;
   background: white;
   border: 1px solid var(--color-hairline);
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 0.8rem;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  z-index: 100;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  z-index: 9999;
   max-width: 320px;
   line-height: 1.6;
 }
-@keyframes riskDotPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(198,69,69,0.5); }
-  50% { box-shadow: 0 0 6px 2px rgba(198,69,69,0.3); }
+@keyframes riskDotPulseHigh {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198,69,69,0.5); transform: scale(1); }
+  50% {  box-shadow: 0 0 8px 3px rgba(198,69,69,0.3); transform: scale(1.4); }
 }
-.risk-dot-high {
-  animation: riskDotPulse 2s ease-in-out infinite;
+@keyframes riskDotPulseMedium {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(243,156,18,0.45); transform: scale(1); }
+  50% {  box-shadow: 0 0 6px 2px rgba(243,156,18,0.25); transform: scale(1.25); }
 }
+@keyframes riskDotPulseLow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(39,174,96,0.35); transform: scale(1); }
+  50% {  box-shadow: 0 0 4px 1px rgba(39,174,96,0.18); transform: scale(1.15); }
+}
+.risk-dot-high    { animation: riskDotPulseHigh 1.8s ease-in-out infinite; }
+.risk-dot-medium  { animation: riskDotPulseMedium 2.4s ease-in-out infinite; }
+.risk-dot-low     { animation: riskDotPulseLow 3s ease-in-out infinite; }
 `;
 
 export default function RiskNodeTable({ data }: Props) {
@@ -68,26 +76,6 @@ export default function RiskNodeTable({ data }: Props) {
       activeTweensRef.current.forEach((t) => t.kill());
     };
   }, []);
-
-  // 高风险节点持续脉冲
-  useEffect(() => {
-    const el = listRef.current;
-    if (!el || !shouldAnimate()) return;
-    const dots = el.querySelectorAll<HTMLElement>('.risk-dot-high');
-    if (dots.length === 0) return;
-
-    const tweens = gsap.utils.toArray(dots).map((dot: any) =>
-      gsap.to(dot, {
-        scale: 1.6,
-        autoAlpha: 0.5,
-        duration: 1.2,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      })
-    );
-    return () => tweens.forEach((t) => t.kill());
-  }, [data]);
 
   const animateRows = useCallback((clientY: number) => {
     const list = listRef.current;
@@ -221,7 +209,7 @@ export default function RiskNodeTable({ data }: Props) {
                 </div>
                 <div style={{ padding: '8px 12px', whiteSpace: 'nowrap', alignSelf: 'center' }}>
                   <span
-                    className={n.risk_level === 'high' ? 'risk-dot-high' : ''}
+                    className={`risk-dot-${n.risk_level || 'low'}`}
                     style={{
                       display: 'inline-block', width: 10, height: 10, borderRadius: '50%',
                       background: RISK_COLORS[n.risk_level] || 'var(--color-unavailable)',
