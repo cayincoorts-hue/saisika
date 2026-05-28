@@ -11,7 +11,7 @@
 | v1.0 | 2026-05-02 | 初始版本 |
 | v1.1 | 2026-05-03 | 决策收口：图片识别、代码复用、优先级公式、流式展示、传播图、开发顺序 |
 | v1.2 | 2026-05-25 | 技术栈调整为纯静态部署、Excel+CSV双输入、数据自动持久化、三层数据流架构 |
-| v1.3 | 2026-05-28 | 推理链条、领域模式检测、动作分类追溯、可复现性指纹、打包分发方案设计 |
+| v1.3 | 2026-05-28 | 推理链条、领域模式检测、动作分类追溯、可复现性指纹、GSAP动画、PyInstaller+Electron打包完成 |
 
 ---
 
@@ -908,7 +908,46 @@ saisika.app / saisika.exe
 
 ---
 
-## 32. 更新原则
+## 32. v1.3 实现进展（2026-05-28）
+
+### 32.1 GSAP 动画系统
+
+- `src/utils/animations.ts`：全局 shouldAnimate() 判定、useReveal hook
+- **PageShell**：页面入场卡片 stagger（y:36 + scale:0.96 → power3.out）
+- **SectionCard**：back.out(1.2) 回弹入场
+- **SummaryPanel**：五段文字从左侧滑入
+- **RiskNodeTable**：GSAP tween 行悬浮、三色呼吸灯（红/橙/绿 CSS keyframes）
+- **RiskTrendChart**：折线 animationDelay 从左到右逐点绘制
+- **弹窗**：React Portal 渲染到 body（position:fixed + 动态坐标 + z-index:9999）
+- 全局 `prefers-reduced-motion` 适配
+
+### 32.2 打包分发
+
+| 组件 | 状态 | 大小 |
+|------|------|------|
+| `path_utils.py` | ✅ 三模式路径解析（dev/PyInstaller onefile/onedir） | - |
+| `packaged_app.py` | ✅ 打包版启动入口 | - |
+| `saisika.spec` | ✅ 含 numpy.random._pickle hiddenimport | - |
+| PyInstaller `dist/saisika_backend/` | ✅ 可独立运行 | 55MB |
+| Electron `main.js` + `package.json` | ✅ 开发模式跑通 | - |
+| `Saisca.app` | ✅ electron-builder 生成 | 296MB |
+
+**PyInstaller 踩坑记录**：
+- `__file__` 在 spec 中不可用，改用 `SPECPATH`
+- `data_path()` onedir 模式需排除只读 `_internal/`，数据写 exe 同级目录
+- `numpy.random._pickle` 需加 hiddenimport
+- Electron 二进制下载需设 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/`
+
+### 32.3 待完成
+
+- [ ] macOS 公证（需 Apple Developer $99/年）
+- [ ] 生成 `.dmg` 安装包
+- [ ] 领域模式阈值用真实数据校准
+- [ ] Windows `.exe` 打包（需 Windows 机器或 CI）
+
+---
+
+## 33. 更新原则
 
 - 每次讨论出稳定结论，更新本文件
 - 新增实现代码时，在本文件补充「实现进展」段落
