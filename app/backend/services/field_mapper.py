@@ -498,6 +498,9 @@ class FieldMapper:
     ) -> list[dict]:
         """将宽表 melt 为长表。
 
+        如果数据已经是长格式（含 node_id + value 列），跳过 melt，
+        直接重命名列并保留原数据。
+
         输入（宽表）:
             Date | SOS008L02P | SOS005L04P | ...
         输出（长表）:
@@ -508,6 +511,16 @@ class FieldMapper:
             ]
         """
         melted = []
+
+        # 检测是否为长格式：列名中包含 node_id 或 value
+        is_long_format = self._is_long_format(columns)
+
+        if is_long_format and all_data is not None and len(all_data) > 0:
+            # 已是长格式，直接解析，不 melt
+            return self._parse_long_format(
+                columns, date_col, metric_name, file_name, all_data
+            )
+
         node_cols = [c for c in columns if c != date_col]
 
         # 如果是 pandas DataFrame
@@ -548,6 +561,76 @@ class FieldMapper:
                     })
 
         return melted
+
+    @staticmethod
+    def _is_long_format(columns: list[str]) -> bool:
+        """检测数据是否已经是长格式（有 node_id + value 列）。
+
+        长格式特征：存在名为 node_id/节点/node 的列 + 可以存放数值的 value 列。
+        """
+        col_lower = {c.lower().strip() for c in columns}
+        has_node_id = bool(col_lower & {"node_id", "node", "节点", "节点id", "id"})
+        has_value = bool(col_lower & {"value", "值", "数值", "quantity", "qty", "数量"})
+        return has_node_id and has_value
+
+    @staticmethod
+    def _parse_long_format(
+        columns: list[str], date_col: str, metric_name: str,
+        file_name: str, all_data
+    ) -> list[dict]:
+        """解析已是长格式的事实表，不执行 melt。
+
+        输入（长表）:
+            date | node_id | value
+        输出（标准化）:
+            [{"date": "2026-01-05", "node_id": "S001", "value": 99.3, ...}]
+        """
+        # 找到 node_id 列和 value 列
+        node_col = None
+        value_col = None
+        for col in columns:
+            cl = col.lower().strip()
+            if cl in ("node_id", "node", "节点", "节点id", "id"):
+                node_col = col
+            elif cl in ("value", "值", "数值", "quantity", "qty", "数量"):
+                value_col = col
+
+        rows = []
+        if hasattr(all_data, "columns"):
+            for _, row in all_data.iterrows():
+                nid = str(row[node_col]) if node_col else None
+                date_val = str(row[date_col])[:10] if date_col else ""
+                val = row[value_col] if value_col else 0
+                if pd.isna(val) or val == 0:
+                    continue
+                if not nid:
+                    continue
+                rows.append({
+                    "date": date_val,
+                    "node_id": nid,
+                    "value": float(val),
+                    "metric_name": metric_name,
+                    "source_file": file_name,
+                })
+        elif isinstance(all_data, list) and len(all_data) > 0:
+            node_idx = columns.index(node_col) if node_col else -1
+            val_idx = columns.index(value_col) if value_col else -1
+            date_idx = columns.index(date_col) if date_col else -1
+            for row in all_data:
+                nid = str(row[node_idx]) if node_idx >= 0 else None
+                val = row[val_idx] if val_idx >= 0 else 0
+                d = str(row[date_idx])[:10] if date_idx >= 0 else ""
+                if val is None or val == 0 or not nid:
+                    continue
+                rows.append({
+                    "date": d,
+                    "node_id": nid,
+                    "value": float(val),
+                    "metric_name": metric_name,
+                    "source_file": file_name,
+                })
+
+        return rows
 
     @staticmethod
     def _normalize_node_id(column_name: str) -> str:
