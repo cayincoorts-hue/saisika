@@ -15,3 +15,7 @@ data/templates/*
 .env
 .env.local
 *.log
+dist/
+electron/release/
+electron/node_modules/
+electron/package-lock.json

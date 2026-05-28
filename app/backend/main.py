@@ -31,22 +31,21 @@ from services.risk_engine import RiskEngine
 from services.analysis_engine import AnalysisEngine
 from services.prompt_builder import PromptBuilder
 from services.result_exporter import ResultExporter
+from utils.path_utils import app_path, data_path
 
 # ── 应用初始化 ──────────────────────────────────────────────
 
-app = FastAPI(title="Saisca — 供应链风险分析系统", version="1.2.0")
+app = FastAPI(title="Saisca — 供应链风险分析系统", version="1.3.0")
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = BASE_DIR / "data"
-UPLOAD_DIR = DATA_DIR / "uploads"
-RESULT_DIR = DATA_DIR / "results"
-TEMPLATE_DIR = DATA_DIR / "templates"
+UPLOAD_DIR = data_path("uploads")
+RESULT_DIR = data_path("results")
+TEMPLATE_DIR = data_path("templates")
 
 for d in (UPLOAD_DIR, RESULT_DIR, TEMPLATE_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
 # 加载已知节点列表（如果存在）
-KNOWN_NODES_PATH = DATA_DIR / "known_nodes.json"
+KNOWN_NODES_PATH = data_path("known_nodes.json")
 KNOWN_NODES: list[str] = []
 if KNOWN_NODES_PATH.exists():
     with open(KNOWN_NODES_PATH, "r") as f:
@@ -348,12 +347,12 @@ async def get_node_detail(node_id: str, batch_id: Optional[str] = None):
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "version": "1.2.0"}
+    return {"status": "ok", "version": "1.3.0"}
 
 
 # ── 静态文件服务 ──────────────────────────────────────────
 
-STATIC_DIR = Path(__file__).resolve().parent / "static"
+STATIC_DIR = app_path("app", "backend", "static")
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
 # 确保 static/ 下至少有一个 index.html

@@ -1,6 +1,6 @@
 # 项目理论与设计讨论记录
 
-更新时间：2026-05-25
+更新时间：2026-05-28
 
 ---
 
@@ -11,6 +11,7 @@
 | v1.0 | 2026-05-02 | 初始版本 |
 | v1.1 | 2026-05-03 | 决策收口：图片识别、代码复用、优先级公式、流式展示、传播图、开发顺序 |
 | v1.2 | 2026-05-25 | 技术栈调整为纯静态部署、Excel+CSV双输入、数据自动持久化、三层数据流架构 |
+| v1.3 | 2026-05-28 | 推理链条、领域模式检测、动作分类追溯、可复现性指纹、打包分发方案设计 |
 
 ---
 
@@ -786,7 +787,128 @@ def _main_causes(node_scores):
 
 ---
 
-## 29. 更新原则
+## 30. v1.3 新增特性（2026-05-28）
+
+### 30.1 推理链条（reasoning_trail）
+
+risk_engine 为每个节点输出完整的 6 步推理过程：
+
+| 步骤 | 名称 | 内容 |
+|------|------|------|
+| 1 | 指标聚合 | 从 N 个文件聚合 M 个指标的时序数据 |
+| 2 | 分量计算 | 计算 volatility/inventory/delivery/delay_flag 的原始值 |
+| 3 | 百分位归一化 | 将原始值在所有节点中的排名转换为 0-1 得分 |
+| 4 | 风险加权 | Risk = vol×0.30 + inv×0.25 + delivery×0.25 + delay×0.20 |
+| 5 | 传播系数 | 0.5 + 0.3×degree_factor + 0.2×position_factor |
+| 6 | 最终评分 | Score = Risk × Propagation（封顶 1.0） |
+
+每步记录数据来源文件，支持前端 ReasoningPanel 折叠展开。
+
+### 30.2 风险原因详情（risk_causes_detail）
+
+每个风险标签附带阈值对比信息：
+- `triggered_by`: 触发指标名
+- `actual_value`: 实际值
+- `threshold`: 阈值
+- `excess_ratio`: 超出百分比
+
+前端 RiskNodeTable 支持点击原因标签弹出 Popover 显示详情。
+
+### 30.3 动作分类与追溯（action_type + action_justification）
+
+结构化动作类型（论文 3.4 节落地）：
+
+| action_type | 触发条件 |
+|-------------|---------|
+| 补货 | inventory_risk > 阈值 |
+| 转单 | delivery_delay_risk > 阈值 且 propagation > 0.7 |
+| 切换供应商 | delay_flag_risk > 阈值 |
+| 调整运输路径 | propagation > 0.8 |
+| 核查波动原因 | volatility_risk > 阈值 + medium 等级 |
+| 加强监控 | medium 等级，未触发具体动作 |
+| 维持现状 | low 等级 |
+
+每个动作附带 reasons（为什么推荐）和 alternatives（替代方案不可用的原因）。
+
+### 30.4 领域模式检测（domain_patterns）
+
+| 模式 | 检测方法 | 当前阈值 | 依据 |
+|------|---------|---------|------|
+| 牛鞭效应 | 上游 CV / 下游平均 CV | > 1.5 | Isaksson & Seifert (2016) 实证平均 1.90，我们取保守值 |
+| VMI | 节点 CV / 同层平均 CV | < 0.5 | 文献支持 VMI 降低波动 30-50% |
+| QR 补货 | CV < 0.15 且数据点 > 200 | 高频小幅特征 | 定性判断 |
+
+阈值待真实多层级数据校准。分析结果以 domain_insights 第六类结果输出。
+
+### 30.5 可复现性指纹（deterministic_fingerprint）
+
+基于输入数据 SHA256 采样哈希（前 50 行 + 数据规模结构），确保同一份输入在任何机器上产生相同结果。
+
+### 30.6 数据补充对照表（supplement_map）
+
+data_confidence 新增 supplement_map 字段，格式：
+```
+{missing: "缺少字段", impact: "当前影响", unlocks: "补充后可解锁"}
+```
+替换原来只提示"缺什么"的方式，改为"缺什么 → 怎么影响 → 补了能解锁什么"。
+
+---
+
+## 31. v2.0 打包分发方案（2026-05-28 讨论确认）
+
+### 31.1 核心决策
+
+> **先打磨 v1.x 规则引擎到极致，不做 GNN+LNN 的 v2.0 ML 方向。**
+>
+> 原因：ML 模型需要 GPU/云端，与"数据不出本地"的隐私定位矛盾，且普通笔记本跑不动。正确的顺序是：产品好 → 客户来 → 资源有 → 再上 ML。
+
+### 31.2 打包目标
+
+将 saisika 从"开发者工具（`python run.py`）"变成"客户可双击使用的桌面应用"。
+
+### 31.3 技术方案：Electron + PyInstaller
+
+```
+saisika.app / saisika.exe
+├── Electron 主进程        ← 双击启动，自动开窗口
+│   ├── 启动 Python 后端子进程
+│   ├── 加载 React 前端
+│   └── 管理生命周期
+├── backend/              ← PyInstaller 打包的 Python 后端
+└── frontend/             ← React build 静态产物
+```
+
+### 31.4 工程难点与负责人
+
+| 难点 | 状态 | 说明 |
+|------|------|------|
+| 文件路径适配（`__file__` → `resource_path()`） | Claude 可解决 | 纯代码改造 |
+| PyInstaller 打包脚本（.spec 配置） | Claude 可解决 | 含 hiddenimports、datas 配置 |
+| Electron 主进程（启动后端 + 开窗口） | Claude 可解决 | main.js 编写 |
+| 跨平台构建（Mac .dmg + Win .exe） | Claude 可解决 | GitHub Actions CI 配置 |
+| 更新机制（版本检测 + 下载） | Claude 可解决 | 带增量更新 |
+| Python 依赖体积（200-400MB） | 无法根本解决 | pandas 等依赖是 Python 生态硬伤 |
+| macOS 公证（notarization） | 需 Apple Developer $99/年 | 用户自己注册，Claude 指导操作 |
+| macOS 不公证也能用 | 右键"打开"即可 | B2B 客户 IT 部门能处理 |
+
+### 31.5 分发产物
+
+| 平台 | 格式 | 公证 | 用户体验 |
+|------|------|------|---------|
+| macOS | `.dmg` | 暂不公证 | 下载 → 拖到 Applications → 右键打开 |
+| Windows | `.exe` 安装包 | 不需公证 | 下载 → 双击安装 |
+| Linux | AppImage | 不需公证 | 下载 → chmod +x → 运行 |
+
+### 31.6 隐私保护
+
+- 所有数据存在本地 `data/` 目录
+- 无网络请求，无遥测
+- 代码编译进二进制，客户看不到源码
+- 无云端依赖，完全离线运行
+
+---
+
+## 32. 更新原则
 
 - 每次讨论出稳定结论，更新本文件
 - 新增实现代码时，在本文件补充「实现进展」段落

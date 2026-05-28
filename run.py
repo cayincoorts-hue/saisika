@@ -27,7 +27,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 50)
-    print("  Saisca v1.2 — 供应链风险分析")
+    print("  Saisca v1.3 — 供应链风险分析")
     print("=" * 50)
     print()
     print(f"  启动地址: http://{args.host}:{args.port}")
