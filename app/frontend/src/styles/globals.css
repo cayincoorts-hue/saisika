@@ -112,10 +112,6 @@ h4 {
   opacity: 1;
   transform: translateX(0);
 }
-.reveal-card {
-  animation: reveal-card var(--duration-lux) var(--motion-smooth) both;
-  animation-delay: var(--reveal-delay, 0ms);
-}
 .card-title {
   font-family: var(--font-display);
   font-size: 22px;

@@ -1,5 +1,6 @@
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
+import gsap from '../../utils/animations';
 
 interface Props {
   data: any;
@@ -22,11 +23,6 @@ const COLS = '1fr 0.9fr 0.6fr 0.7fr 2.2fr 2fr';
 const ANIM_STYLE = `
 .hf-rnt-row {
   transform-origin: center center;
-  transition: transform 0.78s var(--motion-smooth),
-              opacity 0.78s var(--motion-smooth),
-              background 0.72s var(--motion-smooth),
-              border-left-color 0.72s var(--motion-smooth),
-              box-shadow 0.72s var(--motion-smooth);
 }
 .cause-tag {
   display: inline-block;
@@ -53,20 +49,18 @@ const ANIM_STYLE = `
 }
 `;
 
-function proximity(activeIndex: number, rowIndex: number): number {
-  const dist = Math.abs(rowIndex - activeIndex);
-  if (dist === 0) return 1;
-  if (dist === 1) return 0.8;
-  if (dist === 2) return 0.52;
-  if (dist === 3) return 0.25;
-  if (dist === 4) return 0.08;
-  return 0.03;
-}
-
 export default function RiskNodeTable({ data }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
   const prevActiveRef = useRef<number | null>(null);
+  const activeTweensRef = useRef<gsap.core.Tween[]>([]);
   const [activeCause, setActiveCause] = useState<{ row: number; causeIdx: number } | null>(null);
+
+  // 清理动画
+  useEffect(() => {
+    return () => {
+      activeTweensRef.current.forEach((t) => t.kill());
+    };
+  }, []);
 
   const animateRows = useCallback((clientY: number) => {
     const list = listRef.current;
@@ -86,33 +80,52 @@ export default function RiskNodeTable({ data }: Props) {
     if (bestIdx === prevActiveRef.current) return;
     prevActiveRef.current = bestIdx;
 
+    // 停止所有活跃的动画
+    activeTweensRef.current.forEach((t) => t.kill());
+    activeTweensRef.current = [];
+
     rows.forEach((row, i) => {
-      const s = proximity(bestIdx, i);
-      row.style.transform = `scaleY(${s})`;
-      row.style.opacity = `${Math.max(0.06, s)}`;
-      row.style.background = i === bestIdx ? 'rgba(198,69,69,0.05)' : 'transparent';
-      row.style.borderLeftColor = i === bestIdx ? 'var(--color-risk-high)' : 'transparent';
-      row.style.boxShadow = i === bestIdx ? 'inset 18px 0 28px rgba(198,69,69,0.05)' : 'none';
+      const dist = Math.abs(bestIdx - i);
+      const scale = dist === 0 ? 1 : dist === 1 ? 0.97 : dist === 2 ? 0.94 : 0.9;
+      const opacity = dist === 0 ? 1 : dist === 1 ? 0.72 : dist === 2 ? 0.45 : 0.2;
+      const isActive = i === bestIdx;
+
+      const tween = gsap.to(row, {
+        scaleY: scale,
+        autoAlpha: opacity,
+        backgroundColor: isActive ? 'rgba(198,69,69,0.05)' : 'transparent',
+        borderLeftColor: isActive ? 'var(--color-risk-high)' : 'transparent',
+        duration: 0.35,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
+      activeTweensRef.current.push(tween);
     });
   }, []);
 
   const resetRows = useCallback(() => {
     prevActiveRef.current = null;
+    activeTweensRef.current.forEach((t) => t.kill());
+    activeTweensRef.current = [];
     const list = listRef.current;
     if (!list) return;
     const rows = list.querySelectorAll<HTMLElement>('[data-rn-index]');
-    rows.forEach(row => {
-      row.style.transform = 'scaleY(1)';
-      row.style.opacity = '1';
-      row.style.background = 'transparent';
-      row.style.borderLeftColor = 'transparent';
-      row.style.boxShadow = 'none';
+    rows.forEach((row) => {
+      gsap.to(row, {
+        scaleY: 1,
+        autoAlpha: 1,
+        backgroundColor: 'transparent',
+        borderLeftColor: 'transparent',
+        duration: 0.3,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
     });
   }, []);
 
   if (!data || data.status === 'unavailable' || data.status === 'error') {
     return (
-      <div className="card reveal-card" style={{ '--reveal-delay': '420ms' } as CSSProperties}>
+      <div className="card" style={{} as CSSProperties}>
         <div className="card-title">高风险节点</div>
         <div className={`notice notice-${data?.status === 'error' ? 'error' : 'warning'}`}>
           {data?.missing_reason || '暂无高风险节点数据'}
@@ -124,7 +137,7 @@ export default function RiskNodeTable({ data }: Props) {
   const nodes = data.rows || data.nodes || [];
 
   return (
-    <div className="card reveal-card" style={{ '--reveal-delay': '420ms', position: 'relative' } as CSSProperties}>
+    <div className="card" style={{ position: 'relative' } as CSSProperties}>
       <style>{ANIM_STYLE}</style>
       <div className="card-title">
         高风险节点
