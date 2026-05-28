@@ -16,7 +16,7 @@ from pathlib import Path
 
 # ── 路径配置 ──────────────────────────────────────────────────
 
-PROJECT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = Path(SPECPATH)
 BACKEND_DIR = PROJECT_DIR / "app" / "backend"
 STATIC_DIR = BACKEND_DIR / "static"
 DATA_DIR = PROJECT_DIR / "data"
