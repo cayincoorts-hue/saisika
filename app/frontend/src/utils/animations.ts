@@ -15,21 +15,16 @@ gsap.defaults({
   ease: "power2.out",
 });
 
-// ── matchMedia（全局唯一实例）────────────────────────────────
+// ── 全局动画启用判定 ──────────────────────────────────────
 
-let mm: gsap.MatchMedia | null = null;
+let _reduceMotion = false;
 
-function getMM(): gsap.MatchMedia {
-  if (!mm) {
-    mm = gsap.matchMedia();
-  }
-  return mm;
-}
+try {
+  _reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+} catch {}
 
-/** 销毁全局 matchMedia（组件卸载时调用） */
-export function revertAll() {
-  mm?.revert();
-  mm = null;
+export function shouldAnimate(): boolean {
+  return !_reduceMotion;
 }
 
 // ── 条件常量 ─────────────────────────────────────────────────
@@ -133,7 +128,7 @@ export function dimRow(row: HTMLElement) {
   });
 }
 
-// ── React Hook：组件挂载时触发动画 ──────────────────────────
+// ── React Hook：组件挂载时触发入场动画 ──────────────────────
 
 import { useEffect, useRef } from "react";
 
@@ -144,31 +139,27 @@ export function useReveal(delay: number = 0) {
     const el = ref.current;
     if (!el) return;
 
-    const cleanup = getMM().add(
+    if (!shouldAnimate()) {
+      gsap.set(el, { autoAlpha: 1 });
+      return;
+    }
+
+    const tween = gsap.fromTo(
+      el,
+      { autoAlpha: 0, y: 32, scale: 0.97 },
       {
-        reduceMotion: MEDIA.reduceMotion,
-      },
-      (ctx) => {
-        const { reduceMotion } = ctx.conditions!;
-        if (reduceMotion) {
-          gsap.set(el, { autoAlpha: 1 });
-          return;
-        }
-        gsap.fromTo(
-          el,
-          { autoAlpha: 0, y: 20 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            delay,
-            duration: 0.5,
-            ease: "power2.out",
-          }
-        );
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        delay,
+        duration: 0.5,
+        ease: "back.out(1.2)",
       }
     );
 
-    return () => cleanup.revert();
+    return () => {
+      tween.kill();
+    };
   }, [delay]);
 
   return ref;

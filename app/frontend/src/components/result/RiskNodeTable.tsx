@@ -1,6 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
-import gsap from '../../utils/animations';
+import gsap, { shouldAnimate } from '../../utils/animations';
 
 interface Props {
   data: any;
@@ -47,6 +47,13 @@ const ANIM_STYLE = `
   max-width: 320px;
   line-height: 1.6;
 }
+@keyframes riskDotPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198,69,69,0.5); }
+  50% { box-shadow: 0 0 6px 2px rgba(198,69,69,0.3); }
+}
+.risk-dot-high {
+  animation: riskDotPulse 2s ease-in-out infinite;
+}
 `;
 
 export default function RiskNodeTable({ data }: Props) {
@@ -61,6 +68,26 @@ export default function RiskNodeTable({ data }: Props) {
       activeTweensRef.current.forEach((t) => t.kill());
     };
   }, []);
+
+  // 高风险节点持续脉冲
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || !shouldAnimate()) return;
+    const dots = el.querySelectorAll<HTMLElement>('.risk-dot-high');
+    if (dots.length === 0) return;
+
+    const tweens = gsap.utils.toArray(dots).map((dot: any) =>
+      gsap.to(dot, {
+        scale: 1.6,
+        autoAlpha: 0.5,
+        duration: 1.2,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      })
+    );
+    return () => tweens.forEach((t) => t.kill());
+  }, [data]);
 
   const animateRows = useCallback((clientY: number) => {
     const list = listRef.current;
@@ -193,11 +220,14 @@ export default function RiskNodeTable({ data }: Props) {
                   </span>
                 </div>
                 <div style={{ padding: '8px 12px', whiteSpace: 'nowrap', alignSelf: 'center' }}>
-                  <span style={{
-                    display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
-                    background: RISK_COLORS[n.risk_level] || 'var(--color-unavailable)',
-                    marginRight: 6,
-                  }} />
+                  <span
+                    className={n.risk_level === 'high' ? 'risk-dot-high' : ''}
+                    style={{
+                      display: 'inline-block', width: 10, height: 10, borderRadius: '50%',
+                      background: RISK_COLORS[n.risk_level] || 'var(--color-unavailable)',
+                      marginRight: 6,
+                    }}
+                  />
                   {RISK_LABELS[n.risk_level] || n.risk_level}
                 </div>
                 <div style={{ padding: '8px 12px', whiteSpace: 'nowrap', alignSelf: 'center', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
