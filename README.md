@@ -28,7 +28,7 @@
 首次运行显示机器 ID，联系供应商获取激活码：
 
 - [提交 GitHub Issue](https://github.com/cayincoorts-hue/saisika/issues/new?title=申请激活码&body=机器ID：%0A用途说明：)
-- 或邮件联系：[待补充]
+- 或邮件联系：cayincoorts@gmail.com
 
 激活码绑定单台机器，换机器需重新申请。不联网，离线验证。
 
