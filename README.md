@@ -19,19 +19,18 @@
 
 ## 快速开始
 
-### 方式一：桌面应用（双击即用）
+### 桌面应用（双击即用）
 
-下载 `.dmg` → 拖入 Applications → 启动 Saisca。首次启动右键打开。
+从 [GitHub Releases](https://github.com/cayincoorts-hue/saisika/releases) 下载最新版 `.dmg` → 拖入 Applications → 启动 Saisca。首次启动右键打开。
 
-### 方式二：开发者模式
+### 获取激活码
 
-```bash
-pip install -r requirements.txt
-python run.py
-open http://localhost:8000
-```
+首次运行显示机器 ID，联系供应商获取激活码：
 
-首次使用需激活。输入界面显示的机器 ID，联系供应商获取激活码。
+- [提交 GitHub Issue](https://github.com/cayincoorts-hue/saisika/issues/new?title=申请激活码&body=机器ID：%0A用途说明：)
+- 或邮件联系：[待补充]
+
+激活码绑定单台机器，换机器需重新申请。不联网，离线验证。
 
 ## 演示数据
 
@@ -116,4 +115,4 @@ Date,SOS008L02P,SOS005L04P
 
 ## 许可证
 
-专有软件。未经授权不得分发。
+专有软件。未经授权不得分发。使用需有效激活码。
