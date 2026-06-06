@@ -1,4 +1,5 @@
 import ReactECharts from 'echarts-for-react';
+import { useTranslation } from 'react-i18next';
 import ChartStateBlock from './ChartStateBlock';
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
 }
 
 export default function RiskTrendChart({ data }: Props) {
+  const { t } = useTranslation();
   if (!data || data.status !== 'ok') {
     return <ChartStateBlock status={data?.status || 'unavailable'} missingReason={data?.missing_reason}><div /></ChartStateBlock>;
   }
@@ -22,7 +24,7 @@ export default function RiskTrendChart({ data }: Props) {
     },
     legend: { data: data.series?.map((s: any) => s.name) || [] },
     xAxis: { type: 'category', data: data.x || [], axisLabel: { rotate: 30, fontSize: 11, margin: 14 } },
-    yAxis: { type: 'value', name: '风险评分', nameTextStyle: { fontSize: 11 } },
+    yAxis: { type: 'value', name: t('riskNodeTable.riskScore'), nameTextStyle: { fontSize: 11 } },
     series: (data.series || []).map((s: any, si: number) => ({
       name: s.name, type: 'line', data: s.data,
       smooth: true,

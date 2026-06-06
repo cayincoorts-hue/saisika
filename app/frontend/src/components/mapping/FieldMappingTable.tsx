@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import MappingStatusBadge from './MappingStatusBadge';
 
 interface FieldMapping { original_column: string; mapped_field: string; status: string; sample_values: string[]; confidence: number; }
@@ -10,23 +11,24 @@ interface Props {
 }
 
 export default function FieldMappingTable({ mappings, unmetRequirements, canStart, onStart }: Props) {
+  const { t } = useTranslation();
   const requiredFields = ['time', 'node_id', 'node_name', 'node_type'];
 
   return (
     <div>
       {unmetRequirements.length > 0 && (
         <div className="notice notice-warning">
-          <strong>缺失关键字段：</strong>{unmetRequirements.join('、')}
-          <br />请确认字段映射后再开始分析。
+          <strong>{t('mapping.missingRequired')}：</strong>{unmetRequirements.join('、')}
+          <br />{t('mapping.mappingHint')}
         </div>
       )}
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
         <thead>
           <tr style={{ background: 'var(--color-surface-card)' }}>
-            <th style={{ padding: '8px 12px', textAlign: 'left' }}>原始列名</th>
-            <th style={{ padding: '8px 12px', textAlign: 'left' }}>识别结果</th>
-            <th style={{ padding: '8px 12px', textAlign: 'left' }}>状态</th>
-            <th style={{ padding: '8px 12px', textAlign: 'left' }}>样例值</th>
+            <th style={{ padding: '8px 12px', textAlign: 'left' }}>{t('mapping.originalColumn')}</th>
+            <th style={{ padding: '8px 12px', textAlign: 'left' }}>{t('mapping.standardField')}</th>
+            <th style={{ padding: '8px 12px', textAlign: 'left' }}>{t('mapping.statusLabel')}</th>
+            <th style={{ padding: '8px 12px', textAlign: 'left' }}>{t('mapping.sampleValues')}</th>
           </tr>
         </thead>
         <tbody>
@@ -36,7 +38,7 @@ export default function FieldMappingTable({ mappings, unmetRequirements, canStar
               <tr key={i} style={{ borderBottom: '1px solid #eee', background: isRequired && m.status !== 'identified' ? 'var(--color-surface-soft)' : undefined }}>
                 <td style={{ padding: '8px 12px' }}>
                   {m.original_column}
-                  {isRequired && <span style={{ color: 'var(--color-error)', marginLeft: 4, fontSize: '0.75rem' }}>必填</span>}
+                  {isRequired && <span style={{ color: 'var(--color-error)', marginLeft: 4, fontSize: '0.75rem' }}>{t('mapping.requiredFields')}</span>}
                 </td>
                 <td style={{ padding: '8px 12px' }}>{m.mapped_field || '—'}</td>
                 <td style={{ padding: '8px 12px' }}><MappingStatusBadge status={m.status} /></td>
@@ -50,7 +52,7 @@ export default function FieldMappingTable({ mappings, unmetRequirements, canStar
       </table>
       <div style={{ marginTop: 16, textAlign: 'right' }}>
         <button className="btn btn-primary" disabled={!canStart} onClick={onStart}>
-          确认并开始分析
+          {t('mapping.confirmAnalyze')}
         </button>
       </div>
     </div>

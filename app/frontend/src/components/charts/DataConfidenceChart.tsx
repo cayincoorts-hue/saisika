@@ -1,29 +1,32 @@
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   data: any;
 }
 
 export default function DataConfidenceChart({ data }: Props) {
-  if (!data) return <div className="notice notice-warning">暂无数据可信度信息</div>;
+  const { t } = useTranslation();
+
+  if (!data) return <div className="notice notice-warning">{t('dataConfidence.noData')}</div>;
 
   const coverage = data.field_coverage || {};
   const capabilities = data.capability_status || {};
   const level = data.confidence_level || 'unknown';
   const messages = data.messages || [];
 
-  const levelLabel: Record<string, string> = { high: '高', medium: '中', low: '低', unknown: '未知' };
+  const levelLabel: Record<string, string> = { high: t('riskNodeTable.levels.high'), medium: t('riskNodeTable.levels.medium'), low: t('riskNodeTable.levels.low'), unknown: t('common.unknown') };
   const levelColor: Record<string, string> = { high: 'var(--color-ok)', medium: 'var(--color-limited)', low: 'var(--color-error)', unknown: 'var(--color-unavailable)' };
 
   return (
     <div>
       <div className="stagger-item" style={{ textAlign: 'center', marginBottom: 16 }}>
         <span style={{ fontSize: '2rem', fontWeight: 'bold', color: levelColor[level] }}>{levelLabel[level]}</span>
-        <p style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>数据可信度</p>
+        <p style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>{t('dataConfidence.title')}</p>
       </div>
       <div className="grid-2" style={{ marginBottom: 12 }}>
         <div>
-          <h4 style={{ fontSize: '0.9rem', marginBottom: 8 }}>字段覆盖</h4>
+          <h4 style={{ fontSize: '0.9rem', marginBottom: 8 }}>{t('dataConfidence.coverageStatus')}</h4>
           {Object.entries(coverage).map(([key, info]: [string, any], i) => (
             <div
               key={key}
@@ -42,7 +45,7 @@ export default function DataConfidenceChart({ data }: Props) {
           ))}
         </div>
         <div>
-          <h4 style={{ fontSize: '0.9rem', marginBottom: 8 }}>可生成图表</h4>
+          <h4 style={{ fontSize: '0.9rem', marginBottom: 8 }}>{t('dataConfidence.availableCharts')}</h4>
           {Object.entries(capabilities).map(([key, info]: [string, any], i) => (
             <div
               key={key}

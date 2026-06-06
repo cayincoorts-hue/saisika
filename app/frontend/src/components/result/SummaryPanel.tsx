@@ -1,21 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import gsap, { shouldAnimate } from '../../utils/animations';
 
 interface Props {
   textSummary: Record<string, string>;
 }
 
-const SECTIONS: Record<string, string> = {
-  current_judgment: '当前判断',
-  main_causes: '主要原因',
-  impact_targets: '影响对象',
-  recommended_actions: '建议动作',
-  need_more: '还需补充',
-};
-
 export default function SummaryPanel({ textSummary }: Props) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const sectionsRef = useRef<HTMLDivElement>(null);
+
+  const SECTIONS: Record<string, string> = {
+    current_judgment: t('summaryPanel.currentJudgment'),
+    main_causes: t('summaryPanel.mainCauses'),
+    impact_targets: t('summaryPanel.impactTargets'),
+    recommended_actions: t('summaryPanel.recommendedActions'),
+    need_more: t('summaryPanel.needMore'),
+  };
 
   useEffect(() => {
     if (!expanded || !sectionsRef.current || !shouldAnimate()) return;
@@ -42,8 +44,8 @@ export default function SummaryPanel({ textSummary }: Props) {
         style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
         onClick={() => setExpanded(!expanded)}
       >
-        <span>分析结论</span>
-        <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>{expanded ? '收起' : '展开'}</span>
+        <span>{t('summaryPanel.title')}</span>
+        <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>{expanded ? t('riskNodeTable.collapse') : t('riskNodeTable.expand')}</span>
       </div>
       {expanded && (
         <div ref={sectionsRef}>

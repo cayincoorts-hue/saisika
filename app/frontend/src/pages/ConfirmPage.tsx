@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PageShell from '../components/layout/PageShell';
 import SectionCard from '../components/layout/SectionCard';
 import TopNotice from '../components/layout/TopNotice';
@@ -12,24 +13,25 @@ interface ProgressInfo {
   details?: any;
 }
 
-const STAGE_LABELS: Record<string, string> = {
-  start: '准备中',
-  reading: '读取文件',
-  mapping: '字段识别',
-  merging: '数据合并',
-  graph: '构建网络图',
-  risk: '风险评估',
-  analysis: '生成分析结果',
-  done: '分析完成',
-};
-
 export default function ConfirmPage() {
+  const { t } = useTranslation();
   const { batchId } = useParams<{ batchId: string }>();
   const navigate = useNavigate();
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState<ProgressInfo | null>(null);
   const [error, setError] = useState('');
   const [textSections, setTextSections] = useState<Record<string, string>>({});
+
+  const STAGE_LABELS: Record<string, string> = {
+    start: t('confirm.progress.preparing'),
+    reading: t('confirm.progress.readingFiles'),
+    mapping: t('confirm.progress.fieldIdentification'),
+    merging: t('confirm.progress.dataMerge'),
+    graph: t('confirm.progress.buildingGraph'),
+    risk: t('confirm.progress.riskAssessment'),
+    analysis: t('confirm.progress.generatingResults'),
+    done: t('confirm.progress.complete'),
+  };
 
   const stageKeys = Object.keys(STAGE_LABELS);
   const completedStages = progress ? stageKeys.indexOf(progress.stage) : -1;
@@ -39,7 +41,7 @@ export default function ConfirmPage() {
     if (!batchId) return;
     setAnalyzing(true);
     setError('');
-    setProgress({ stage: 'start', message: '开始分析...' });
+    setProgress({ stage: 'start', message: t('confirm.analyzing') });
     setTextSections({});
 
     analyzeSSE(
@@ -61,14 +63,14 @@ export default function ConfirmPage() {
     <PageShell>
       <div className="page-header">
         <h1>Saisca</h1>
-        <span style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>步骤 2/3：确认并分析</span>
+        <span style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>{t('confirm.step')}</span>
       </div>
 
       <TopNotice type="error" message={error} />
 
       <SectionCard title="批次信息" delay={120}>
         <p style={{ fontSize: '0.9rem' }}>
-          批次 ID：<code>{batchId}</code>
+          Batch ID: <code>{batchId}</code>
         </p>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginTop: 8 }}>
           系统将自动识别字段、合并数据、构建网络图、计算风险评分并生成分析结论。
@@ -78,10 +80,10 @@ export default function ConfirmPage() {
       {!analyzing && (
         <div className="stagger-item" style={{ '--item-delay': '260ms', textAlign: 'right', marginTop: 16 } as CSSProperties}>
           <button className="btn btn-outline" onClick={() => navigate('/')} style={{ marginRight: 12 }}>
-            返回上一步
+            {t('confirm.backToUpload')}
           </button>
           <button className="btn btn-primary" onClick={handleStart} style={{ minWidth: 160 }}>
-            开始分析
+            {t('confirm.startAnalysis')}
           </button>
         </div>
       )}

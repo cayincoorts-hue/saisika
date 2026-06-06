@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface NodeInfo {
   id: string;
   name: string;
@@ -21,13 +23,8 @@ const RISK_COLORS: Record<string, string> = {
   low: '#5db872',
 };
 
-const RISK_LABELS: Record<string, string> = {
-  high: '高',
-  medium: '中',
-  low: '低',
-};
-
 export default function NodeConnectivityTable({ nodes, highlightNodeId, onSelectNode }: Props) {
+  const { t } = useTranslation();
   const sorted = [...nodes].sort((a, b) => b._degree - a._degree);
 
   return (
@@ -38,14 +35,14 @@ export default function NodeConnectivityTable({ nodes, highlightNodeId, onSelect
             background: 'var(--color-surface-cream-strong)',
             position: 'sticky', top: 0, zIndex: 1,
           }}>
-            <th style={thStyle}>排名</th>
-            <th style={thStyle}>节点名称</th>
-            <th style={thStyle}>层级</th>
-            <th style={thStyle}>风险等级</th>
-            <th style={thStyle}>风险评分</th>
-            <th style={thStyle}>上游连接</th>
-            <th style={thStyle}>下游连接</th>
-            <th style={thStyle}>总连接数</th>
+            <th style={thStyle}>{t('nodeConnectivityTable.rank')}</th>
+            <th style={thStyle}>{t('propagation.name')}</th>
+            <th style={thStyle}>{t('propagation.tier')}</th>
+            <th style={thStyle}>{t('propagation.riskLevel')}</th>
+            <th style={thStyle}>{t('propagation.riskScore')}</th>
+            <th style={thStyle}>{t('nodeConnectivityTable.upstream')}</th>
+            <th style={thStyle}>{t('nodeConnectivityTable.downstream')}</th>
+            <th style={thStyle}>{t('nodeConnectivityTable.totalConnections')}</th>
           </tr>
         </thead>
         <tbody>
@@ -84,12 +81,12 @@ export default function NodeConnectivityTable({ nodes, highlightNodeId, onSelect
                     <span style={{
                       marginLeft: 8, fontSize: '0.75rem', color: 'var(--color-primary)',
                     }}>
-                      ← 聚焦中
+                      ← {t('nodeConnectivityTable.focused')}
                     </span>
                   )}
                 </td>
                 <td style={tdStyle}>L{n.level}</td>
-                <td style={tdStyle}>{RISK_LABELS[n.risk_level] || n.risk_level}</td>
+                <td style={tdStyle}>{(() => { const m: Record<string, string> = { high: t('riskNodeTable.levels.high'), medium: t('riskNodeTable.levels.medium'), low: t('riskNodeTable.levels.low') }; return m[n.risk_level] || n.risk_level; })()}</td>
                 <td style={tdStyle}>{n.risk_score.toFixed(3)}</td>
                 <td style={{
                   ...tdStyle,

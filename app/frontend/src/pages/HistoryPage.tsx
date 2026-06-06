@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PageShell from '../components/layout/PageShell';
 import TopNotice from '../components/layout/TopNotice';
 import { getHistory, deleteHistory } from '../utils/api';
@@ -57,6 +58,7 @@ function proximity(activeIndex: number, rowIndex: number): number {
 }
 
 export default function HistoryPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +74,7 @@ export default function HistoryPage() {
     setError('');
     getHistory()
       .then(setRecords)
-      .catch(err => setError(err?.detail || err?.message || '加载历史记录失败'))
+      .catch(err => setError(err?.detail || err?.message || t('history.loadFailed')))
       .finally(() => setLoading(false));
   }, []);
 
@@ -126,7 +128,7 @@ export default function HistoryPage() {
 
   const handleDelete = async (batchId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!window.confirm(`确认删除批次 ${batchId} 的分析结果和上传文件？`)) return;
+    if (!window.confirm(t('history.deleteConfirm'))) return;
 
     setDeleting(batchId);
     setAnimatingOut(prev => new Set(prev).add(batchId));
@@ -142,7 +144,7 @@ export default function HistoryPage() {
         });
       }, 500);
     } catch {
-      setError('删除失败，请重试');
+      setError(t('history.deleteFailed'));
       setAnimatingOut(prev => {
         const next = new Set(prev);
         next.delete(batchId);
@@ -171,9 +173,9 @@ export default function HistoryPage() {
       <style>{ANIM_STYLE}</style>
 
       <div className="page-header hf-enter-header">
-        <h1>分析历史</h1>
+        <h1>{t('history.title')}</h1>
         <span style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>
-          共 {records.length} 条记录
+          {t('history.totalRecords', { count: records.length })}
         </span>
       </div>
 
@@ -182,13 +184,13 @@ export default function HistoryPage() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: 60 }}>
           <span className="loading-spinner" style={{ width: 24, height: 24 }} />
-          <p style={{ marginTop: 12, color: 'var(--color-muted)' }}>加载中...</p>
+          <p style={{ marginTop: 12, color: 'var(--color-muted)' }}>{t('common.loading')}</p>
         </div>
       ) : records.length === 0 && animatingOut.size === 0 ? (
         <div className="card hf-enter-card" style={{ textAlign: 'center', padding: 60 }}>
-          <p style={{ color: 'var(--color-muted)', marginBottom: 16 }}>暂无历史分析记录</p>
+          <p style={{ color: 'var(--color-muted)', marginBottom: 16 }}>{t('history.noHistory')}</p>
           <button className="btn btn-primary" onClick={() => navigate('/')}>
-            开始新分析
+            {t('history.newAnalysis')}
           </button>
         </div>
       ) : (
@@ -199,7 +201,7 @@ export default function HistoryPage() {
             background: 'var(--color-surface-cream-strong)',
             borderBottom: '2px solid var(--color-hairline)',
           }}>
-            {['批次 ID', '分析时间', '文件数', '节点数', '操作'].map(h => (
+            {[t('history.batchId'), t('history.analysisTime'), t('history.fileCount'), t('history.nodeCount'), t('history.actions')].map(h => (
               <div key={h} style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap' }}>{h}</div>
             ))}
           </div>
@@ -246,7 +248,7 @@ export default function HistoryPage() {
                         transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s cubic-bezier(0.22, 0.61, 0.36, 1)',
                       }}
                     >
-                      {deleting === r.batch_id ? '...' : '删除'}
+                      {deleting === r.batch_id ? '...' : t('common.delete')}
                     </button>
                   </div>
                 </div>
@@ -258,7 +260,7 @@ export default function HistoryPage() {
 
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <button className="btn btn-outline" onClick={() => navigate('/')}>
-          返回首页
+          {t('common.backHome')}
         </button>
       </div>
     </PageShell>

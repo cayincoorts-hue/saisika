@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PageShell from '../components/layout/PageShell';
 import SectionCard from '../components/layout/SectionCard';
 import FileDropzone from '../components/upload/FileDropzone';
@@ -8,6 +9,7 @@ import TopNotice from '../components/layout/TopNotice';
 import { uploadFiles } from '../utils/api';
 
 export default function UploadPage() {
+  const { t } = useTranslation();
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -15,7 +17,7 @@ export default function UploadPage() {
 
   const handleUpload = async () => {
     if (files.length === 0) {
-      setError('请先选择文件');
+      setError(t('upload.selectFile'));
       return;
     }
     setUploading(true);
@@ -29,7 +31,7 @@ export default function UploadPage() {
         navigate(`/confirm/${result.batch_id}`);
       }
     } catch (err: any) {
-      setError(err?.detail?.errors?.map((e: any) => e.error).join('；') || err?.message || '上传失败');
+      setError(err?.detail?.errors?.map((e: any) => e.error).join('；') || err?.message || t('upload.uploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -40,21 +42,21 @@ export default function UploadPage() {
       <div className="page-header">
         <h1>Saisca</h1>
         <span style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>
-          步骤 1/3：导入数据
+          {t('upload.step')}
           {' · '}
           <button
             className="btn btn-outline"
             onClick={() => navigate('/history')}
             style={{ padding: '2px 10px', fontSize: '0.8rem' }}
           >
-            历史记录
+            {t('history.title')}
           </button>
         </span>
       </div>
 
       <TopNotice type="error" message={error} />
 
-      <SectionCard title="上传数据文件" delay={140}>
+      <SectionCard title={t('upload.title')} delay={140}>
         <FileDropzone files={files} onChange={setFiles} disabled={uploading} />
       </SectionCard>
 
@@ -66,9 +68,9 @@ export default function UploadPage() {
           style={{ minWidth: 140 }}
         >
           {uploading ? (
-            <span><span className="loading-spinner" style={{ marginRight: 8 }} />上传中...</span>
+            <span><span className="loading-spinner" style={{ marginRight: 8 }} />{t('upload.uploading')}</span>
           ) : (
-            `上传并继续 (${files.length} 个文件)`
+            t('upload.filesSelected', { count: files.length })
           )}
         </button>
       </div>

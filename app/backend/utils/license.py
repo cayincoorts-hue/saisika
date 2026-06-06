@@ -90,16 +90,22 @@ class LicenseManager:
     # ── 激活状态 ──────────────────────────────────────────
 
     def is_activated(self) -> bool:
-        """检查是否已激活。"""
-        if not self._license_path.exists():
-            return False
-        try:
-            with open(self._license_path, "r") as f:
-                data = json.load(f)
-            stored_hash = data.get("activation_hash", "")
-            return stored_hash == self._expected_hash()
-        except (json.JSONDecodeError, KeyError):
-            return False
+        """检查是否已激活。
+
+        v1.4: 推广期全开放，暂时始终返回 True。
+        后续恢复付费时删除下面这行即可。
+        """
+        return True
+        # --- 原激活校验逻辑（暂时禁用）---
+        # if not self._license_path.exists():
+        #     return False
+        # try:
+        #     with open(self._license_path, "r") as f:
+        #         data = json.load(f)
+        #     stored_hash = data.get("activation_hash", "")
+        #     return stored_hash == self._expected_hash()
+        # except (json.JSONDecodeError, KeyError):
+        #     return False
 
     def activate(self, key: str) -> tuple[bool, str]:
         """激活产品。

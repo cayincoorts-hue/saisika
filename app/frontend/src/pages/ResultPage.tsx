@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PageShell from '../components/layout/PageShell';
 import SectionCard from '../components/layout/SectionCard';
 import TopNotice from '../components/layout/TopNotice';
@@ -17,6 +18,7 @@ import DataConfidenceChart from '../components/charts/DataConfidenceChart';
 import { getResults } from '../utils/api';
 
 export default function ResultPage() {
+  const { t } = useTranslation();
   const { batchId } = useParams<{ batchId: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
@@ -29,7 +31,7 @@ export default function ResultPage() {
     setLoading(true);
     getResults(batchId)
       .then(setData)
-      .catch(err => setError(err?.detail || err?.message || '加载结果失败'))
+      .catch(err => setError(err?.detail || err?.message || t('result.loadingResult')))
       .finally(() => setLoading(false));
   }, [batchId]);
 
@@ -51,7 +53,7 @@ export default function ResultPage() {
       <PageShell>
         <div style={{ textAlign: 'center', padding: 80 }}>
           <span className="loading-spinner" style={{ width: 32, height: 32 }} />
-          <p style={{ marginTop: 16, color: 'var(--color-muted)' }}>加载分析结果...</p>
+          <p style={{ marginTop: 16, color: 'var(--color-muted)' }}>{t('result.loadingResult')}</p>
         </div>
       </PageShell>
     );
@@ -61,7 +63,7 @@ export default function ResultPage() {
     return (
       <PageShell>
         <TopNotice type="error" message={error} />
-        <button className="btn btn-outline" onClick={() => navigate('/')}>返回首页</button>
+        <button className="btn btn-outline" onClick={() => navigate('/')}>{t('common.backHome')}</button>
       </PageShell>
     );
   }
@@ -72,22 +74,22 @@ export default function ResultPage() {
     <PageShell>
       <div className="page-header">
         <h1>Saisca</h1>
-        <span style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>步骤 3/3：查看结果</span>
+        <span style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>{t('result.step')}</span>
       </div>
 
-      <SectionCard title="数据概况" delay={80}>
+      <SectionCard title={t('result.summary')} delay={80}>
         <div className="grid-3">
           <div>
             <strong>{inputSummary.file_count || inputSummary.total_files || '—'}</strong>
-            <br /><small style={{ color: 'var(--color-muted)' }}>文件数</small>
+            <br /><small style={{ color: 'var(--color-muted)' }}>{t('result.files')}</small>
           </div>
           <div>
             <strong>{inputSummary.row_count || '—'}</strong>
-            <br /><small style={{ color: 'var(--color-muted)' }}>数据行</small>
+            <br /><small style={{ color: 'var(--color-muted)' }}>{t('result.dataRows')}</small>
           </div>
           <div>
             <strong>{inputSummary.node_count || '—'}</strong>
-            <br /><small style={{ color: 'var(--color-muted)' }}>节点</small>
+            <br /><small style={{ color: 'var(--color-muted)' }}>{t('result.nodes')}</small>
           </div>
         </div>
       </SectionCard>
@@ -97,7 +99,7 @@ export default function ResultPage() {
       <ReasoningPanel data={visuals.high_risk_nodes} />
 
       {visuals.domain_insights && visuals.domain_insights.status !== 'unavailable' && (
-        <SectionCard title="供应链领域洞察" delay={200}>
+        <SectionCard title={t('domainInsights.title')} delay={200}>
           {visuals.domain_insights.status === 'limited' ? (
             <div className="notice notice-info" style={{ marginBottom: 12 }}>
               {visuals.domain_insights.missing_reason || visuals.domain_insights.summary}
@@ -107,7 +109,7 @@ export default function ResultPage() {
               <p style={{ fontSize: '0.9rem', marginBottom: 12 }}>{visuals.domain_insights.summary}</p>
               {visuals.domain_insights.bullwhip_nodes?.length > 0 && (
                 <div style={{ marginBottom: 8 }}>
-                  <strong style={{ fontSize: '0.85rem' }}>牛鞭效应节点：</strong>
+                  <strong style={{ fontSize: '0.85rem' }}>{t('domainInsights.bullwhipNodes')}：</strong>
                   {visuals.domain_insights.bullwhip_nodes.map((n: any, i: number) => (
                     <div key={i} style={{ fontSize: '0.82rem', padding: '4px 0', color: 'var(--color-limited)' }}>
                       • {n.node_id}：{n.detail}
@@ -117,7 +119,7 @@ export default function ResultPage() {
               )}
               {visuals.domain_insights.vmi_nodes?.length > 0 && (
                 <div style={{ marginBottom: 8 }}>
-                  <strong style={{ fontSize: '0.85rem' }}>VMI 信息共享模式：</strong>
+                  <strong style={{ fontSize: '0.85rem' }}>{t('domainInsights.vmiNodes')}：</strong>
                   {visuals.domain_insights.vmi_nodes.map((n: any, i: number) => (
                     <div key={i} style={{ fontSize: '0.82rem', padding: '4px 0', color: 'var(--color-ok)' }}>
                       • {n.node_id}：{n.detail}
@@ -127,7 +129,7 @@ export default function ResultPage() {
               )}
               {visuals.domain_insights.qr_nodes?.length > 0 && (
                 <div>
-                  <strong style={{ fontSize: '0.85rem' }}>QR 高频补货特征：</strong>
+                  <strong style={{ fontSize: '0.85rem' }}>{t('domainInsights.qrNodes')}：</strong>
                   {visuals.domain_insights.qr_nodes.map((n: any, i: number) => (
                     <div key={i} style={{ fontSize: '0.82rem', padding: '4px 0' }}>
                       • {n.node_id}：{n.detail}
@@ -140,25 +142,25 @@ export default function ResultPage() {
         </SectionCard>
       )}
 
-      <SectionCard title="风险趋势图" delay={220}>
+      <SectionCard title={t('result.riskTrend')} delay={220}>
         <RiskTrendChart data={visuals.risk_trend} />
       </SectionCard>
 
-      <SectionCard title="风险分布图" delay={340}>
+      <SectionCard title={t('result.riskDistribution')} delay={340}>
         <RiskDistributionChart data={visuals.risk_distribution} />
       </SectionCard>
 
       <RiskNodeTable data={visuals.high_risk_nodes} />
 
       {graphData.nodes.length > 0 && (
-        <SectionCard title="供应链网络 3D 关系图" delay={500}>
+        <SectionCard title={t('result.networkGraph3D')} delay={500}>
           <p style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginBottom: 4 }}>
-            拖拽旋转 · 滚轮缩放 · 右键平移 · 点击节点查看连接关系
+            {t('result.dragToRotate')} · {t('result.scrollToZoom')} · {t('result.clickForDetail')}
           </p>
           <p style={{ fontSize: '0.8rem', color: 'var(--color-muted-soft)', marginBottom: 12 }}>
             {graphData.edges.length > 400
-              ? `共 ${graphData.nodes.length} 个节点，${graphData.edges.length >= 400 ? '显示权重最高的 400 条边' : ''}（总计 ${visuals.propagation_timeline?.edges?.length || graphData.edges.length} 条边）`
-              : `${graphData.nodes.length} 个节点，${graphData.edges.length} 条边`
+              ? t('result.nodeEdgeCountTruncated', { nodes: graphData.nodes.length, shown: 400, total: visuals.propagation_timeline?.edges?.length || graphData.edges.length })
+              : t('result.nodeEdgeCount', { nodes: graphData.nodes.length, edges: graphData.edges.length })
             }
           </p>
           <ForceGraph3D
@@ -169,9 +171,9 @@ export default function ResultPage() {
             isolatedCount={graphData.isolatedCount}
           />
           <div style={{ marginTop: 16 }}>
-            <h4 style={{ marginBottom: 8 }}>节点连接数排名</h4>
+            <h4 style={{ marginBottom: 8 }}>{t('result.nodeConnectivityRank')}</h4>
             <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 8 }}>
-              点击表格行可聚焦对应节点并高亮其所有连线
+              {t('result.clickRowToFocus')}
             </p>
             <NodeConnectivityTable
               nodes={graphData.nodes}
@@ -182,11 +184,11 @@ export default function ResultPage() {
         </SectionCard>
       )}
 
-      <SectionCard title="风险传播时序图" delay={620}>
+      <SectionCard title={t('result.propagation')} delay={620}>
         <PropagationTimelineChart data={visuals.propagation_timeline} />
       </SectionCard>
 
-      <SectionCard title="数据可信度" delay={740}>
+      <SectionCard title={t('result.dataConfidence')} delay={740}>
         <DataConfidenceChart data={visuals.data_confidence} />
       </SectionCard>
 
@@ -196,7 +198,7 @@ export default function ResultPage() {
 
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <button className="btn btn-outline" onClick={() => navigate('/')}>
-          分析新数据
+          {t('result.analyzeNewData')}
         </button>
       </div>
     </PageShell>

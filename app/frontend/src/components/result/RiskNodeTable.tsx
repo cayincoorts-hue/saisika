@@ -1,6 +1,7 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import gsap from '../../utils/animations';
 
 interface Props {
@@ -13,13 +14,29 @@ const RISK_COLORS: Record<string, string> = {
   low: 'var(--color-risk-low)',
 };
 
-const RISK_LABELS: Record<string, string> = {
-  high: '高',
-  medium: '中',
-  low: '低',
-};
-
 const COLS = '1fr 0.9fr 0.6fr 0.7fr 2.2fr 2fr';
+
+function getRiskLabel(level: string, t: (key: string) => string): string {
+  const map: Record<string, string> = {
+    high: t('riskNodeTable.levels.high'),
+    medium: t('riskNodeTable.levels.medium'),
+    low: t('riskNodeTable.levels.low'),
+  };
+  return map[level] || level;
+}
+
+function getActionColor(actionType: string): string {
+  const map: Record<string, string> = {
+    '补货': '#fdebd0',
+    '转单': '#d5f5e3',
+    '切换供应商': '#fadbd8',
+    '调整运输路径': '#d6eaf8',
+    '核查波动原因': '#fef9e7',
+    '加强监控': '#eaf2f8',
+    '维持现状': '#ecf0f1',
+  };
+  return map[actionType] || '#ecf0f1';
+}
 
 const ANIM_STYLE = `
 .hf-rnt-row {
@@ -66,6 +83,7 @@ const ANIM_STYLE = `
 `;
 
 export default function RiskNodeTable({ data }: Props) {
+  const { t } = useTranslation();
   const listRef = useRef<HTMLDivElement>(null);
   const prevActiveRef = useRef<number | null>(null);
   const activeTweensRef = useRef<gsap.core.Tween[]>([]);
@@ -142,9 +160,9 @@ export default function RiskNodeTable({ data }: Props) {
   if (!data || data.status === 'unavailable' || data.status === 'error') {
     return (
       <div className="card" style={{} as CSSProperties}>
-        <div className="card-title">高风险节点</div>
+        <div className="card-title">{t('result.highRiskNodes')}</div>
         <div className={`notice notice-${data?.status === 'error' ? 'error' : 'warning'}`}>
-          {data?.missing_reason || '暂无高风险节点数据'}
+          {data?.missing_reason || t('riskNodeTable.noResults')}
         </div>
       </div>
     );
@@ -156,13 +174,13 @@ export default function RiskNodeTable({ data }: Props) {
     <div className="card" style={{ position: 'relative' } as CSSProperties}>
       <style>{ANIM_STYLE}</style>
       <div className="card-title">
-        高风险节点
+        {t('result.highRiskNodes')}
         {data.status === 'limited' && (
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-limited)', marginLeft: 8 }}>（数据受限）</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--color-limited)', marginLeft: 8 }}>（{t('chartState.limited')}）</span>
         )}
       </div>
       {nodes.length === 0 ? (
-        <p style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>未检测到中高风险节点</p>
+        <p style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>{t('riskNodeTable.noResults')}</p>
       ) : (
         <div style={{ overflow: 'hidden', border: '1px solid var(--color-hairline)', borderRadius: 8 }}>
           {/* header */}
@@ -171,7 +189,7 @@ export default function RiskNodeTable({ data }: Props) {
             background: 'var(--color-surface-card)',
             borderBottom: '2px solid var(--color-hairline)',
           }}>
-            {['节点ID', '动作类型', '风险等级', '风险评分', '主要原因', '建议动作'].map(h => (
+            {[t('riskNodeTable.nodeId'), t('riskNodeTable.actionType'), t('riskNodeTable.riskLevel'), t('riskNodeTable.riskScore'), t('riskNodeTable.mainCauses'), t('riskNodeTable.recommendedAction')].map(h => (
               <div key={h} style={{ padding: '8px 12px', fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap' }}>{h}</div>
             ))}
           </div>
@@ -203,7 +221,7 @@ export default function RiskNodeTable({ data }: Props) {
                     padding: '1px 6px',
                     borderRadius: 4,
                     fontSize: '0.78rem',
-                    background: ({ '补货': '#fdebd0', '转单': '#d5f5e3', '切换供应商': '#fadbd8', '调整运输路径': '#d6eaf8', '核查波动原因': '#fef9e7', '加强监控': '#eaf2f8', '维持现状': '#ecf0f1' } as Record<string, string>)[n.action_type] || '#ecf0f1',
+                    background: getActionColor(n.action_type),
                   }}>
                     {n.action_type || '—'}
                   </span>
@@ -217,7 +235,7 @@ export default function RiskNodeTable({ data }: Props) {
                       marginRight: 6,
                     }}
                   />
-                  {RISK_LABELS[n.risk_level] || n.risk_level}
+                  {getRiskLabel(n.risk_level, t)}
                 </div>
                 <div style={{ padding: '8px 12px', whiteSpace: 'nowrap', alignSelf: 'center', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                   {(n.risk_score ?? 0).toFixed(3)}
@@ -272,12 +290,12 @@ export default function RiskNodeTable({ data }: Props) {
             }}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <div>触发指标：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].triggered_by}</div>
-            <div>实际值：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].actual_value}</div>
-            <div>阈值：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].threshold}</div>
+            <div>{t('riskNodeTable.triggeredBy')}：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].triggered_by}</div>
+            <div>{t('riskNodeTable.actualValue')}：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].actual_value}</div>
+            <div>{t('riskNodeTable.threshold')}：{nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].threshold}</div>
             {nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].excess_ratio && (
               <div style={{ color: 'var(--color-risk-high)', fontWeight: 600 }}>
-                超出阈值 {nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].excess_ratio}%
+                {t('riskNodeTable.excessRatio')} {nodes[activeCause.row].risk_causes_detail[activeCause.causeIdx].excess_ratio}%
               </div>
             )}
           </div>,

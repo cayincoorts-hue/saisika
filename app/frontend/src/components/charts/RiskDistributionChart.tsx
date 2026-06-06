@@ -1,4 +1,5 @@
 import ReactECharts from 'echarts-for-react';
+import { useTranslation } from 'react-i18next';
 import ChartStateBlock from './ChartStateBlock';
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
 }
 
 export default function RiskDistributionChart({ data }: Props) {
+  const { t } = useTranslation();
   if (!data || data.status !== 'ok') {
     return <ChartStateBlock status={data?.status || 'unavailable'} missingReason={data?.missing_reason}><div /></ChartStateBlock>;
   }
@@ -26,7 +28,7 @@ export default function RiskDistributionChart({ data }: Props) {
       textStyle: { color: '#252523' },
     },
     xAxis: { type: 'category', data: categories },
-    yAxis: { type: 'value', name: '节点数' },
+    yAxis: { type: 'value', name: t('riskDistribution.nodeCount') },
     series: [{
       type: 'bar', data: values.map((v: number, i: number) => ({
         value: v,

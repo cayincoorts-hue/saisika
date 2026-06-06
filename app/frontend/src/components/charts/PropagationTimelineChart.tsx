@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactECharts from 'echarts-for-react';
 import ChartStateBlock from './ChartStateBlock';
 import GraphInterpretation from './GraphInterpretation';
@@ -32,15 +33,19 @@ const RISK_COLORS: Record<string, string> = {
   low: '#5db872',
 };
 
-const RISK_LABELS: Record<string, string> = {
-  high: '高',
-  medium: '中',
-  low: '低',
-};
+function getRiskLabel(level: string, t: (key: string) => string): string {
+  const map: Record<string, string> = {
+    high: t('riskNodeTable.levels.high'),
+    medium: t('riskNodeTable.levels.medium'),
+    low: t('riskNodeTable.levels.low'),
+  };
+  return map[level] || level;
+}
 
 type SortKey = 'name' | 'level' | 'risk_level' | 'risk_score' | 'degree' | 'importance';
 
 export default function PropagationTimelineChart({ data }: Props) {
+  const { t } = useTranslation();
   const [minDegree, setMinDegree] = useState(1);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('importance');
@@ -230,7 +235,7 @@ export default function PropagationTimelineChart({ data }: Props) {
         formatter: (params: any) => {
           const d = params.data;
           if (params.seriesType === 'scatter' && d.name) {
-            return `${d.name}<br/>风险：${RISK_LABELS[d.risk_level] || d.risk_level} (${d.risk_score?.toFixed(3)})<br/>连接数：${d._degree}`;
+            return `${d.name}<br/>${t('propagation.riskLevel')}：${getRiskLabel(d.risk_level, t)} (${d.risk_score?.toFixed(3)})<br/>${t('propagation.connections')}：${d._degree}`;
           }
           if (params.seriesType === 'lines') {
             return `关系类型：${params.data._type}<br/>权重：${params.data._weight}`;
@@ -290,8 +295,8 @@ export default function PropagationTimelineChart({ data }: Props) {
   };
 
   const degreeOptions = [
-    { value: 0, label: `全部（${rawNodes.length}）` },
-    { value: 1, label: '有连接' },
+    { value: 0, label: `${t('propagation.filterAll')}（${rawNodes.length}）` },
+    { value: 1, label: t('propagation.hasConnections') },
     { value: 60, label: '≥60' },
     { value: 100, label: '≥100' },
   ];
@@ -300,7 +305,7 @@ export default function PropagationTimelineChart({ data }: Props) {
     <ChartStateBlock status={data.status} missingReason={data.missing_reason}>
       {/* 顶部控制栏 */}
       <div style={{ marginBottom: 12, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.85rem', color: 'var(--color-muted)' }}>节点数：</span>
+        <span style={{ fontSize: '0.85rem', color: 'var(--color-muted)' }}>{t('propagation.nodeCount')}：</span>
         {degreeOptions.map(opt => (
           <button
             key={opt.value}
@@ -312,7 +317,7 @@ export default function PropagationTimelineChart({ data }: Props) {
           </button>
         ))}
         <span style={{ color: 'var(--color-hairline)', margin: '0 4px' }}>|</span>
-        <span style={{ fontSize: '0.85rem', color: 'var(--color-muted)' }}>风险：</span>
+        <span style={{ fontSize: '0.85rem', color: 'var(--color-muted)' }}>{t('propagation.riskLevel')}：</span>
         {['all', 'high', 'medium', 'low'].map(rf => (
           <button
             key={rf}
@@ -320,12 +325,12 @@ export default function PropagationTimelineChart({ data }: Props) {
             style={{ padding: '4px 12px', fontSize: '0.8rem' }}
             onClick={() => { setRiskFilter(rf); setSelectedNode(null); }}
           >
-            {{ all: '全部', high: '高', medium: '中', low: '低' }[rf]}
+            {{ all: t('propagation.filterAll'), high: t('propagation.filterHigh'), medium: t('propagation.filterMedium'), low: t('propagation.filterLow') }[rf]}
           </button>
         ))}
         <input
           type="text"
-          placeholder="搜索节点名称或ID..."
+          placeholder={t('propagation.searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{
@@ -334,7 +339,7 @@ export default function PropagationTimelineChart({ data }: Props) {
           }}
         />
         <span style={{ fontSize: '0.8rem', color: 'var(--color-unavailable)' }}>
-          {displayNodes.length} 个节点
+          {displayNodes.length} {t('propagation.nodeCountSuffix')}
         </span>
       </div>
 
@@ -343,14 +348,14 @@ export default function PropagationTimelineChart({ data }: Props) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
           <thead>
             <tr style={{ background: 'var(--color-surface-card)', position: 'sticky', top: 0, zIndex: 1 }}>
-              <th style={thStyle} onClick={() => handleSort('name')}>节点名称<SortArrow col="name" /></th>
-              <th style={thStyle} onClick={() => handleSort('level')}>层级<SortArrow col="level" /></th>
-              <th style={thStyle} onClick={() => handleSort('risk_level')}>风险等级<SortArrow col="risk_level" /></th>
-              <th style={thStyle} onClick={() => handleSort('risk_score')}>风险评分<SortArrow col="risk_score" /></th>
-              <th style={thStyle} onClick={() => handleSort('degree')}>上游</th>
-              <th style={thStyle} onClick={() => handleSort('degree')}>下游</th>
-              <th style={thStyle} onClick={() => handleSort('degree')}>总连接<SortArrow col="degree" /></th>
-              <th style={thStyle} onClick={() => handleSort('importance')}>重要性<SortArrow col="importance" /></th>
+              <th style={thStyle} onClick={() => handleSort('name')}>{t('propagation.name')}<SortArrow col="name" /></th>
+              <th style={thStyle} onClick={() => handleSort('level')}>{t('propagation.tier')}<SortArrow col="level" /></th>
+              <th style={thStyle} onClick={() => handleSort('risk_level')}>{t('propagation.riskLevel')}<SortArrow col="risk_level" /></th>
+              <th style={thStyle} onClick={() => handleSort('risk_score')}>{t('propagation.riskScore')}<SortArrow col="risk_score" /></th>
+              <th style={thStyle} onClick={() => handleSort('degree')}>{t('propagation.upstream')}</th>
+              <th style={thStyle} onClick={() => handleSort('degree')}>{t('propagation.downstream')}</th>
+              <th style={thStyle} onClick={() => handleSort('degree')}>{t('propagation.totalConnections')}<SortArrow col="degree" /></th>
+              <th style={thStyle} onClick={() => handleSort('importance')}>{t('propagation.importance')}<SortArrow col="importance" /></th>
             </tr>
           </thead>
           <tbody>
@@ -385,7 +390,7 @@ export default function PropagationTimelineChart({ data }: Props) {
                     {n.name}
                   </td>
                   <td style={tdStyle}>L{n.level}</td>
-                  <td style={tdStyle}>{RISK_LABELS[n.risk_level] || n.risk_level}</td>
+                  <td style={tdStyle}>{getRiskLabel(n.risk_level, t)}</td>
                   <td style={tdStyle}>{n.risk_score.toFixed(3)}</td>
                   <td style={{ ...tdStyle, color: upCount > 10 ? 'var(--color-accent)' : undefined }}>{upCount}</td>
                   <td style={{ ...tdStyle, color: downCount > 10 ? 'var(--color-accent)' : undefined }}>{downCount}</td>
@@ -412,29 +417,29 @@ export default function PropagationTimelineChart({ data }: Props) {
                 display: 'inline-block', marginLeft: 8, padding: '2px 8px', borderRadius: 4,
                 background: RISK_COLORS[selectedData.risk_level], color: 'var(--color-on-primary)', fontSize: '0.75rem',
               }}>
-                {RISK_LABELS[selectedData.risk_level]}风险
+                {getRiskLabel(selectedData.risk_level, t)}{t('propagation.riskLabelSuffix')}
               </span>
               <span style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginLeft: 8 }}>
-                评分 {selectedData.risk_score.toFixed(3)} · 连接 {selectedData._degree} · L{selectedData.level}
+                {t('propagation.riskScore')} {selectedData.risk_score.toFixed(3)} · {t('propagation.totalConnections')} {selectedData._degree} · L{selectedData.level}
               </span>
             </h4>
             <button className="btn btn-outline" style={{ padding: '2px 10px', fontSize: '0.8rem' }}
-                    onClick={() => setSelectedNode(null)}>关闭</button>
+                    onClick={() => setSelectedNode(null)}>{t('common.close')}</button>
           </div>
 
           <div className="grid-2">
             {/* 上游关系列表 */}
             <div>
               <h5 style={{ fontSize: '0.9rem', marginBottom: 8, color: 'var(--color-error)' }}>
-                上游供应（{selectedData._upstream.length} 个来源）
+                {t('propagation.upstream')}（{selectedData._upstream.length} {t('propagation.sourceCount')}）
               </h5>
               <div style={{ maxHeight: 250, overflowY: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                   <thead>
                     <tr style={{ background: 'var(--color-surface-soft)' }}>
-                      <th style={smTh}>来源节点</th>
-                      <th style={smTh}>关系类型</th>
-                      <th style={smTh}>权重</th>
+                      <th style={smTh}>{t('propagation.sourceNode')}</th>
+                      <th style={smTh}>{t('propagation.relationType')}</th>
+                      <th style={smTh}>{t('propagation.weight')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -463,15 +468,15 @@ export default function PropagationTimelineChart({ data }: Props) {
             {/* 下游关系列表 */}
             <div>
               <h5 style={{ fontSize: '0.9rem', marginBottom: 8, color: 'var(--color-accent-teal)' }}>
-                下游流向（{selectedData._downstream.length} 个目标）
+                {t('propagation.downstream')}（{selectedData._downstream.length} {t('propagation.targetCount')}）
               </h5>
               <div style={{ maxHeight: 250, overflowY: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                   <thead>
                     <tr style={{ background: 'var(--color-surface-soft)' }}>
-                      <th style={smTh}>目标节点</th>
-                      <th style={smTh}>关系类型</th>
-                      <th style={smTh}>权重</th>
+                      <th style={smTh}>{t('propagation.targetNode')}</th>
+                      <th style={smTh}>{t('propagation.relationType')}</th>
+                      <th style={smTh}>{t('propagation.weight')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -501,9 +506,9 @@ export default function PropagationTimelineChart({ data }: Props) {
           {/* 局部关系图 */}
           <div style={{ marginTop: 16 }}>
             <h5 style={{ fontSize: '0.9rem', marginBottom: 8 }}>
-              局部关系图（{selectedData.name} 的一度关系网络）
+              {t('propagation.localGraph')}（{selectedData.name} {t('propagation.oneDegreeNetwork')}）
               <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginLeft: 8 }}>
-                左=上游供应 · 中=当前节点 · 右=下游流向
+                {t('propagation.localGraphLegend')}
               </span>
             </h5>
             <div style={{ height: 400, border: '1px solid var(--color-border)', borderRadius: 8, overflow: 'hidden' }}>

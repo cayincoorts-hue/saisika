@@ -1,4 +1,5 @@
 import { useRef, useCallback, useMemo, useState, useEffect, Component } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as THREE from 'three';
 
 interface GraphNode {
@@ -49,14 +50,14 @@ interface Props {
 
 const LEVEL_COLORS = ['#5db8a6', '#cc785c', '#e8a55a', '#8e8b82'];
 
-class ErrorCatcher extends Component<{ children: React.ReactNode }, { hasError: boolean }> {
+class ErrorCatcher extends Component<{ children: React.ReactNode; t: (key: string) => string }, { hasError: boolean }> {
   state = { hasError: false };
   static getDerivedStateFromError() { return { hasError: true }; }
   render() {
     if (this.state.hasError) {
       return (
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--color-muted)' }}>
-          3D 图加载失败，请刷新页面重试
+          {this.props.t('forceGraph3D.error')}
         </div>
       );
     }
@@ -65,6 +66,7 @@ class ErrorCatcher extends Component<{ children: React.ReactNode }, { hasError: 
 }
 
 function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount = 0 }: Props) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 520 });
   const [GraphComp, setGraphComp] = useState<any>(null);
@@ -305,8 +307,8 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
         height: 520, display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: '#faf9f5', borderRadius: 12, color: 'var(--color-muted)', flexDirection: 'column',
       }}>
-        <p>3D 渲染模块加载失败</p>
-        <p style={{ fontSize: '0.8rem', marginTop: 8 }}>请确认浏览器支持 WebGL</p>
+        <p>{t('forceGraph3D.loadError')}</p>
+        <p style={{ fontSize: '0.8rem', marginTop: 8 }}>{t('forceGraph3D.webglHint')}</p>
       </div>
     );
   }
@@ -319,7 +321,7 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
         animation: 'glow-border 2300ms var(--motion-silk) infinite',
       }}>
         <span className="loading-spinner" style={{ marginRight: 12 }} />
-        加载 3D 引擎...
+        {t('forceGraph3D.loading')}
       </div>
     );
   }
@@ -338,8 +340,8 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
         borderRadius: 8, pointerEvents: 'none', lineHeight: 1.6,
         border: '1px solid var(--color-hairline)',
       }}>
-        <div style={{ marginBottom: 4, fontWeight: 500, color: 'var(--color-ink)' }}>图例</div>
-        {['L1 工厂/供应商', 'L2 仓储/集散', 'L3 分销/零售'].map((label, i) => (
+        <div style={{ marginBottom: 4, fontWeight: 500, color: 'var(--color-ink)' }}>{t('forceGraph3D.legendTitle')}</div>
+        {[t('forceGraph3D.legend.L1'), t('forceGraph3D.legend.L2'), t('forceGraph3D.legend.L3')].map((label, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: LEVEL_COLORS[i], display: 'inline-block' }} />
             {label}
@@ -355,7 +357,7 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
           borderRadius: 6, pointerEvents: 'none',
           border: '1px solid var(--color-hairline)',
         }}>
-          {isolatedCount} 个孤立节点未显示
+          {t('forceGraph3D.isolatedNodes', { count: isolatedCount })}
         </div>
       )}
 
@@ -376,7 +378,10 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
           }
           return base;
         }}
-        nodeLabel={(n: any) => `${n.name}\n层级 L${n.level} | 风险 ${n.risk_level} | 评分 ${n.risk_score.toFixed(2)}\n连接 ${n._degree} (上${n.in_degree} / 下${n.out_degree})`}
+        nodeLabel={(n: any) => {
+          const lblT = t;
+          return `${n.name}\n${lblT('propagation.tier')} L${n.level} | ${lblT('propagation.riskLevel')} ${n.risk_level} | ${lblT('propagation.riskScore')} ${n.risk_score.toFixed(2)}\n${lblT('propagation.totalConnections')} ${n._degree} (${lblT('propagation.upDegree')}${n.in_degree} / ${lblT('propagation.downDegree')}${n.out_degree})`;
+        }}
         linkWidth={(l: any) => {
           const src = typeof l.source === 'object' ? l.source.id : l.source;
           const tgt = typeof l.target === 'object' ? l.target.id : l.target;
@@ -406,8 +411,9 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
 }
 
 export default function ForceGraph3D(props: Props) {
+  const { t } = useTranslation();
   return (
-    <ErrorCatcher>
+    <ErrorCatcher t={t}>
       <GraphLoader {...props} />
     </ErrorCatcher>
   );

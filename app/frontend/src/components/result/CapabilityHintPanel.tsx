@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface Props {
   dataConfidence: any;
 }
@@ -9,6 +11,8 @@ interface SupplementItem {
 }
 
 export default function CapabilityHintPanel({ dataConfidence }: Props) {
+  const { t } = useTranslation();
+
   if (!dataConfidence) return null;
 
   const messages: string[] = dataConfidence.messages || [];
@@ -23,11 +27,11 @@ export default function CapabilityHintPanel({ dataConfidence }: Props) {
 
   return (
     <div className="card">
-      <div className="card-title">数据能力提示</div>
+      <div className="card-title">{t('capabilityHintPanel.title')}</div>
 
       {unavailableCharts.length > 0 && (
         <div className="notice notice-warning" style={{ marginBottom: 12 }}>
-          <strong>当前无法生成的图表：</strong>{unavailableCharts.join('、')}
+          <strong>{t('capabilityHintPanel.unavailableCharts')}：</strong>{unavailableCharts.join('、')}
         </div>
       )}
 
@@ -37,7 +41,7 @@ export default function CapabilityHintPanel({ dataConfidence }: Props) {
             display: 'grid', gridTemplateColumns: '1.2fr 1.5fr 1.8fr',
             background: 'var(--color-surface-card)', borderBottom: '1px solid var(--color-hairline)',
           }}>
-            {['缺少字段', '当前影响', '补充后可解锁'].map(h => (
+            {[t('dataConfidence.missingField'), t('dataConfidence.currentImpact'), t('dataConfidence.unlocks')].map(h => (
               <div key={h} style={{ padding: '8px 12px', fontWeight: 600, fontSize: '0.82rem' }}>{h}</div>
             ))}
           </div>
@@ -64,9 +68,9 @@ export default function CapabilityHintPanel({ dataConfidence }: Props) {
       )}
 
       <ul style={{ fontSize: '0.85rem', color: 'var(--color-muted)', paddingLeft: 20 }}>
-        <li>补充更多字段可提升分析可信度</li>
-        <li>补充节点关系字段可生成传播路径图</li>
-        <li>补充业务说明可帮助系统更准确理解数据</li>
+        <li>{t('capabilityHintPanel.hint1')}</li>
+        <li>{t('capabilityHintPanel.hint2')}</li>
+        <li>{t('capabilityHintPanel.hint3')}</li>
       </ul>
     </div>
   );

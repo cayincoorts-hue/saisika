@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ReasoningStep {
   step: number;
@@ -49,6 +50,7 @@ const RISK_COLORS: Record<string, string> = {
 };
 
 export default function ReasoningPanel({ data }: Props) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [openNodes, setOpenNodes] = useState<Record<string, boolean>>({});
 
@@ -67,15 +69,15 @@ export default function ReasoningPanel({ data }: Props) {
         style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         onClick={() => setExpanded(!expanded)}
       >
-        <h3 style={{ margin: 0, fontSize: '1rem' }}>推理过程</h3>
+        <h3 style={{ margin: 0, fontSize: '1rem' }}>{t('reasoningPanel.title')}</h3>
         <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
-          {expanded ? '收起' : '展开'}
+          {expanded ? t('riskNodeTable.collapse') : t('riskNodeTable.expand')}
         </span>
       </div>
 
       {!expanded && (
         <p style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginTop: 8 }}>
-          点击展开查看各高风险节点的完整计算过程和触发条件。共 {nodes.length} 个节点可查看。
+          {t('reasoningPanel.expandHint', { count: nodes.length })}
         </p>
       )}
 
@@ -121,7 +123,7 @@ export default function ReasoningPanel({ data }: Props) {
                     />
                     <strong>{node.node_id}</strong>
                     <span style={{ fontSize: '0.85rem', color: 'var(--color-muted)' }}>
-                      风险评分 {node.risk_score.toFixed(3)}
+                      {t('riskNodeTable.riskScore')} {node.risk_score.toFixed(3)}
                     </span>
                     <span
                       style={{
@@ -136,7 +138,7 @@ export default function ReasoningPanel({ data }: Props) {
                     </span>
                   </div>
                   <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
-                    {isOpen ? '收起' : '展开'}
+                    {isOpen ? t('riskNodeTable.collapse') : t('riskNodeTable.expand')}
                   </span>
                 </div>
 
@@ -146,7 +148,7 @@ export default function ReasoningPanel({ data }: Props) {
                     {dataSources.length > 0 && (
                       <div style={{ marginBottom: 12 }}>
                         <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
-                          数据来源：
+                          {t('reasoningPanel.dataSources')}：
                         </span>
                         <span style={{ fontSize: '0.85rem' }}>
                           {dataSources.join('、')}
@@ -165,18 +167,18 @@ export default function ReasoningPanel({ data }: Props) {
                         }}
                       >
                         <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 2 }}>
-                          步骤 {step.step}：{step.name}
+                          {t(`reasoningPanel.step${step.step}`, step.name)}
                         </div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--color-text-primary)', lineHeight: 1.6 }}>
                           {step.description}
                         </div>
                         {step.detail?.contributions && (
                           <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginTop: 4 }}>
-                            分量贡献：
-                            波动性 {step.detail.contributions.volatility?.toFixed(4)}，
-                            库存 {step.detail.contributions.inventory?.toFixed(4)}，
-                            交期 {step.detail.contributions.delivery_delay?.toFixed(4)}，
-                            延迟标记 {step.detail.contributions.delay_flag?.toFixed(4)}
+                            {t('reasoningPanel.contributions')}：
+                            {t('reasoningPanel.volatility')} {step.detail.contributions.volatility?.toFixed(4)}，
+                            {t('reasoningPanel.inventory')} {step.detail.contributions.inventory?.toFixed(4)}，
+                            {t('reasoningPanel.delivery')} {step.detail.contributions.delivery_delay?.toFixed(4)}，
+                            {t('reasoningPanel.delayFlag')} {step.detail.contributions.delay_flag?.toFixed(4)}
                           </div>
                         )}
                       </div>
@@ -185,8 +187,8 @@ export default function ReasoningPanel({ data }: Props) {
                     {/* 风险等级划分标准 */}
                     {trail?.risk_level_thresholds && (
                       <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: 8 }}>
-                        风险等级划分：≥{trail.risk_level_thresholds.high} 为高风险，
-                        ≥{trail.risk_level_thresholds.medium} 为中风险，其余为低风险
+                        {t('reasoningPanel.riskLevelRule')}：≥{trail.risk_level_thresholds.high} {t('reasoningPanel.riskLevelHigh')}，
+                        ≥{trail.risk_level_thresholds.medium} {t('reasoningPanel.riskLevelMedium')}，{t('reasoningPanel.riskLevelLow')}
                       </div>
                     )}
 
@@ -201,15 +203,15 @@ export default function ReasoningPanel({ data }: Props) {
                         }}
                       >
                         <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: 4 }}>
-                          触发原因详情
+                          {t('riskNodeTable.causesDetail')}
                         </div>
                         {node.risk_causes_detail.map((cd, i) => (
                           <div key={i} style={{ fontSize: '0.8rem', lineHeight: 1.8 }}>
                             • {cd.label}
                             {cd.actual_value && cd.threshold && (
                               <span style={{ color: 'var(--color-muted)' }}>
-                                ：实际值 {cd.actual_value}，阈值 {cd.threshold}
-                                {cd.excess_ratio ? `，超出 ${cd.excess_ratio}%` : ''}
+                                ：{t('riskNodeTable.actualValue')} {cd.actual_value}，{t('riskNodeTable.threshold')} {cd.threshold}
+                                {cd.excess_ratio ? `，${t('riskNodeTable.excessRatio')} ${cd.excess_ratio}%` : ''}
                               </span>
                             )}
                           </div>
@@ -228,7 +230,7 @@ export default function ReasoningPanel({ data }: Props) {
                         }}
                       >
                         <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: 4 }}>
-                          动作依据
+                          {t('reasoningPanel.actionBasis')}
                         </div>
                         {node.action_justification.reasons?.map((r, i) => (
                           <div key={i} style={{ fontSize: '0.8rem', lineHeight: 1.8 }}>
@@ -238,7 +240,7 @@ export default function ReasoningPanel({ data }: Props) {
                         {node.action_justification.alternatives?.length > 0 && (
                           <>
                             <div style={{ fontWeight: 600, fontSize: '0.8rem', marginTop: 8, marginBottom: 4 }}>
-                              替代方案评估
+                              {t('reasoningPanel.alternatives')}
                             </div>
                             {node.action_justification.alternatives.map((a, i) => (
                               <div key={i} style={{ fontSize: '0.8rem', lineHeight: 1.8, color: 'var(--color-muted)' }}>

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   status: 'ok' | 'limited' | 'unavailable' | 'error';
@@ -7,12 +8,14 @@ interface Props {
 }
 
 export default function ChartStateBlock({ status, missingReason, children }: Props) {
-  if (status === 'error') return <div className="notice notice-error">{missingReason || '该图表生成失败'}</div>;
-  if (status === 'unavailable') return <div className="notice notice-warning">{missingReason || '数据不足，无法生成此图表'}</div>;
+  const { t } = useTranslation();
+
+  if (status === 'error') return <div className="notice notice-error">{missingReason || t('chartState.reasonError')}</div>;
+  if (status === 'unavailable') return <div className="notice notice-warning">{missingReason || t('chartState.reasonUnavailable')}</div>;
   return (
     <div className="chart-reveal">
       {children}
-      {status === 'limited' && <div className="notice notice-warning" style={{ marginTop: 8 }}>{missingReason || '数据有限，图表仅供参考'}</div>}
+      {status === 'limited' && <div className="notice notice-warning" style={{ marginTop: 8 }}>{missingReason || t('chartState.reasonLimited')}</div>}
     </div>
   );
 }

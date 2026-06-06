@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import type { CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   files: File[];
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function FileDropzone({ files, onChange, disabled }: Props) {
+  const { t } = useTranslation();
   const [dragover, setDragover] = useState(false);
   const counterRef = useRef(0);
 
@@ -129,13 +131,13 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
         } as CSSProperties}
       >
         <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)', margin: 0, position: 'relative' }}>
-          {dragover ? '松开鼠标以上传文件' : '拖拽 CSV/Excel 文件或文件夹到此处'}
+          {dragover ? t('upload.dropHere') : t('upload.dragDrop')}
         </p>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: '8px 0', position: 'relative' }}>
-          支持 .csv / .xlsx / .xls，可同时拖入整个文件夹
+          {t('upload.supportedFormats')}
         </p>
         <label className="btn btn-outline" style={{ display: 'inline-block', marginTop: 12 }}>
-          或点击选择文件
+          {t('upload.selectFile')}
           <input type="file" accept=".csv,.xlsx,.xls" multiple onChange={handleSelect}
                  style={{ display: 'none' }} disabled={disabled} />
         </label>
@@ -143,7 +145,7 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
       {files.length > 0 && (
         <div className="stagger-item" style={{ marginTop: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>已选择 {files.length} 个文件</span>
+            <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{t('upload.filesSelected', { count: files.length })}</span>
             <button
               onClick={() => onChange([])}
               style={{
@@ -152,7 +154,7 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
               }}
               disabled={disabled}
             >
-              清空全部
+              {t('upload.clearAll')}
             </button>
           </div>
           <div style={{ maxHeight: 200, overflowY: 'auto' }}>

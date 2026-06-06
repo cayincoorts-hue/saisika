@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent, type CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   onActivated: () => void;
 }
 
 export default function ActivatePage({ onActivated }: Props) {
+  const { t } = useTranslation();
   const [machineId, setMachineId] = useState('');
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +24,7 @@ export default function ActivatePage({ onActivated }: Props) {
           setMachineId(data.machine_id || '');
         }
       })
-      .catch(() => setError('无法连接到后端服务'))
+      .catch(() => setError(t('activate.backendError')))
       .finally(() => setChecking(false));
   }, [onActivated]);
 
@@ -40,10 +42,10 @@ export default function ActivatePage({ onActivated }: Props) {
       });
       const data = await res.json();
       if (res.ok) {
-        setSuccess(data.message || '激活成功');
+        setSuccess(data.message || t('activate.activateSuccess'));
         setTimeout(() => onActivated(), 800);
       } else {
-        setError(data.detail || '激活失败');
+        setError(data.detail || t('activate.activateFailed'));
       }
     } catch {
       setError('网络错误，请确认后端服务是否正常运行。');
@@ -76,11 +78,11 @@ export default function ActivatePage({ onActivated }: Props) {
       <div style={cardStyle}>
         <h1 style={{ fontSize: '1.4rem', marginBottom: 8, fontWeight: 600 }}>Saisca</h1>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginBottom: 24 }}>
-          供应链风险分析系统 · 产品激活
+          {t('activate.title')}
         </p>
 
         <div style={machineIdBoxStyle}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>机器 ID</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>{t('activate.machineId')}</span>
           <code style={{ fontSize: '1.1rem', fontWeight: 600, fontFamily: 'var(--font-mono)', userSelect: 'all' }}>
             {machineId || '—'}
           </code>
@@ -88,7 +90,7 @@ export default function ActivatePage({ onActivated }: Props) {
 
         <form onSubmit={handleSubmit}>
           <label style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: 6, display: 'block' }}>
-            激活码
+            {t('activate.activationCode')}
           </label>
           <input
             type="text"
@@ -117,12 +119,12 @@ export default function ActivatePage({ onActivated }: Props) {
             className="btn btn-primary"
             style={{ marginTop: 18, width: '100%' }}
           >
-            {loading ? '验证中...' : '激活'}
+            {loading ? t('activate.activating') : t('activate.activate')}
           </button>
         </form>
 
         <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginTop: 20, textAlign: 'center' }}>
-          请将机器 ID 发送给供应商以获取激活码
+          {t('activate.contactVendor')}
         </p>
       </div>
     </div>

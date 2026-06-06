@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface GraphNode {
   id: string;
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function GraphInterpretation({ nodes, edges, removedCount, totalNodes }: Props) {
+  const { t } = useTranslation();
   const analysis = useMemo(() => {
     if (!nodes.length) return null;
 
@@ -102,39 +104,39 @@ export default function GraphInterpretation({ nodes, edges, removedCount, totalN
 
   return (
     <div style={{ marginTop: 16, background: 'var(--color-surface-card)', borderRadius: 8, padding: 16 }}>
-      <h4 style={{ fontSize: '0.95rem', marginBottom: 12, color: 'var(--color-accent)' }}>网络结构解读</h4>
+      <h4 style={{ fontSize: '0.95rem', marginBottom: 12, color: 'var(--color-accent)' }}>{t('graphInterpretation.title')}</h4>
 
       <div className="grid-2" style={{ marginBottom: 12 }}>
         <div>
           <p style={{ fontSize: '0.85rem', marginBottom: 6 }}>
-            <strong>节点构成：</strong>共 {nodes.length} 个节点
+            <strong>{t('graphInterpretation.nodeComposition')}：</strong>{t('graphInterpretation.totalNodes', { count: nodes.length })}
             {removedCount > 0 && (
-              <span style={{ color: 'var(--color-accent-amber)' }}>（已排除 {removedCount} 个无连接低风险节点）</span>
+              <span style={{ color: 'var(--color-accent-amber)' }}>（{t('graphInterpretation.removedNodes', { count: removedCount })}）</span>
             )}
           </p>
           <p style={{ fontSize: '0.85rem', marginBottom: 4 }}>
-            <span style={{ color: 'var(--color-error)' }}>高风险 {analysis.highCount}</span>
+            <span style={{ color: 'var(--color-error)' }}>{t('riskNodeTable.levels.high')} {analysis.highCount}</span>
             <span style={{ margin: '0 8px', color: 'var(--color-hairline)' }}>|</span>
-            <span style={{ color: 'var(--color-limited)' }}>中风险 {analysis.mediumCount}</span>
+            <span style={{ color: 'var(--color-limited)' }}>{t('riskNodeTable.levels.medium')} {analysis.mediumCount}</span>
             <span style={{ margin: '0 8px', color: 'var(--color-hairline)' }}>|</span>
-            <span style={{ color: 'var(--color-ok)' }}>低风险 {analysis.lowCount}</span>
+            <span style={{ color: 'var(--color-ok)' }}>{t('riskNodeTable.levels.low')} {analysis.lowCount}</span>
           </p>
           <p style={{ fontSize: '0.85rem', marginBottom: 4 }}>
-            <strong>关系类型：</strong>plant {analysis.plantEdges} · storage {analysis.storageEdges}
+            <strong>{t('graphInterpretation.relationTypes')}：</strong>plant {analysis.plantEdges} · storage {analysis.storageEdges}
           </p>
           <p style={{ fontSize: '0.85rem', marginBottom: 4 }}>
-            <strong>跨层级风险传播边：</strong>{analysis.crossLevelCount} 条
+            <strong>{t('graphInterpretation.crossLevelEdges')}：</strong>{analysis.crossLevelCount} {t('graphInterpretation.edgeCount')}
           </p>
         </div>
         <div>
           <div style={{ fontSize: '0.8rem', marginBottom: 8 }}>
             {Array.from(analysis.levelStats.entries()).sort(([a], [b]) => a - b).map(([level, s]) => (
               <div key={level} style={{ marginBottom: 2 }}>
-                <strong>L{level}：</strong>{s.total} 节点
-                {s.high > 0 && <span style={{ color: 'var(--color-error)' }}>（高{s.high} </span>}
-                {s.medium > 0 && <span style={{ color: 'var(--color-limited)' }}>中{s.medium}</span>}
+                <strong>L{level}：</strong>{s.total} {t('result.nodes')}
+                {s.high > 0 && <span style={{ color: 'var(--color-error)' }}>（{t('riskNodeTable.levels.high')}{s.high} </span>}
+                {s.medium > 0 && <span style={{ color: 'var(--color-limited)' }}>{t('riskNodeTable.levels.medium')}{s.medium}</span>}
                 {s.high > 0 && ')'}
-                <span style={{ color: 'var(--color-unavailable)' }}> · 平均连接 {s.avgDegree} 条</span>
+                <span style={{ color: 'var(--color-unavailable)' }}> · {t('graphInterpretation.avgConnections')} {s.avgDegree} {t('graphInterpretation.edgeCount')}</span>
               </div>
             ))}
           </div>
@@ -144,9 +146,9 @@ export default function GraphInterpretation({ nodes, edges, removedCount, totalN
       {analysis.hubs.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <p style={{ fontSize: '0.85rem', marginBottom: 8 }}>
-            <strong>核心枢纽节点 Top 5：</strong>
+            <strong>{t('graphInterpretation.hubAnalysis')}：</strong>
             <span style={{ color: 'var(--color-muted)', fontSize: '0.8rem' }}>
-              这 {analysis.hubs.length} 个节点占网络总连接的 {analysis.hubRatio}%
+              {t('graphInterpretation.hubPercentage', { count: analysis.hubs.length, percentage: analysis.hubRatio })}
             </span>
           </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -168,16 +170,16 @@ export default function GraphInterpretation({ nodes, edges, removedCount, totalN
       {analysis.topTargets.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <p style={{ fontSize: '0.85rem', marginBottom: 8 }}>
-            <strong>受高风险节点影响最大的下游：</strong>
+            <strong>{t('graphInterpretation.downstreamImpact')}：</strong>
           </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {analysis.topTargets.map(t => (
-              <span key={t.name} style={{
+            {analysis.topTargets.map(item => (
+              <span key={item.name} style={{
                 display: 'inline-block', padding: '3px 8px', background: 'var(--color-canvas)', borderRadius: 4,
                 border: '1px solid #e0e0e0', fontSize: '0.8rem',
               }}>
-                {t.name}
-                <span style={{ color: 'var(--color-muted)', marginLeft: 4 }}>权重{t.weight}</span>
+                {item.name}
+                <span style={{ color: 'var(--color-muted)', marginLeft: 4 }}>{t('propagation.weight')}{item.weight}</span>
               </span>
             ))}
           </div>
@@ -186,28 +188,27 @@ export default function GraphInterpretation({ nodes, edges, removedCount, totalN
 
       {analysis.isolatedRisk.length > 0 && (
         <div className="notice notice-warning">
-          <strong>注意：</strong>以下中高风险节点连接数极低（&lt;5），可能是数据缺失或孤立风险点：
-          {analysis.isolatedRisk.map(n => n.name).join('、')}
+          <strong>{t('graphInterpretation.notes')}：</strong>{t('graphInterpretation.isolatedRiskWarning', { nodes: analysis.isolatedRisk.map(n => n.name).join('、') })}
         </div>
       )}
 
       <div className="notice notice-info" style={{ marginBottom: 0 }}>
-        <p style={{ fontSize: '0.85rem', marginBottom: 4 }}><strong>解读要点：</strong></p>
+        <p style={{ fontSize: '0.85rem', marginBottom: 4 }}><strong>{t('graphInterpretation.interpretationPoints')}：</strong></p>
         <ul style={{ fontSize: '0.8rem', paddingLeft: 18, color: 'var(--color-body)' }}>
           {analysis.hubRatio && Number(analysis.hubRatio) > 40 && (
-            <li>网络呈中心化结构：Top 5 枢纽节点集中了 {analysis.hubRatio}% 的连接，这些节点是供应链关键瓶颈，建议优先保障其稳定性。</li>
+            <li>{t('graphInterpretation.pointCentralized', { percentage: analysis.hubRatio })}</li>
           )}
           {analysis.highCount > 0 && (
-            <li>当前 {analysis.highCount} 个高风险节点全部位于 Level 1，是供应链运营层的核心环节，风险集中在运营执行层而非战略层。</li>
+            <li>{t('graphInterpretation.pointHighRiskLevel', { count: analysis.highCount })}</li>
           )}
           {analysis.crossLevelCount > 50 && (
-            <li>高风险节点向其他层级发出 {analysis.crossLevelCount} 条传播边，风险可能通过 storage 和 plant 关系向上游/下游扩散。</li>
+            <li>{t('graphInterpretation.pointCrossLevel', { count: analysis.crossLevelCount })}</li>
           )}
           {removedCount > 10 && (
-            <li>原始数据中 {removedCount}/{totalNodes} 个节点无有效连接（度数不足），已自动过滤。如需查看，点击"全部节点"按钮。</li>
+            <li>{t('graphInterpretation.pointRemovedNodes', { removed: removedCount, total: totalNodes })}</li>
           )}
-          <li>节点圆越大 = 连接越多 = 网络中越重要；红色 = 高风险，黄色 = 中风险。</li>
-          <li>优先级排序表按"重要性 = 连接数 × 风险评分"降序排列，建议按此顺序逐一排查。</li>
+          <li>{t('graphInterpretation.pointNodeSize')}</li>
+          <li>{t('graphInterpretation.pointPriority')}</li>
         </ul>
       </div>
     </div>
