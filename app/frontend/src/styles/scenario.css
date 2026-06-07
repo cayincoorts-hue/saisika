@@ -1,0 +1,43 @@
+/* ── Scenario Comparison Responsive Styles ── */
+
+/* < 1024px: Bottom drawer instead of 340px sidebar */
+@media (max-width: 1023px) {
+  .scenario-panel-drawer {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    max-height: 60vh;
+    border-left: none !important;
+    border-top: 1px solid var(--color-hairline);
+    border-radius: var(--rounded-lg) var(--rounded-lg) 0 0;
+    z-index: 100;
+    transform: translateY(100%) !important;
+    transition: transform 300ms ease-out !important;
+  }
+
+  .scenario-panel-drawer.is-open {
+    transform: translateY(0) !important;
+  }
+}
+
+/* < 768px: Stack vertically instead of side-by-side */
+@media (max-width: 767px) {
+  .compare-horizontal {
+    flex-direction: column !important;
+  }
+
+  .compare-column {
+    border-right: none !important;
+    border-bottom: 1px solid var(--color-hairline);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenario-panel-drawer {
+    transition: none !important;
+  }
+}

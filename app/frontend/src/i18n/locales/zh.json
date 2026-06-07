@@ -26,6 +26,8 @@
     "backHome": "返回首页"
   },
   "nav": {
+    "navigation": "导航",
+    "current": "当前",
     "upload": "上传",
     "history": "历史",
     "settings": "设置",
@@ -85,8 +87,13 @@
       "buildingGraph": "构建网络图",
       "riskAssessment": "风险评估",
       "generatingResults": "生成分析结果",
-      "complete": "分析完成"
+      "complete": "分析完成",
+      "redirecting": "分析完成，正在跳转到结果页..."
     },
+    "batchInfo": "批次信息",
+    "autoAnalyzeHint": "系统将自动识别字段、合并数据、构建网络图、计算风险评分并生成分析结论。",
+    "progressTitle": "分析进度",
+    "previewTitle": "分析结论预览",
     "backToUpload": "返回上一步",
     "startAnalysis": "开始分析",
     "analyzing": "分析中..."

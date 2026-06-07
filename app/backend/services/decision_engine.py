@@ -9,13 +9,15 @@ v1.3：动作分类与追溯（论文 3.4 节落地）
   - recommended_action：面向管理层的处置建议文案
 """
 
+from utils.bilingual import tl, tlf
+
 
 class DecisionEngine:
     """动作建议生成器。
 
     用法:
         engine = DecisionEngine()
-        scores = engine.decide(scores=risk_scores, graph=graph)
+        scores = engine.decide(scores=risk_scores, graph=graph, lang="en")
     """
 
     # 动作分类阈值
@@ -29,12 +31,13 @@ class DecisionEngine:
     PROPAGATION_TRANSFER_THRESHOLD = 0.7
     PROPAGATION_REROUTE_THRESHOLD = 0.8
 
-    def decide(self, scores: dict, graph: dict = None) -> dict:
+    def decide(self, scores: dict, graph: dict = None, lang: str = "zh") -> dict:
         """为每个节点生成动作建议。
 
         Args:
             scores: risk_engine 输出的 node_id → risk_info
             graph: graph_builder 输出的图结构
+            lang: 'zh' 或 'en'
 
         Returns:
             dict: 更新后的 scores，每个节点增加 action_type / action_justification / recommended_action
@@ -49,10 +52,10 @@ class DecisionEngine:
             components = s.get("risk_components", {})
             propagation = s.get("propagation_coefficient", 1.0)
 
-            action_type = self._classify_action_type(level, components, propagation)
-            recommended_action = self._recommend_action(level, action_type)
+            action_type = self._classify_action_type(level, components, propagation, lang)
+            recommended_action = self._recommend_action(level, action_type, lang)
             action_justification = self._build_action_justification(
-                nid, components, propagation, level, action_type, graph
+                nid, components, propagation, level, action_type, graph, lang
             )
 
             s["action_type"] = action_type
@@ -62,11 +65,11 @@ class DecisionEngine:
         return scores
 
     def _classify_action_type(
-        self, level: str, components: dict, propagation: float
+        self, level: str, components: dict, propagation: float, lang: str = "zh"
     ) -> str:
         """将风险等级和原因映射为结构化动作类型。"""
         if level == "low":
-            return "维持现状"
+            return tl("维持现状", lang)
 
         inv = components.get("inventory_risk", 0)
         delay_flag = components.get("delay_flag_risk", 0)
@@ -74,27 +77,27 @@ class DecisionEngine:
         vol = components.get("volatility_risk", 0)
 
         if inv > self.INVENTORY_ACTION_THRESHOLD:
-            return "补货"
+            return tl("补货", lang)
 
         if delivery > self.DELAY_VAL_ACTION_THRESHOLD and propagation > self.PROPAGATION_TRANSFER_THRESHOLD:
-            return "转单"
+            return tl("转单", lang)
 
         if delay_flag > self.DELAY_FLAG_ACTION_THRESHOLD:
-            return "切换供应商"
+            return tl("切换供应商", lang)
 
         if propagation > self.PROPAGATION_REROUTE_THRESHOLD:
-            return "调整运输路径"
+            return tl("调整运输路径", lang)
 
         if level == "medium":
             if vol > self.VOLATILITY_ACTION_THRESHOLD:
-                return "核查波动原因"
-            return "加强监控"
+                return tl("核查波动原因", lang)
+            return tl("加强监控", lang)
 
-        return "维持现状"
+        return tl("维持现状", lang)
 
     def _build_action_justification(
         self, nid: str, components: dict, propagation: float,
-        level: str, action_type: str, graph: dict
+        level: str, action_type: str, graph: dict, lang: str = "zh"
     ) -> dict:
         """构建动作追溯信息。"""
         justification = {
@@ -108,60 +111,98 @@ class DecisionEngine:
         delay_flag = components.get("delay_flag_risk", 0)
         vol = components.get("volatility_risk", 0)
 
-        if action_type == "补货":
+        t = lambda zh, en: tlf(zh, en, lang)
+
+        if "补货" in action_type or "Replenish" in action_type:
             justification["reasons"].append(
-                f"库存风险分 {inv} > 阈值 {self.INVENTORY_ACTION_THRESHOLD}"
+                t(f"库存风险分 {inv} > 阈值 {self.INVENTORY_ACTION_THRESHOLD}",
+                  f"Inventory risk {inv} > threshold {self.INVENTORY_ACTION_THRESHOLD}")
             )
             if propagation < self.PROPAGATION_TRANSFER_THRESHOLD:
                 justification["alternatives"].append(
-                    f"转单（当前不适用：网络传播系数 {propagation} < {self.PROPAGATION_TRANSFER_THRESHOLD}，影响范围有限）"
+                    t(f"转单（当前不适用：网络传播系数 {propagation} < {self.PROPAGATION_TRANSFER_THRESHOLD}，影响范围有限）",
+                      f"Rerouting (not applicable: propagation {propagation} < {self.PROPAGATION_TRANSFER_THRESHOLD}, limited impact)")
                 )
             else:
                 justification["alternatives"].append(
-                    f"转单（当前网络传播系数 {propagation} > {self.PROPAGATION_TRANSFER_THRESHOLD}，可考虑同步转单降低传播风险）"
+                    t(f"转单（当前网络传播系数 {propagation} > {self.PROPAGATION_TRANSFER_THRESHOLD}，可考虑同步转单降低传播风险）",
+                      f"Rerouting (propagation {propagation} > {self.PROPAGATION_TRANSFER_THRESHOLD}, consider concurrent rerouting)")
                 )
 
-        elif action_type == "转单":
+        elif "转单" in action_type or "Reroute" in action_type:
             justification["reasons"].append(
-                f"交期偏差风险 {delivery} > 阈值 {self.DELAY_VAL_ACTION_THRESHOLD}，"
-                f"且传播系数 {propagation} > {self.PROPAGATION_TRANSFER_THRESHOLD}"
+                t(f"交期偏差风险 {delivery} > 阈值 {self.DELAY_VAL_ACTION_THRESHOLD}，"
+                  f"且传播系数 {propagation} > {self.PROPAGATION_TRANSFER_THRESHOLD}",
+                  f"Delivery deviation risk {delivery} > threshold {self.DELAY_VAL_ACTION_THRESHOLD}, "
+                  f"propagation {propagation} > {self.PROPAGATION_TRANSFER_THRESHOLD}")
             )
 
-        elif action_type == "切换供应商":
+        elif "切换供应商" in action_type or "Switch Supplier" in action_type:
             justification["reasons"].append(
-                f"历史延迟标记 {delay_flag} > 阈值 {self.DELAY_FLAG_ACTION_THRESHOLD}"
+                t(f"历史延迟标记 {delay_flag} > 阈值 {self.DELAY_FLAG_ACTION_THRESHOLD}",
+                  f"Historical delay flag {delay_flag} > threshold {self.DELAY_FLAG_ACTION_THRESHOLD}")
             )
             justification["alternatives"].append(
-                "转单（当前不适用：需先确认替代供应商的交期能力）"
+                t("转单（当前不适用：需先确认替代供应商的交期能力）",
+                  "Rerouting (not applicable: must verify alternative supplier lead time first)")
             )
 
-        elif action_type == "调整运输路径":
+        elif "调整运输" in action_type or "Adjust Logistics" in action_type:
             justification["reasons"].append(
-                f"传播系数 {propagation} > {self.PROPAGATION_REROUTE_THRESHOLD}，该节点在网络中处于关键位置"
+                t(f"传播系数 {propagation} > {self.PROPAGATION_REROUTE_THRESHOLD}，该节点在网络中处于关键位置",
+                  f"Propagation {propagation} > {self.PROPAGATION_REROUTE_THRESHOLD}, node is at a critical network position")
             )
 
-        elif action_type == "核查波动原因":
+        elif "核查波动" in action_type or "Investigate" in action_type:
             justification["reasons"].append(
-                f"波动性 {vol} > 阈值 {self.VOLATILITY_ACTION_THRESHOLD}"
+                t(f"波动性 {vol} > 阈值 {self.VOLATILITY_ACTION_THRESHOLD}",
+                  f"Volatility {vol} > threshold {self.VOLATILITY_ACTION_THRESHOLD}")
             )
 
-        elif action_type == "加强监控":
-            justification["reasons"].append("中风险等级，尚未触发具体动作阈值")
+        elif "加强监控" in action_type or "Monitor" in action_type:
+            justification["reasons"].append(
+                t("中风险等级，尚未触发具体动作阈值",
+                  "Medium risk level, no specific action threshold triggered")
+            )
 
         else:
-            justification["reasons"].append("低风险等级，维持现有监控频率")
+            justification["reasons"].append(
+                t("低风险等级，维持现有监控频率",
+                  "Low risk level, maintain current monitoring frequency")
+            )
 
         return justification
 
-    def _recommend_action(self, level: str, action_type: str) -> str:
+    def _recommend_action(self, level: str, action_type: str, lang: str = "zh") -> str:
         """根据动作类型生成处置建议文案。"""
+        t = lambda zh, en: tlf(zh, en, lang)
         action_texts = {
-            "补货": "启动补货计划，根据库存消耗速率确定补货批量和优先级。",
-            "转单": "评估替代供应商交期能力，将部分订单重分配至可用供应源。",
-            "切换供应商": "评估备选供应商质量与交期记录，启动供应商切换评估流程。",
-            "调整运输路径": "核查该节点在网络中的关键程度，评估替代运输路径的可行性。",
-            "核查波动原因": "核查指标波动原因，确认是否为季节性因素或偶发事件。",
-            "加强监控": "提高监控频率，持续关注指标变化趋势。",
-            "维持现状": "维持正常监控节奏，定期复查。",
+            "补货": t("启动补货计划，根据库存消耗速率确定补货批量和优先级。",
+                      "Initiate replenishment plan based on inventory consumption rate."),
+            "转单": t("评估替代供应商交期能力，将部分订单重分配至可用供应源。",
+                      "Evaluate alternative supplier lead times and redistribute orders."),
+            "切换供应商": t("评估备选供应商质量与交期记录，启动供应商切换评估流程。",
+                           "Assess backup supplier quality and delivery history; initiate switch evaluation."),
+            "调整运输路径": t("核查该节点在网络中的关键程度，评估替代运输路径的可行性。",
+                           "Verify node criticality in network; evaluate alternative transport route feasibility."),
+            "核查波动原因": t("核查指标波动原因，确认是否为季节性因素或偶发事件。",
+                           "Investigate metric volatility; confirm if seasonal or incidental."),
+            "加强监控": t("提高监控频率，持续关注指标变化趋势。",
+                        "Increase monitoring frequency; track indicator trends closely."),
+            "维持现状": t("维持正常监控节奏，定期复查。",
+                        "Maintain normal monitoring cadence with periodic review."),
         }
-        return action_texts.get(action_type, "维持正常监控节奏，定期复查。")
+        # Also check translated versions
+        en_action_texts = {
+            "Replenish Inventory": "Initiate replenishment plan based on inventory consumption rate.",
+            "Reroute Orders": "Evaluate alternative supplier lead times and redistribute orders.",
+            "Switch Supplier": "Assess backup supplier quality and delivery history; initiate switch evaluation.",
+            "Adjust Logistics Route": "Verify node criticality in network; evaluate alternative transport route feasibility.",
+            "Investigate Volatility": "Investigate metric volatility; confirm if seasonal or incidental.",
+            "Increase Monitoring": "Increase monitoring frequency; track indicator trends closely.",
+            "Maintain Status Quo": "Maintain normal monitoring cadence with periodic review.",
+        }
+        if lang != "zh" and action_type in en_action_texts:
+            return en_action_texts[action_type]
+        return action_texts.get(action_type, t("维持正常监控节奏，定期复查。",
+                                               "Maintain normal monitoring cadence with periodic review."))

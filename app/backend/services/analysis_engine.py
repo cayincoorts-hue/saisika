@@ -20,6 +20,7 @@ from collections import defaultdict
 from typing import Optional
 
 from utils.error_utils import WarningCollector
+from utils.bilingual import tl
 
 
 class AnalysisEngine:
@@ -45,12 +46,15 @@ class AnalysisEngine:
         graph: dict,
         merge_report: dict,
         text_summary: Optional[dict] = None,
+        lang: str = "zh",
     ) -> dict:
         """组装全部六类结果 + 文本摘要。
 
-        Returns:
-            dict: 完整的 analysis_result 结构
+        Args:
+            lang: 'zh' 或 'en'，用于生成语言特定的标签
         """
+        self.warnings = WarningCollector()
+        self.lang = lang  # store for sub-builders to use
         self.warnings = WarningCollector()
 
         has_time = len(unified_table) > 0 and any("date" in r for r in unified_table[:1])
@@ -70,7 +74,7 @@ class AnalysisEngine:
             ),
             "data_confidence": self._build_data_confidence(
                 unified_table, graph, merge_report,
-                has_time, has_graph, has_scores, has_edges,
+                has_time, has_graph, has_scores, has_edges, lang=lang,
             ),
             "domain_insights": self._build_domain_insights(domain_patterns),
         }
@@ -180,7 +184,7 @@ class AnalysisEngine:
             return {
                 "title": "风险分布图",
                 "status": "unavailable",
-                "missing_reason": "未检测到可用的风险指标字段，暂时只能生成基础结构预览。",
+                "missing_reason": tl("未检测到可用的风险指标字段，暂时只能生成基础结构预览。", self.lang),
                 "bar": {}, "donut": {},
             }
 
@@ -253,9 +257,9 @@ class AnalysisEngine:
     ) -> dict:
         if not has_graph:
             return {
-                "title": "风险传播时序图",
+                "title": tl("风险传播时序图", self.lang),
                 "status": "unavailable",
-                "missing_reason": "缺少节点关系字段，暂时无法可靠生成传播路径。",
+                "missing_reason": tl("缺少节点关系字段，暂时无法可靠生成传播路径。", self.lang),
                 "nodes": [], "edges": [], "events": [],
             }
 
@@ -285,7 +289,7 @@ class AnalysisEngine:
         reason = ""
         if not has_edges:
             status = "limited"
-            reason = "传播边数据有限，仅展示节点状态。图结构可能不完整。"
+            reason = tl("传播边数据有限，仅展示节点状态。图结构可能不完整。", self.lang) if self.lang == "zh" else "Limited edge data — showing node status only. Graph structure may be incomplete."
 
         return {
             "title": "风险传播网络",
@@ -300,22 +304,23 @@ class AnalysisEngine:
 
     def _build_data_confidence(
         self, unified_table: list[dict], graph: dict, merge_report: dict,
-        has_time: bool, has_graph: bool, has_scores: bool, has_edges: bool
+        has_time: bool, has_graph: bool, has_scores: bool, has_edges: bool,
+        lang: str = "zh",
     ) -> dict:
         field_coverage = {
-            "time": {"available": has_time, "label": "时间字段"},
-            "node_id": {"available": len(unified_table) > 0, "label": "节点标识"},
-            "node_relations": {"available": has_edges, "label": "节点关系"},
-            "risk_metrics": {"available": has_scores, "label": "风险指标"},
+            "time": {"available": has_time, "label": tl("时间字段", lang)},
+            "node_id": {"available": len(unified_table) > 0, "label": tl("节点标识", lang)},
+            "node_relations": {"available": has_edges, "label": tl("节点关系", lang)},
+            "risk_metrics": {"available": has_scores, "label": tl("风险指标", lang)},
         }
 
         capability_status = {
-            "risk_trend": {"available": has_time, "label": "风险趋势图"},
-            "risk_distribution": {"available": has_scores, "label": "风险分布图"},
-            "high_risk_nodes": {"available": has_scores, "label": "高风险节点表"},
-            "propagation_timeline": {"available": has_graph, "label": "传播时序图"},
-            "data_confidence": {"available": True, "label": "数据可信度"},
-            "domain_insights": {"available": has_scores and has_graph, "label": "供应链领域洞察"},
+            "risk_trend": {"available": has_time, "label": tl("风险趋势图", lang)},
+            "risk_distribution": {"available": has_scores, "label": tl("风险分布图", lang)},
+            "high_risk_nodes": {"available": has_scores, "label": tl("高风险节点表", lang)},
+            "propagation_timeline": {"available": has_graph, "label": tl("传播时序图", lang)},
+            "data_confidence": {"available": True, "label": tl("数据可信度", lang)},
+            "domain_insights": {"available": has_scores and has_graph, "label": tl("供应链领域洞察", lang)},
         }
 
         available_count = sum(1 for f in field_coverage.values() if f["available"])
@@ -330,44 +335,44 @@ class AnalysisEngine:
         supplement_map = []
 
         if not has_time:
-            msg = "缺少时间字段，无法生成时序分析。"
-            messages.append(msg + "补充后可获得风险趋势图。")
+            msg = tl("缺少时间字段，无法生成时序分析。", lang)
+            messages.append(msg + tl("补充后可获得风险趋势图。", lang))
             supplement_map.append({
-                "missing": "时间字段",
-                "impact": "无法生成风险趋势图",
-                "unlocks": "风险趋势图",
+                "missing": tl("时间字段", lang),
+                "impact": tl("无法生成风险趋势图", lang),
+                "unlocks": tl("风险趋势图", lang),
             })
 
         if not has_edges:
-            msg = "缺少节点关系字段，无法展示传播路径。"
-            messages.append(msg + "补充后可获得完整的传播网络图。")
+            msg = tl("缺少节点关系字段，无法展示传播路径。", lang)
+            messages.append(msg + tl("补充后可获得完整的传播网络图。", lang))
             supplement_map.append({
-                "missing": "节点关系字段",
-                "impact": "无法展示风险传播路径",
-                "unlocks": "完整传播网络图、替代路径分析",
+                "missing": tl("节点关系字段", lang),
+                "impact": tl("无法展示风险传播路径", lang),
+                "unlocks": tl("完整传播网络图、替代路径分析", lang),
             })
 
         if not has_scores:
-            msg = "缺少风险指标字段，无法计算风险评分。"
-            messages.append(msg + "补充后可获得风险排名和分布。")
+            msg = tl("缺少风险指标字段，无法计算风险评分。", lang)
+            messages.append(msg + tl("补充后可获得风险排名和分布。", lang))
             supplement_map.append({
-                "missing": "风险指标字段",
-                "impact": "无法计算风险评分和排名",
-                "unlocks": "风险排名、风险分布图、高风险节点表",
+                "missing": tl("风险指标字段", lang),
+                "impact": tl("无法计算风险评分和排名", lang),
+                "unlocks": tl("风险排名、风险分布图、高风险节点表", lang),
             })
 
         # 补充说明：如果能跑但缺建议字段
         if has_scores:
             supplement_map.extend([
                 {
-                    "missing": "库存字段",
-                    "impact": "库存健康度评估精度受限",
-                    "unlocks": "精确库存风险评估、补货时机建议",
+                    "missing": tl("库存字段", lang),
+                    "impact": tl("库存健康度评估精度受限", lang),
+                    "unlocks": tl("精确库存风险评估、补货时机建议", lang),
                 },
                 {
-                    "missing": "交期偏差字段",
-                    "impact": "供应商交付可靠性评估精度受限",
-                    "unlocks": "延迟传播风险分析、供应商切换建议",
+                    "missing": tl("交期偏差字段", lang),
+                    "impact": tl("供应商交付可靠性评估精度受限", lang),
+                    "unlocks": tl("延迟传播风险分析、供应商切换建议", lang),
                 },
             ])
 

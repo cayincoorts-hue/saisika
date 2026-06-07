@@ -13,7 +13,11 @@ export default function SectionCard({ title, children, className = '', delay = 0
 
   return (
     <div ref={cardRef} className={`card ${className}`.trim()}>
-      {title && <div className="card-title">{title}</div>}
+      {title && (
+        <div className="card-header">
+          <span className="card-title">{title}</span>
+        </div>
+      )}
       {children}
     </div>
   );

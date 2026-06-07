@@ -1,12 +1,15 @@
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import { translateLabel } from '../../utils/labelTranslations';
 
 interface Props {
   data: any;
 }
 
 export default function DataConfidenceChart({ data }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isZh = i18n.language === 'zh';
+  const tl = (s: string) => isZh ? s : translateLabel(s);
 
   if (!data) return <div className="notice notice-warning">{t('dataConfidence.noData')}</div>;
 
@@ -39,7 +42,7 @@ export default function DataConfidenceChart({ data }: Props) {
                 fontSize: '0.85rem',
               } as CSSProperties}
             >
-              <span>{info.label}</span>
+              <span>{tl(info.label)}</span>
               <span style={{ color: info.available ? 'var(--color-ok)' : 'var(--color-error)' }}>{info.available ? '✓' : '✗'}</span>
             </div>
           ))}
@@ -58,7 +61,7 @@ export default function DataConfidenceChart({ data }: Props) {
                 fontSize: '0.85rem',
               } as CSSProperties}
             >
-              <span>{info.label}</span>
+              <span>{tl(info.label)}</span>
               <span style={{ color: info.available ? 'var(--color-ok)' : 'var(--color-unavailable)' }}>{info.available ? '✓' : '✗'}</span>
             </div>
           ))}

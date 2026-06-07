@@ -33,6 +33,7 @@ from services.decision_engine import DecisionEngine
 from services.analysis_engine import AnalysisEngine
 from services.prompt_builder import PromptBuilder
 from services.result_exporter import ResultExporter
+from services.scenario_runner import ScenarioRunner
 from utils.path_utils import app_path, data_path
 from utils.license import LicenseManager
 
@@ -133,8 +134,12 @@ async def upload_files(files: list[UploadFile] = File(...)):
 # ── 路由：分析（SSE 流式推送）───────────────────────────────
 
 @app.post("/api/analyze")
-async def analyze(batch_id: str = Query(...)):
+async def analyze(batch_id: str = Query(...), lang: str = Query("zh")):
     """对指定批次执行全流程分析，通过 SSE 流式推送进度。
+
+    Args:
+        batch_id: 批次 ID
+        lang: 语言偏好 ('zh' 或 'en')，默认 'zh'
 
     进度阶段：
       reading → mapping → merging → graph → risk → analysis → done
@@ -210,7 +215,7 @@ async def analyze(batch_id: str = Query(...)):
             yield _sse("progress", {"stage": "risk", "message": "正在计算风险评分..."})
             await asyncio.sleep(0.1)
             engine = RiskEngine()
-            scores = engine.calculate(unified_table=unified["unified_table"], graph=graph)
+            scores = engine.calculate(unified_table=unified["unified_table"], graph=graph, lang=lang)
 
             high = sum(1 for s in scores.values() if s["risk_level"] == "high")
             med = sum(1 for s in scores.values() if s["risk_level"] == "medium")
@@ -223,7 +228,7 @@ async def analyze(batch_id: str = Query(...)):
             yield _sse("progress", {"stage": "decision", "message": "正在生成处置建议..."})
             await asyncio.sleep(0.1)
             dec_engine = DecisionEngine()
-            scores = dec_engine.decide(scores=scores, graph=graph)
+            scores = dec_engine.decide(scores=scores, graph=graph, lang=lang)
 
             # Step 6-7: analysis + text
             yield _sse("progress", {"stage": "analysis", "message": "正在生成分析结果和文字结论..."})
@@ -234,8 +239,9 @@ async def analyze(batch_id: str = Query(...)):
                 scores=scores,
                 graph=graph,
                 merge_report=unified["merge_report"],
+                lang=lang,
             )
-            pb = PromptBuilder()
+            pb = PromptBuilder(lang=lang)
             text = pb.build(
                 scores=scores,
                 graph=graph,
@@ -383,6 +389,54 @@ async def get_node_detail(node_id: str, batch_id: Optional[str] = None):
     node_info["downstream"] = downstream
 
     return node_info
+
+
+# ── 路由：场景对比 ──────────────────────────────────────────
+
+@app.post("/api/scenario/compare")
+async def scenario_compare(payload: dict):
+    """接收变更列表，返回原始 vs 修改后场景的对比结果。"""
+    batch_id = payload.get("batch_id", "")
+    changes = payload.get("changes", [])
+
+    if not batch_id:
+        raise HTTPException(status_code=400, detail="缺少 batch_id。")
+    if not changes:
+        raise HTTPException(status_code=400, detail="缺少变更列表。")
+
+    valid_params = {"supplier_count", "inventory_strategy", "replenishment_frequency", "transport_path"}
+    for ch in changes:
+        if "node_id" not in ch or "param" not in ch or "to_value" not in ch:
+            raise HTTPException(status_code=400, detail=f"变更格式错误：{ch}")
+        if ch["param"] not in valid_params:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的参数：{ch['param']}。支持：{', '.join(sorted(valid_params))}",
+            )
+
+    try:
+        runner = ScenarioRunner()
+        result = runner.run_comparison(batch_id=batch_id, changes=changes)
+        return result
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"场景对比计算失败：{str(e)}")
+
+
+@app.get("/api/scenario/params/{node_id}")
+async def get_scenario_params(node_id: str, batch_id: str = Query(...)):
+    """获取节点的可调参数及当前值。"""
+    if not batch_id:
+        raise HTTPException(status_code=400, detail="缺少 batch_id。")
+
+    try:
+        runner = ScenarioRunner()
+        return runner.get_params(node_id=node_id, batch_id=batch_id)
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取场景参数失败：{str(e)}")
 
 
 # ── 路由：健康检查 ──────────────────────────────────────────

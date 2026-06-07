@@ -22,6 +22,7 @@ from collections import defaultdict
 from typing import Optional
 
 from utils.error_utils import WarningCollector
+from utils.bilingual import tl, tlf
 
 
 class RiskEngine:
@@ -59,6 +60,7 @@ class RiskEngine:
         self,
         unified_table: list[dict],
         graph: dict,
+        lang: str = "zh",
     ) -> dict:
         """计算所有节点的风险分。
 
@@ -104,7 +106,7 @@ class RiskEngine:
         self._normalize_by_percentile(raw_scores, key_map)
 
         # 4. 领域模式检测（在所有节点分数算完后，统一检测）
-        domain_patterns = self._detect_domain_patterns(node_metrics, graph, raw_scores)
+        domain_patterns = self._detect_domain_patterns(node_metrics, graph, raw_scores, lang)
 
         # 5. 结合传播系数计算最终分数
         scores = {}
@@ -131,15 +133,15 @@ class RiskEngine:
                 level = "low"
 
             # 生成语义标注
-            causes = self._generate_risk_causes(comp)
+            causes = self._generate_risk_causes(comp, lang)
 
             # 注入领域模式标签
             if nid in domain_patterns:
                 for pattern in domain_patterns[nid]:
-                    causes.append(pattern["label"])
+                    causes.append(tl(pattern["label"], lang))
 
             # 生成原因详情（阈值对比）
-            causes_detail = self._generate_risk_causes_detail(comp, domain_patterns.get(nid, []))
+            causes_detail = self._generate_risk_causes_detail(comp, domain_patterns.get(nid, []), lang)
 
             # 推理链条
             reasoning_trail = self._build_reasoning_trail(
@@ -371,7 +373,7 @@ class RiskEngine:
 
     # ── 语义标注生成（阈值唯一源头）─────────────────────────
 
-    def _generate_risk_causes(self, components: dict[str, float]) -> list[str]:
+    def _generate_risk_causes(self, components: dict[str, float], lang: str = "zh") -> list[str]:
         """根据风险分量生成语义标签。
 
         这是系统中唯一判断阈值的地方。
@@ -385,27 +387,27 @@ class RiskEngine:
         vol = components.get("volatility_risk", 0)
 
         if inv_risk > self.INVENTORY_RISK_THRESHOLD:
-            causes.append("库存水位严重偏低")
+            causes.append(tl("库存水位严重偏低", lang))
 
         if delay_flag > self.DELAY_FLAG_THRESHOLD:
-            causes.append("存在历史延迟记录")
+            causes.append(tl("存在历史延迟记录", lang))
 
         if delivery > self.DELAY_VAL_THRESHOLD:
-            causes.append("存在较大交期偏差")
+            causes.append(tl("存在较大交期偏差", lang))
 
         if vol > self.VOLATILITY_THRESHOLD:
-            causes.append("指标波动异常偏高")
+            causes.append(tl("指标波动异常偏高", lang))
 
         if not causes:
             if any(v > 0.2 for v in components.values()):
-                causes.append("多个指标存在轻度风险")
+                causes.append(tl("多个指标存在轻度风险", lang))
             else:
-                causes.append("当前风险主要来自供应链网络结构性因素")
+                causes.append(tl("当前风险主要来自供应链网络结构性因素", lang))
 
         return causes
 
     def _generate_risk_causes_detail(
-        self, components: dict[str, float], domain_patterns: list[dict]
+        self, components: dict[str, float], domain_patterns: list[dict], lang: str = "zh"
     ) -> list[dict]:
         """为每个风险标签附带触发阈值对比信息。"""
         details = []
@@ -413,9 +415,9 @@ class RiskEngine:
         inv = components.get("inventory_risk", 0)
         if inv > self.INVENTORY_RISK_THRESHOLD:
             details.append({
-                "label": "库存水位严重偏低",
+                "label": tl("库存水位严重偏低", lang),
                 "triggered_by": "inventory_risk",
-                "actual_value": inv,
+                "actual_value": round(inv, 4),
                 "threshold": self.INVENTORY_RISK_THRESHOLD,
                 "excess_ratio": round((inv - self.INVENTORY_RISK_THRESHOLD) / self.INVENTORY_RISK_THRESHOLD * 100, 0),
             })
@@ -423,9 +425,9 @@ class RiskEngine:
         delay_flag = components.get("delay_flag_risk", 0)
         if delay_flag > self.DELAY_FLAG_THRESHOLD:
             details.append({
-                "label": "存在历史延迟记录",
+                "label": tl("存在历史延迟记录", lang),
                 "triggered_by": "delay_flag_risk",
-                "actual_value": delay_flag,
+                "actual_value": round(delay_flag, 4),
                 "threshold": self.DELAY_FLAG_THRESHOLD,
                 "excess_ratio": round((delay_flag - self.DELAY_FLAG_THRESHOLD) / self.DELAY_FLAG_THRESHOLD * 100, 0),
             })
@@ -433,9 +435,9 @@ class RiskEngine:
         delivery = components.get("delivery_delay_risk", 0)
         if delivery > self.DELAY_VAL_THRESHOLD:
             details.append({
-                "label": "存在较大交期偏差",
+                "label": tl("存在较大交期偏差", lang),
                 "triggered_by": "delivery_delay_risk",
-                "actual_value": delivery,
+                "actual_value": round(delivery, 4),
                 "threshold": self.DELAY_VAL_THRESHOLD,
                 "excess_ratio": round((delivery - self.DELAY_VAL_THRESHOLD) / self.DELAY_VAL_THRESHOLD * 100, 0),
             })
@@ -443,16 +445,16 @@ class RiskEngine:
         vol = components.get("volatility_risk", 0)
         if vol > self.VOLATILITY_THRESHOLD:
             details.append({
-                "label": "指标波动异常偏高",
+                "label": tl("指标波动异常偏高", lang),
                 "triggered_by": "volatility_risk",
-                "actual_value": vol,
+                "actual_value": round(vol, 4),
                 "threshold": self.VOLATILITY_THRESHOLD,
                 "excess_ratio": round((vol - self.VOLATILITY_THRESHOLD) / self.VOLATILITY_THRESHOLD * 100, 0),
             })
 
         for pattern in domain_patterns:
             details.append({
-                "label": pattern["label"],
+                "label": tl(pattern["label"], lang),
                 "triggered_by": pattern.get("type", "domain_pattern"),
                 "actual_value": pattern.get("actual_value", ""),
                 "threshold": pattern.get("threshold", ""),
@@ -464,7 +466,7 @@ class RiskEngine:
     # ── 领域模式检测 ────────────────────────────────────────
 
     def _detect_domain_patterns(
-        self, node_metrics: dict, graph: dict, raw_scores: dict
+        self, node_metrics: dict, graph: dict, raw_scores: dict, lang: str = "zh"
     ) -> dict[str, list[dict]]:
         """供应链领域特有模式检测。
 
@@ -516,14 +518,20 @@ class RiskEngine:
                 avg_downstream_cv = sum(neighbor_cvs) / len(neighbor_cvs)
                 ratio = node_cv / avg_downstream_cv if avg_downstream_cv > 0 else 0
                 if ratio > self.BULLWHIP_CV_RATIO:
+                    label_zh = (
+                        f"该节点存在牛鞭效应：需求波动沿供应链放大 "
+                        f"（上游 CV {node_cv:.3f} / 下游平均 CV {avg_downstream_cv:.3f}"
+                        f" = {ratio:.1f} 倍）"
+                    )
+                    label_en = (
+                        f"Bullwhip effect: demand amplification upstream "
+                        f"(upstream CV {node_cv:.3f} / downstream avg CV {avg_downstream_cv:.3f}"
+                        f" = {ratio:.1f}x)"
+                    )
                     patterns[nid].append({
                         "type": "bullwhip",
-                        "label": (
-                            f"该节点存在牛鞭效应：需求波动沿供应链放大 "
-                            f"（上游 CV {node_cv:.3f} / 下游平均 CV {avg_downstream_cv:.3f}"
-                            f" = {ratio:.1f} 倍）"
-                        ),
-                        "actual_value": f"CV 比率 {ratio:.1f}",
+                        "label": tlf(label_zh, label_en, lang),
+                        "actual_value": f"CV ratio {ratio:.1f}",
                         "threshold": f"> {self.BULLWHIP_CV_RATIO}",
                         "excess_ratio": "",
                     })
@@ -534,12 +542,15 @@ class RiskEngine:
             if avg_cv_for_level > 0 and node_cv / avg_cv_for_level < self.VMI_CV_RATIO:
                 patterns[nid].append({
                     "type": "vmi",
-                    "label": (
+                    "label": tlf(
                         f"该节点波动显著低于同层节点 "
                         f"（CV {node_cv:.3f} / 同层平均 {avg_cv_for_level:.3f}），"
-                        f"符合 VMI 信息共享模式特征"
+                        f"符合 VMI 信息共享模式特征",
+                        f"Node volatility significantly below tier average "
+                        f"(CV {node_cv:.3f} / tier avg {avg_cv_for_level:.3f}), "
+                        f"consistent with VMI information-sharing pattern"
                     ),
-                    "actual_value": f"CV 比率 {node_cv / avg_cv_for_level:.2f}",
+                    "actual_value": f"CV ratio {node_cv / avg_cv_for_level:.2f}",
                     "threshold": f"< {self.VMI_CV_RATIO}",
                     "excess_ratio": "",
                 })
@@ -552,9 +563,11 @@ class RiskEngine:
             if node_cv < 0.15 and total_points > 200:
                 patterns[nid].append({
                     "type": "qr",
-                    "label": (
+                    "label": tlf(
                         f"该节点呈现 QR 高频补货特征："
-                        f"CV {node_cv:.3f}（波动小），数据点 {total_points}（频次高）"
+                        f"CV {node_cv:.3f}（波动小），数据点 {total_points}（频次高）",
+                        f"Quick Response (QR) pattern detected: "
+                        f"CV {node_cv:.3f} (low volatility), {total_points} data points (high frequency)"
                     ),
                     "actual_value": f"CV {node_cv:.3f}",
                     "threshold": f"CV < 0.15 且数据点 > 200",

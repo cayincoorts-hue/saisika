@@ -8,9 +8,9 @@ export async function uploadFiles(files: File[]): Promise<{ batch_id: string; sa
   return res.json();
 }
 
-export function analyzeSSE(batchId: string, onProgress: (data: any) => void, onText: (data: any) => void, onComplete: () => void, onError: (msg: string) => void): AbortController {
+export function analyzeSSE(batchId: string, onProgress: (data: any) => void, onText: (data: any) => void, onComplete: () => void, onError: (msg: string) => void, lang: string = 'zh'): AbortController {
   const controller = new AbortController();
-  fetch(`${API_BASE}/analyze?batch_id=${batchId}`, { method: 'POST', signal: controller.signal })
+  fetch(`${API_BASE}/analyze?batch_id=${batchId}&lang=${lang}`, { method: 'POST', signal: controller.signal })
     .then(async res => {
       const reader = res.body?.getReader();
       if (!reader) return;
@@ -61,6 +61,22 @@ export async function deleteHistory(batchId: string) {
 export async function getNodeDetail(nodeId: string, batchId?: string) {
   const url = batchId ? `${API_BASE}/nodes/${nodeId}?batch_id=${batchId}` : `${API_BASE}/nodes/${nodeId}`;
   const res = await fetch(url);
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+export async function getScenarioParams(nodeId: string, batchId: string) {
+  const res = await fetch(`${API_BASE}/scenario/params/${nodeId}?batch_id=${batchId}`);
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+export async function runScenarioCompare(batchId: string, changes: Array<{node_id: string; param: string; to_value: string | number}>) {
+  const res = await fetch(`${API_BASE}/scenario/compare`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ batch_id: batchId, changes }),
+  });
   if (!res.ok) throw await res.json();
   return res.json();
 }

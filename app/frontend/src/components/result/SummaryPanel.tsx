@@ -6,6 +6,14 @@ interface Props {
   textSummary: Record<string, string>;
 }
 
+const SECTION_ICONS: Record<string, string> = {
+  current_judgment: '🔍',
+  main_causes: '⚠️',
+  impact_targets: '🎯',
+  recommended_actions: '💡',
+  need_more: '📋',
+};
+
 export default function SummaryPanel({ textSummary }: Props) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(true);
@@ -38,24 +46,76 @@ export default function SummaryPanel({ textSummary }: Props) {
   if (!textSummary || Object.keys(textSummary).length === 0) return null;
 
   return (
-    <div className="card">
+    <div className="card card-dark" style={{ marginBottom: 'var(--space-6)' }}>
       <div
-        className="card-title"
-        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
+        style={{
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: expanded ? 'var(--space-6)' : 0,
+        }}
         onClick={() => setExpanded(!expanded)}
       >
-        <span>{t('summaryPanel.title')}</span>
-        <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>{expanded ? t('riskNodeTable.collapse') : t('riskNodeTable.expand')}</span>
+        <h3 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-xl)',
+          fontWeight: 400,
+          color: 'var(--color-on-dark)',
+          margin: 0,
+          letterSpacing: 'var(--tracking-tight)',
+        }}>
+          {t('summaryPanel.title')}
+        </h3>
+        <span style={{
+          fontSize: 'var(--text-xs)',
+          color: 'var(--color-on-dark-soft)',
+          fontWeight: 500,
+          cursor: 'pointer',
+          userSelect: 'none',
+        }}>
+          {expanded ? t('riskNodeTable.collapse') + ' ▲' : t('riskNodeTable.expand') + ' ▼'}
+        </span>
       </div>
+
       {expanded && (
         <div ref={sectionsRef}>
           {Object.entries(SECTIONS).map(([key, label]) => {
             const text = textSummary[key];
             if (!text) return null;
+            const icon = SECTION_ICONS[key] || '•';
             return (
-              <div key={key} data-section style={{ marginBottom: 16 }}>
-                <h4 style={{ fontSize: '0.95rem', color: 'var(--color-accent)', marginBottom: 4 }}>{label}</h4>
-                <p style={{ fontSize: '0.9rem', lineHeight: 1.8, color: 'var(--color-text-primary)' }}>{text}</p>
+              <div
+                key={key}
+                data-section
+                style={{
+                  marginBottom: 'var(--space-5)',
+                  padding: 'var(--space-4)',
+                  background: 'var(--color-dark-elevated)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-dark-border)',
+                }}
+              >
+                <h4 style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 600,
+                  color: 'var(--color-primary)',
+                  marginBottom: 'var(--space-2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}>
+                  <span>{icon}</span>
+                  {label}
+                </h4>
+                <p style={{
+                  fontSize: 'var(--text-sm)',
+                  lineHeight: 1.8,
+                  color: 'var(--color-on-dark-soft)',
+                }}>
+                  {text}
+                </p>
               </div>
             );
           })}

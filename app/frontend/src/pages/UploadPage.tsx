@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import PageShell from '../components/layout/PageShell';
 import SectionCard from '../components/layout/SectionCard';
 import FileDropzone from '../components/upload/FileDropzone';
 import TopNotice from '../components/layout/TopNotice';
@@ -38,42 +36,35 @@ export default function UploadPage() {
   };
 
   return (
-    <PageShell>
+    <>
       <div className="page-header">
-        <h1>Saisca</h1>
-        <span style={{ color: 'var(--color-muted)', fontSize: '0.9rem' }}>
-          {t('upload.step')}
-          {' · '}
-          <button
-            className="btn btn-outline"
-            onClick={() => navigate('/history')}
-            style={{ padding: '2px 10px', fontSize: '0.8rem' }}
-          >
-            {t('history.title')}
-          </button>
-        </span>
+        <h1>{t('upload.title')}</h1>
+        <p>{t('upload.step')}</p>
       </div>
 
       <TopNotice type="error" message={error} />
 
-      <SectionCard title={t('upload.title')} delay={140}>
+      <SectionCard>
         <FileDropzone files={files} onChange={setFiles} disabled={uploading} />
       </SectionCard>
 
-      <div className="stagger-item" style={{ '--item-delay': '280ms', textAlign: 'right' } as CSSProperties}>
+      <div className="stagger-item" style={{ '--item-delay': '200ms', textAlign: 'right' } as React.CSSProperties}>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary btn-lg"
           disabled={files.length === 0 || uploading}
           onClick={handleUpload}
-          style={{ minWidth: 140 }}
+          style={{ minWidth: 160 }}
         >
           {uploading ? (
-            <span><span className="loading-spinner" style={{ marginRight: 8 }} />{t('upload.uploading')}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <span className="loading-spinner" />
+              {t('upload.uploading')}
+            </span>
           ) : (
             t('upload.filesSelected', { count: files.length })
           )}
         </button>
       </div>
-    </PageShell>
+    </>
   );
 }

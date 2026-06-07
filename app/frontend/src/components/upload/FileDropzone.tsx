@@ -8,6 +8,17 @@ interface Props {
   disabled?: boolean;
 }
 
+const FILE_ICONS: Record<string, string> = {
+  csv: '📊',
+  xlsx: '📈',
+  xls: '📈',
+};
+
+function fileIcon(name: string): string {
+  const ext = name.split('.').pop()?.toLowerCase() || '';
+  return FILE_ICONS[ext] || '📄';
+}
+
 export default function FileDropzone({ files, onChange, disabled }: Props) {
   const { t } = useTranslation();
   const [dragover, setDragover] = useState(false);
@@ -46,7 +57,6 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
     const newFiles: File[] = [];
 
     if (items) {
-      // 支持文件夹拖入（递归读取）
       const processEntry = (entry: FileSystemEntry): Promise<File[]> => {
         return new Promise(resolve => {
           if (entry.isFile) {
@@ -72,7 +82,6 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
         if (entry) {
           entries.push(entry);
         } else {
-          // 兼容不支持 webkitGetAsEntry 的浏览器
           const file = items[i].getAsFile();
           if (file) newFiles.push(file);
         }
@@ -87,7 +96,6 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
       }
     }
 
-    // fallback：不支持 items 时用 files
     const dropped = Array.from(e.dataTransfer.files || []);
     onChange([...files, ...dropped]);
   }, [files, onChange, disabled]);
@@ -100,9 +108,6 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
   }, [files, onChange, disabled]);
 
   const removeFile = (i: number) => onChange(files.filter((_, idx) => idx !== i));
-
-  const borderColor = dragover ? 'var(--color-accent)' : 'var(--color-border)';
-  const bgColor = dragover ? 'rgba(52,152,219,0.06)' : 'var(--color-bg-page)';
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -120,58 +125,75 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
         onDragOver={handleDragOver}
         onPointerMove={handlePointerMove}
         style={{
-          border: `2px dashed ${borderColor}`,
-          borderRadius: 'var(--radius)',
-          padding: '40px 20px',
-          textAlign: 'center',
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.5 : 1,
-          transition: 'border-color 0.7s var(--motion-smooth), background 0.7s var(--motion-smooth), transform 0.7s var(--motion-smooth), box-shadow 0.7s var(--motion-smooth)',
-          background: bgColor,
         } as CSSProperties}
       >
-        <p style={{ fontSize: '1.1rem', color: 'var(--color-text-secondary)', margin: 0, position: 'relative' }}>
+        <span className="upload-dropzone-icon">
+          {dragover ? '📥' : '📂'}
+        </span>
+        <p className="upload-dropzone-text">
           {dragover ? t('upload.dropHere') : t('upload.dragDrop')}
         </p>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: '8px 0', position: 'relative' }}>
+        <p className="upload-dropzone-hint">
           {t('upload.supportedFormats')}
         </p>
-        <label className="btn btn-outline" style={{ display: 'inline-block', marginTop: 12 }}>
+        <label className="btn btn-outline" style={{ display: 'inline-flex', marginTop: 8 }}>
           {t('upload.selectFile')}
-          <input type="file" accept=".csv,.xlsx,.xls" multiple onChange={handleSelect}
-                 style={{ display: 'none' }} disabled={disabled} />
+          <input
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            multiple
+            onChange={handleSelect}
+            style={{ display: 'none' }}
+            disabled={disabled}
+          />
         </label>
       </div>
+
       {files.length > 0 && (
-        <div className="stagger-item" style={{ marginTop: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{t('upload.filesSelected', { count: files.length })}</span>
+        <div className="file-list stagger-item" style={{ '--item-delay': '120ms' } as CSSProperties}>
+          <div className="file-list-header">
+            <span className="file-list-count">
+              {t('upload.filesSelected', { count: files.length })}
+            </span>
             <button
               onClick={() => onChange([])}
+              className="btn-ghost"
               style={{
-                border: 'none', background: 'none', cursor: 'pointer',
-                color: 'var(--color-error)', fontSize: '0.85rem'
+                border: 'none', background: 'none',
+                color: 'var(--color-error)', fontSize: 'var(--text-xs)',
+                cursor: 'pointer', fontWeight: 500,
               }}
               disabled={disabled}
             >
               {t('upload.clearAll')}
             </button>
           </div>
-          <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+          <div style={{ maxHeight: 220, overflowY: 'auto' }}>
             {files.map((f, i) => (
               <div
                 key={`${f.name}-${f.size}-${i}`}
-                className="stagger-item"
+                className="file-item stagger-item"
                 style={{
-                  '--item-delay': `${i * 70}ms`,
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '6px 12px', background: 'var(--color-bg-card)', borderRadius: 6, marginBottom: 4,
-                  transition: 'transform 0.65s var(--motion-smooth), background 0.65s var(--motion-smooth)',
+                  '--item-delay': `${120 + i * 50}ms`,
                 } as CSSProperties}
               >
-                <span style={{ fontSize: '0.9rem' }}>{f.name} <span style={{ color: 'var(--color-unavailable)' }}>{(f.size / 1024).toFixed(0)} KB</span></span>
-                <button onClick={() => removeFile(i)} style={{ border: 'none', background: 'none', cursor: 'pointer',
-                  color: 'var(--color-error)', fontSize: '1.2rem' }} disabled={disabled}>×</button>
+                <span className="file-item-name">
+                  <span className="file-item-icon">{fileIcon(f.name)}</span>
+                  <span>{f.name}</span>
+                </span>
+                <span className="file-item-size">
+                  {(f.size / 1024).toFixed(0)} KB
+                </span>
+                <button
+                  className="file-item-remove"
+                  onClick={() => removeFile(i)}
+                  disabled={disabled}
+                  title={t('common.delete')}
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>

@@ -26,6 +26,8 @@
     "backHome": "Back to Home"
   },
   "nav": {
+    "navigation": "Navigation",
+    "current": "Current",
     "upload": "Upload",
     "history": "History",
     "settings": "Settings",
@@ -85,8 +87,13 @@
       "buildingGraph": "Building network graph",
       "riskAssessment": "Risk assessment",
       "generatingResults": "Generating analysis results",
-      "complete": "Analysis complete"
+      "complete": "Analysis complete",
+      "redirecting": "Redirecting to results..."
     },
+    "batchInfo": "Batch Information",
+    "autoAnalyzeHint": "The system will automatically identify fields, merge data, build network graphs, calculate risk scores, and generate analysis conclusions.",
+    "progressTitle": "Analysis Progress",
+    "previewTitle": "Analysis Preview",
     "backToUpload": "Back to Upload",
     "startAnalysis": "Start Analysis",
     "analyzing": "Analyzing..."
