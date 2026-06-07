@@ -6,15 +6,8 @@ interface Props {
   children: ReactNode;
 }
 
-interface NavItem {
-  key: string;
-  label: string;
-  icon: string;
-  path: string;
-}
-
 export default function AppShell({ children }: Props) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -23,95 +16,49 @@ export default function AppShell({ children }: Props) {
     return location.pathname.startsWith(path);
   };
 
-  const mainNav: NavItem[] = [
-    { key: 'upload', label: t('nav.upload'), icon: '📤', path: '/' },
-    { key: 'history', label: t('nav.history'), icon: '📋', path: '/history' },
-  ];
-
-  const resultNav: NavItem[] = [];
-  if (location.pathname.startsWith('/result')) {
-    resultNav.push({ key: 'result', label: t('result.title'), icon: '📊', path: location.pathname });
-  }
-  if (location.pathname.startsWith('/confirm')) {
-    resultNav.push({ key: 'confirm', label: t('confirm.title'), icon: '🔍', path: location.pathname });
-  }
-
   const toggleLang = () => {
     const next = i18n.language === 'en' ? 'zh' : 'en';
     i18n.changeLanguage(next);
     localStorage.setItem('saiska-lang', next);
   };
 
+  const showNav = !location.pathname.startsWith('/activate');
+
   return (
     <div className="app-layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <a
-          href="/"
-          className="sidebar-brand"
-          onClick={e => { e.preventDefault(); navigate('/'); }}
-        >
-          <span className="sidebar-brand-icon">S</span>
-          <span className="sidebar-brand-text">Saisca</span>
-        </a>
-
-        <nav className="sidebar-nav">
-          <div className="sidebar-section-label">{t('nav.navigation')}</div>
-          {mainNav.map(item => (
+      {showNav && (
+        <nav className="navbar">
+          <a
+            href="/"
+            className="navbar-brand"
+            onClick={e => { e.preventDefault(); navigate('/'); }}
+          >
+            Saisca
+          </a>
+          <div className="navbar-links">
             <button
-              key={item.key}
-              className={`sidebar-link ${isActive(item.path) ? 'is-active' : ''}`}
-              onClick={() => navigate(item.path)}
-              style={{ position: 'relative' }}
+              className={`navbar-link ${isActive('/') ? 'is-active' : ''}`}
+              onClick={() => navigate('/')}
             >
-              <span className="sidebar-link-icon">{item.icon}</span>
-              {item.label}
+              Upload
             </button>
-          ))}
-
-          {resultNav.length > 0 && (
-            <>
-              <div className="sidebar-section-label" style={{ marginTop: 'var(--space-4)' }}>
-                {t('nav.current')}
-              </div>
-              {resultNav.map(item => (
-                <button
-                  key={item.key}
-                  className={`sidebar-link ${isActive(item.path) ? 'is-active' : ''}`}
-                  onClick={() => navigate(item.path)}
-                  style={{ position: 'relative' }}
-                >
-                  <span className="sidebar-link-icon">{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
-            </>
-          )}
-        </nav>
-
-        <div className="sidebar-footer">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>v1.4.0</span>
+            <button
+              className={`navbar-link ${isActive('/history') ? 'is-active' : ''}`}
+              onClick={() => navigate('/history')}
+            >
+              History
+            </button>
+          </div>
+          <div className="navbar-actions">
             <button onClick={toggleLang} className="lang-toggle">
-              {i18n.language === 'en' ? '中文' : 'EN'}
+              {i18n.language === 'en' ? 'ZH' : 'EN'}
             </button>
           </div>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <div className="main-content">
-        <header className="topbar">
-          <div className="topbar-right" style={{ marginLeft: 'auto' }}>
-            <button className="topbar-action" onClick={toggleLang}>
-              🌐 {i18n.language === 'en' ? '中文' : 'English'}
-            </button>
-          </div>
-        </header>
-        <main className="page-content">
-          {children}
-        </main>
-      </div>
+        </nav>
+      )}
+      <main className="page-content">
+        {children}
+      </main>
     </div>
   );
 }
