@@ -548,7 +548,8 @@ class RiskEngine:
                         f"符合 VMI 信息共享模式特征",
                         f"Node volatility significantly below tier average "
                         f"(CV {node_cv:.3f} / tier avg {avg_cv_for_level:.3f}), "
-                        f"consistent with VMI information-sharing pattern"
+                        f"consistent with VMI information-sharing pattern",
+                        lang
                     ),
                     "actual_value": f"CV ratio {node_cv / avg_cv_for_level:.2f}",
                     "threshold": f"< {self.VMI_CV_RATIO}",
@@ -567,7 +568,8 @@ class RiskEngine:
                         f"该节点呈现 QR 高频补货特征："
                         f"CV {node_cv:.3f}（波动小），数据点 {total_points}（频次高）",
                         f"Quick Response (QR) pattern detected: "
-                        f"CV {node_cv:.3f} (low volatility), {total_points} data points (high frequency)"
+                        f"CV {node_cv:.3f} (low volatility), {total_points} data points (high frequency)",
+                        lang
                     ),
                     "actual_value": f"CV {node_cv:.3f}",
                     "threshold": f"CV < 0.15 且数据点 > 200",

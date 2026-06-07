@@ -377,7 +377,7 @@ class AnalysisEngine:
             ])
 
         return {
-            "title": "数据可信度",
+            "title": tl("数据可信度", self.lang),
             "field_coverage": field_coverage,
             "capability_status": capability_status,
             "confidence_level": confidence_level,
@@ -397,25 +397,23 @@ class AnalysisEngine:
             causes_detail = s.get("risk_causes_detail", [])
             for detail in causes_detail:
                 label = detail.get("label", "")
-                if "牛鞭效应" in label:
+                pattern_type = detail.get("triggered_by", "")
+                if pattern_type == "bullwhip" or "牛鞭" in label or "Bullwhip" in label:
                     bullwhip_nodes.append({
-                        "node_id": nid,
-                        "detail": label,
+                        "node_id": nid, "detail": label,
                         "triggered_by": detail.get("triggered_by", ""),
                         "actual_value": detail.get("actual_value", ""),
                         "threshold": detail.get("threshold", ""),
                     })
-                elif "VMI" in label or "信息共享" in label:
+                elif pattern_type == "vmi" or "VMI" in label:
                     vmi_nodes.append({
-                        "node_id": nid,
-                        "detail": label,
+                        "node_id": nid, "detail": label,
                         "triggered_by": detail.get("triggered_by", ""),
                         "actual_value": detail.get("actual_value", ""),
                     })
-                elif "QR" in label or "高频补货" in label:
+                elif pattern_type == "qr" or "QR" in label or "Quick Response" in label:
                     qr_nodes.append({
-                        "node_id": nid,
-                        "detail": label,
+                        "node_id": nid, "detail": label,
                         "triggered_by": detail.get("triggered_by", ""),
                         "actual_value": detail.get("actual_value", ""),
                     })
@@ -424,20 +422,26 @@ class AnalysisEngine:
 
         summary_parts = []
         if bullwhip_nodes:
-            summary_parts.append(f"{len(bullwhip_nodes)} 个节点存在牛鞭效应放大")
+            summary_parts.append(tl(f"{len(bullwhip_nodes)} 个节点存在牛鞭效应放大", self.lang)
+                                 if self.lang == "zh" else f"{len(bullwhip_nodes)} nodes with bullwhip amplification")
         if vmi_nodes:
-            summary_parts.append(f"{len(vmi_nodes)} 个节点呈现 VMI 信息共享模式特征")
+            summary_parts.append(tl(f"{len(vmi_nodes)} 个节点呈现 VMI 信息共享模式特征", self.lang)
+                                 if self.lang == "zh" else f"{len(vmi_nodes)} nodes with VMI information-sharing pattern")
         if qr_nodes:
-            summary_parts.append(f"{len(qr_nodes)} 个节点呈现 QR 高频补货特征")
+            summary_parts.append(tl(f"{len(qr_nodes)} 个节点呈现 QR 高频补货特征", self.lang)
+                                 if self.lang == "zh" else f"{len(qr_nodes)} nodes with Quick Response replenishment pattern")
 
         return {
-            "title": "供应链领域洞察",
+            "title": tl("供应链领域洞察", self.lang),
             "status": "ok" if has_any else "limited",
             "missing_reason": "" if has_any else (
-                "当前数据中未检测到显著的牛鞭效应、VMI 或 QR 模式特征。"
-                "补充更多层级的数据后，领域模式识别将更可靠。"
+                tl("当前数据中未检测到显著的牛鞭效应、VMI 或 QR 模式特征。"
+                   "补充更多层级的数据后，领域模式识别将更可靠。", self.lang)
+                if self.lang == "zh" else
+                "No significant bullwhip, VMI, or QR patterns detected in current data. "
+                "Domain pattern recognition improves with multi-tier data."
             ),
-            "summary": "；".join(summary_parts) if summary_parts else "未检测到显著领域模式。",
+            "summary": tl("；".join(summary_parts), self.lang) if summary_parts else tl("未检测到显著领域模式。", self.lang) if self.lang == "zh" else "No significant domain patterns detected.",
             "bullwhip_nodes": bullwhip_nodes,
             "vmi_nodes": vmi_nodes,
             "qr_nodes": qr_nodes,
