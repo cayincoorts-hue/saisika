@@ -1,93 +1,91 @@
 /* ═══════════════════════════════════════════════════════════════
-   Saisca Design Tokens v4 — Tactical Telemetry CRT Terminal
-   Industrial Brutalism: monospace dominance, phosphor glow,
-   hazard red accent, mechanical precision.
+   Saisca Design Tokens v3 — Black Dashboard
+   Dark professional dashboard design system.
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── CRT Substrate ──────────────────────────────────────── */
-  --color-bg: #0A0A0A;
-  --color-bg-soft: #0F0F0F;
-  --color-bg-elevated: #141414;
-  --color-bg-card: #111111;
-  --color-bg-card-hover: #161616;
-  --color-bg-input: #0D0D0D;
+  /* ── Brand accent ──────────────────────────────────────── */
+  --color-primary: #e14f62;
+  --color-primary-hover: #f0626e;
+  --color-primary-active: #c4384a;
+  --color-primary-gradient: linear-gradient(135deg, #e14f62, #f0626e);
+  --color-primary-glow: rgba(225, 79, 98, 0.22);
+  --color-accent-blue: #4da6ff;
+  --color-accent-teal: #2ed8a3;
+  --color-accent-amber: #f5b041;
+  --color-accent-purple: #9b7bff;
 
-  /* ── Sidebar (darker than main) ─────────────────────────── */
-  --color-sidebar-bg: #080808;
-  --color-sidebar-hover: #111111;
-  --color-sidebar-active: #161616;
-  --color-sidebar-text: #666666;
-  --color-sidebar-text-active: #EAEAEA;
-  --color-sidebar-brand: #EAEAEA;
-  --color-sidebar-divider: rgba(234, 234, 234, 0.08);
+  /* ── Sidebar ───────────────────────────────────────────── */
+  --color-sidebar-bg: #1a1e2b;
+  --color-sidebar-hover: #232838;
+  --color-sidebar-active: #272d40;
+  --color-sidebar-text: #8b8fa3;
+  --color-sidebar-text-active: #ffffff;
+  --color-sidebar-brand: #ffffff;
+  --color-sidebar-divider: rgba(255, 255, 255, 0.06);
 
-  /* ── Phosphor & Ink ─────────────────────────────────────── */
-  --color-primary: #FF2A2A;
-  --color-primary-hover: #FF5555;
-  --color-primary-active: #CC0000;
-  --color-primary-glow: rgba(255, 42, 42, 0.18);
-  --color-accent-blue: #4DA6FF;
-  --color-accent-teal: #4AF626;
-  --color-accent-amber: #FFAA00;
-  --color-accent-purple: #9B7BFF;
+  /* ── Main background ───────────────────────────────────── */
+  --color-bg: #1e2130;
+  --color-bg-soft: #232637;
+  --color-bg-elevated: #282c3d;
+  --color-bg-card: #272b3a;
+  --color-bg-card-hover: #2c3040;
+  --color-bg-input: #1c1f2b;
 
-  /* ── Borders ─────────────────────────────────────────────── */
-  --color-border: #2A2A2A;
-  --color-border-light: #1E1E1E;
-  --color-border-focus: rgba(255, 42, 42, 0.5);
+  /* ── Border ─────────────────────────────────────────────── */
+  --color-border: #2d3143;
+  --color-border-light: #333852;
+  --color-border-focus: rgba(225, 79, 98, 0.4);
 
-  /* ── Text (phosphor scale) ───────────────────────────────── */
-  --color-text: #C8C8C8;
-  --color-text-strong: #EAEAEA;
-  --color-text-secondary: #888888;
-  --color-text-muted: #555555;
-  --color-text-on-primary: #EAEAEA;
+  /* ── Text ──────────────────────────────────────────────── */
+  --color-text: #e8eaed;
+  --color-text-strong: #ffffff;
+  --color-text-secondary: #9da4b0;
+  --color-text-muted: #6b7180;
+  --color-text-on-primary: #ffffff;
 
-  /* ── Semantic status ────────────────────────────────────── */
-  --color-ok: #4AF626;
-  --color-ok-bg: rgba(74, 246, 38, 0.08);
-  --color-ok-text: #4AF626;
-  --color-limited: #FFAA00;
-  --color-limited-bg: rgba(255, 170, 0, 0.08);
-  --color-limited-text: #FFAA00;
-  --color-error: #FF2A2A;
-  --color-error-bg: rgba(255, 42, 42, 0.08);
-  --color-error-text: #FF2A2A;
-  --color-unavailable: #555555;
-  --color-unavailable-bg: rgba(85, 85, 85, 0.08);
+  /* ── Semantic status ───────────────────────────────────── */
+  --color-ok: #2ed8a3;
+  --color-ok-bg: rgba(46, 216, 163, 0.1);
+  --color-ok-text: #2ed8a3;
+  --color-limited: #f5b041;
+  --color-limited-bg: rgba(245, 176, 65, 0.1);
+  --color-limited-text: #f5b041;
+  --color-error: #f75454;
+  --color-error-bg: rgba(247, 84, 84, 0.1);
+  --color-error-text: #f75454;
+  --color-unavailable: #6b7180;
+  --color-unavailable-bg: rgba(107, 113, 128, 0.1);
 
-  /* ── Risk levels ────────────────────────────────────────── */
-  --color-risk-high: #FF2A2A;
-  --color-risk-high-bg: rgba(255, 42, 42, 0.1);
-  --color-risk-mid: #FFAA00;
-  --color-risk-mid-bg: rgba(255, 170, 0, 0.1);
-  --color-risk-low: #4AF626;
-  --color-risk-low-bg: rgba(74, 246, 38, 0.1);
+  /* ── Risk levels ───────────────────────────────────────── */
+  --color-risk-high: #f75454;
+  --color-risk-high-bg: rgba(247, 84, 84, 0.1);
+  --color-risk-mid: #f5b041;
+  --color-risk-mid-bg: rgba(245, 176, 65, 0.1);
+  --color-risk-low: #2ed8a3;
+  --color-risk-low-bg: rgba(46, 216, 163, 0.1);
 
-  /* ── Typography: Tactical Telemetry ──────────────────────── */
-  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-body: "JetBrains Mono", "SF Mono", "IBM Plex Mono", "Courier New", monospace;
-  --font-mono: "JetBrains Mono", "SF Mono", "IBM Plex Mono", monospace;
+  /* ── Typography ────────────────────────────────────────── */
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
-  --text-2xs: 0.625rem;   /* 10px */
-  --text-xs: 0.6875rem;   /* 11px */
-  --text-sm: 0.75rem;     /* 12px */
-  --text-base: 0.8125rem; /* 13px */
-  --text-md: 0.875rem;    /* 14px */
-  --text-lg: 1rem;        /* 16px */
+  --text-2xs: 0.6875rem;  /* 11px */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.8125rem;   /* 13px */
+  --text-base: 0.875rem;  /* 14px */
+  --text-md: 0.9375rem;   /* 15px */
+  --text-lg: 1.0625rem;   /* 17px */
   --text-xl: 1.25rem;     /* 20px */
   --text-2xl: 1.5rem;     /* 24px */
-  --text-3xl: 2rem;       /* 32px */
+  --text-3xl: 1.875rem;   /* 30px */
 
-  --leading-tight: 0.9;
-  --leading-snug: 1.15;
-  --leading-normal: 1.35;
-  --tracking-macro: -0.04em;
-  --tracking-micro: 0.08em;
-  --tracking-tight: -0.02em;
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+  --tracking-tight: -0.3px;
 
-  /* ── Spacing ────────────────────────────────────────────── */
+  /* ── Spacing ───────────────────────────────────────────── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -98,33 +96,33 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* ── Radius: NONE (industrial brutalism) ────────────────── */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-pill: 0px;
+  /* ── Radius ────────────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
 
-  /* ── Shadow: NONE (flat phosphor display) ───────────────── */
-  --shadow-sm: none;
-  --shadow-md: none;
-  --shadow-lg: none;
-  --shadow-xl: none;
+  /* ── Shadow ────────────────────────────────────────────── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.5);
 
-  /* ── Transition ─────────────────────────────────────────── */
-  --ease-out: steps(3);
-  --ease-smooth: steps(4);
-  --duration-fast: 80ms;
-  --duration-base: 120ms;
-  --duration-slow: 200ms;
+  /* ── Transition ────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
 
-  /* ── Layout ─────────────────────────────────────────────── */
-  --sidebar-width: 260px;
-  --sidebar-collapsed-width: 48px;
-  --topbar-height: 48px;
+  /* ── Layout ────────────────────────────────────────────── */
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 64px;
+  --topbar-height: 56px;
   --content-max-width: 1320px;
 
-  /* ── Legacy aliases ─────────────────────────────────────── */
+  /* ── Legacy aliases (keep old code working) ────────────── */
   --color-canvas: var(--color-bg);
   --color-surface-card: var(--color-bg-card);
   --color-surface-dark: var(--color-sidebar-bg);
@@ -132,7 +130,7 @@
   --color-surface-dark-soft: var(--color-bg-soft);
   --color-hairline: var(--color-border);
   --color-hairline-soft: var(--color-border-light);
-  --color-hairline-strong: var(--color-border);
+  --color-hairline-strong: var(--color-border-light);
   --color-ink: var(--color-text-strong);
   --color-ink-soft: var(--color-text);
   --color-body: var(--color-text-secondary);
@@ -146,10 +144,12 @@
   --color-surface-elevated: var(--color-bg-elevated);
   --color-surface-muted: var(--color-bg-card);
   --color-primary-light: var(--color-primary-glow);
-  --color-primary-ghost: rgba(255, 42, 42, 0.04);
+  --color-primary-ghost: rgba(225, 79, 98, 0.06);
   --color-accent: var(--color-primary);
   --color-bg-page: var(--color-bg);
   --color-text-primary: var(--color-text-strong);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-border: var(--color-border);
   --color-on-primary: var(--color-text-on-primary);
 
   /* legacy spacing */
@@ -163,21 +163,21 @@
   --spacing-section: var(--space-12);
 
   /* legacy radius */
-  --rounded-xs: 0px;
-  --rounded-sm: 0px;
-  --rounded-md: 0px;
-  --rounded-lg: 0px;
-  --rounded-xl: 0px;
-  --rounded-pill: 0px;
+  --rounded-xs: 4px;
+  --rounded-sm: var(--radius-sm);
+  --rounded-md: var(--radius-md);
+  --rounded-lg: var(--radius-lg);
+  --rounded-xl: var(--radius-xl);
+  --rounded-pill: var(--radius-pill);
 
   /* legacy misc */
-  --radius: 0px;
+  --radius: var(--radius-lg);
   --shadow: none;
-  --duration-stream: 0.15s;
+  --duration-stream: 0.3s;
   --navbar-height: 0px;
 
   /* legacy motion */
-  --motion-smooth: steps(3);
-  --motion-silk: steps(4);
-  --motion-spring: steps(5);
+  --motion-smooth: var(--ease-out);
+  --motion-silk: var(--ease-smooth);
+  --motion-spring: cubic-bezier(0.34, 1.35, 0.64, 1);
 }
