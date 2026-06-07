@@ -15,7 +15,7 @@ Most supply chain risk tools are either enterprise SaaS (expensive, cloud-depend
 
 **Demo data included** — a 10-node supply chain with intentionally engineered risks (inventory crash, bullwhip amplification, VMI pattern).
 
-GitHub: https://github.com/cayincoorts-hue/saisika
-Download: https://github.com/cayincoorts-hue/saisika/releases
+GitHub: https://github.com/cengchenyicheng/saisika
+Download: https://github.com/cengchenyicheng/saisika/releases
 
 Feedback welcome — especially from anyone in supply chain or logistics!

@@ -1,73 +1,81 @@
 /* ═══════════════════════════════════════════════════════════════
-   Saisca Design Tokens v3 — Black Dashboard
-   Dark professional dashboard design system.
+   Saisca Design Tokens v4 — Ethereal Glass on OLED
+   Premium agency-tier: deep blacks, glassmorphism, soft gradients,
+   custom cubic-bezier motion, generous whitespace.
    ═══════════════════════════════════════════════════════════════ */
 
-:root {
-  /* ── Brand accent ──────────────────────────────────────── */
-  --color-primary: #e14f62;
-  --color-primary-hover: #f0626e;
-  --color-primary-active: #c4384a;
-  --color-primary-gradient: linear-gradient(135deg, #e14f62, #f0626e);
-  --color-primary-glow: rgba(225, 79, 98, 0.22);
-  --color-accent-blue: #4da6ff;
-  --color-accent-teal: #2ed8a3;
-  --color-accent-amber: #f5b041;
-  --color-accent-purple: #9b7bff;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-  /* ── Sidebar ───────────────────────────────────────────── */
-  --color-sidebar-bg: #1a1e2b;
-  --color-sidebar-hover: #232838;
-  --color-sidebar-active: #272d40;
-  --color-sidebar-text: #8b8fa3;
-  --color-sidebar-text-active: #ffffff;
-  --color-sidebar-brand: #ffffff;
+:root {
+  /* ── Brand accent (warm coral → peach gradient) ─────────── */
+  --color-primary: #FF5C72;
+  --color-primary-hover: #FF7B8D;
+  --color-primary-active: #E04A5E;
+  --color-primary-gradient: linear-gradient(135deg, #FF5C72 0%, #FF8E6E 100%);
+  --color-primary-glow: rgba(255, 92, 114, 0.12);
+  --color-primary-soft: rgba(255, 92, 114, 0.06);
+
+  /* ── Glass accents ──────────────────────────────────────── */
+  --color-accent-blue: #5B9EFF;
+  --color-accent-teal: #3DD68C;
+  --color-accent-amber: #FFB347;
+  --color-accent-purple: #A78BFA;
+
+  /* ── Sidebar — deep glass ───────────────────────────────── */
+  --color-sidebar-bg: rgba(0, 0, 0, 0.55);
+  --color-sidebar-blur: blur(32px) saturate(1.2);
+  --color-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --color-sidebar-active: rgba(255, 255, 255, 0.08);
+  --color-sidebar-text: #8A8A8A;
+  --color-sidebar-text-active: #FFFFFF;
+  --color-sidebar-brand: #FFFFFF;
   --color-sidebar-divider: rgba(255, 255, 255, 0.06);
 
-  /* ── Main background ───────────────────────────────────── */
-  --color-bg: #1e2130;
-  --color-bg-soft: #232637;
-  --color-bg-elevated: #282c3d;
-  --color-bg-card: #272b3a;
-  --color-bg-card-hover: #2c3040;
-  --color-bg-input: #1c1f2b;
+  /* ── OLED substrate ─────────────────────────────────────── */
+  --color-bg: #050505;
+  --color-bg-soft: #080808;
+  --color-bg-elevated: #0D0D0D;
+  --color-bg-card: rgba(255, 255, 255, 0.025);
+  --color-bg-card-hover: rgba(255, 255, 255, 0.04);
+  --color-bg-input: rgba(255, 255, 255, 0.025);
+  --color-bg-glass: rgba(255, 255, 255, 0.03);
 
-  /* ── Border ─────────────────────────────────────────────── */
-  --color-border: #2d3143;
-  --color-border-light: #333852;
-  --color-border-focus: rgba(225, 79, 98, 0.4);
+  /* ── Glass hairline borders ─────────────────────────────── */
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+  --color-border-focus: rgba(255, 92, 114, 0.3);
 
-  /* ── Text ──────────────────────────────────────────────── */
-  --color-text: #e8eaed;
-  --color-text-strong: #ffffff;
-  --color-text-secondary: #9da4b0;
-  --color-text-muted: #6b7180;
-  --color-text-on-primary: #ffffff;
+  /* ── Text on OLED ───────────────────────────────────────── */
+  --color-text: #F5F5F5;
+  --color-text-strong: #FFFFFF;
+  --color-text-secondary: #A0A0A0;
+  --color-text-muted: #666666;
+  --color-text-on-primary: #FFFFFF;
 
-  /* ── Semantic status ───────────────────────────────────── */
-  --color-ok: #2ed8a3;
-  --color-ok-bg: rgba(46, 216, 163, 0.1);
-  --color-ok-text: #2ed8a3;
-  --color-limited: #f5b041;
-  --color-limited-bg: rgba(245, 176, 65, 0.1);
-  --color-limited-text: #f5b041;
-  --color-error: #f75454;
-  --color-error-bg: rgba(247, 84, 84, 0.1);
-  --color-error-text: #f75454;
-  --color-unavailable: #6b7180;
-  --color-unavailable-bg: rgba(107, 113, 128, 0.1);
+  /* ── Semantic status ────────────────────────────────────── */
+  --color-ok: #3DD68C;
+  --color-ok-bg: rgba(61, 214, 140, 0.08);
+  --color-ok-text: #3DD68C;
+  --color-limited: #FFB347;
+  --color-limited-bg: rgba(255, 179, 71, 0.08);
+  --color-limited-text: #FFB347;
+  --color-error: #FF5C72;
+  --color-error-bg: rgba(255, 92, 114, 0.08);
+  --color-error-text: #FF5C72;
+  --color-unavailable: #666666;
+  --color-unavailable-bg: rgba(102, 102, 102, 0.08);
 
-  /* ── Risk levels ───────────────────────────────────────── */
-  --color-risk-high: #f75454;
-  --color-risk-high-bg: rgba(247, 84, 84, 0.1);
-  --color-risk-mid: #f5b041;
-  --color-risk-mid-bg: rgba(245, 176, 65, 0.1);
-  --color-risk-low: #2ed8a3;
-  --color-risk-low-bg: rgba(46, 216, 163, 0.1);
+  /* ── Risk levels ────────────────────────────────────────── */
+  --color-risk-high: #FF5C72;
+  --color-risk-high-bg: rgba(255, 92, 114, 0.08);
+  --color-risk-mid: #FFB347;
+  --color-risk-mid-bg: rgba(255, 179, 71, 0.08);
+  --color-risk-low: #3DD68C;
+  --color-risk-low-bg: rgba(61, 214, 140, 0.08);
 
-  /* ── Typography ────────────────────────────────────────── */
-  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  /* ── Premium typography ─────────────────────────────────── */
+  --font-display: "Outfit", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
   --text-2xs: 0.6875rem;  /* 11px */
@@ -75,17 +83,18 @@
   --text-sm: 0.8125rem;   /* 13px */
   --text-base: 0.875rem;  /* 14px */
   --text-md: 0.9375rem;   /* 15px */
-  --text-lg: 1.0625rem;   /* 17px */
-  --text-xl: 1.25rem;     /* 20px */
-  --text-2xl: 1.5rem;     /* 24px */
-  --text-3xl: 1.875rem;   /* 30px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.375rem;    /* 22px */
+  --text-2xl: 1.75rem;    /* 28px */
+  --text-3xl: 2.25rem;    /* 36px */
 
-  --leading-tight: 1.15;
-  --leading-snug: 1.3;
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
   --leading-normal: 1.55;
-  --tracking-tight: -0.3px;
+  --tracking-tight: -0.4px;
+  --tracking-eyebrow: 0.2em;
 
-  /* ── Spacing ───────────────────────────────────────────── */
+  /* ── Generous spacing ───────────────────────────────────── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -95,34 +104,44 @@
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
 
-  /* ── Radius ────────────────────────────────────────────── */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* ── Soft squircle radii ────────────────────────────────── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
   --radius-pill: 9999px;
 
-  /* ── Shadow ────────────────────────────────────────────── */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.5);
+  /* ── Ethereal shadows (glass-like, not harsh) ───────────── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.7);
+  --shadow-glow-primary: 0 0 80px rgba(255, 92, 114, 0.06);
+  --shadow-inset-glass: inset 0 1px 1px rgba(255, 255, 255, 0.06);
 
-  /* ── Transition ────────────────────────────────────────── */
+  /* ── Premium motion curves ───────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-smooth: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-silk: cubic-bezier(0.32, 0.72, 0, 1);
   --duration-fast: 150ms;
-  --duration-base: 250ms;
-  --duration-slow: 400ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  --duration-glacial: 800ms;
 
-  /* ── Layout ────────────────────────────────────────────── */
-  --sidebar-width: 250px;
+  /* ── Layout ─────────────────────────────────────────────── */
+  --sidebar-width: 260px;
   --sidebar-collapsed-width: 64px;
-  --topbar-height: 56px;
+  --topbar-height: 60px;
   --content-max-width: 1320px;
 
-  /* ── Legacy aliases (keep old code working) ────────────── */
+  /* ── Legacy aliases ─────────────────────────────────────── */
   --color-canvas: var(--color-bg);
   --color-surface-card: var(--color-bg-card);
   --color-surface-dark: var(--color-sidebar-bg);
@@ -144,12 +163,10 @@
   --color-surface-elevated: var(--color-bg-elevated);
   --color-surface-muted: var(--color-bg-card);
   --color-primary-light: var(--color-primary-glow);
-  --color-primary-ghost: rgba(225, 79, 98, 0.06);
+  --color-primary-ghost: var(--color-primary-soft);
   --color-accent: var(--color-primary);
   --color-bg-page: var(--color-bg);
   --color-text-primary: var(--color-text-strong);
-  --color-text-secondary: var(--color-text-secondary);
-  --color-border: var(--color-border);
   --color-on-primary: var(--color-text-on-primary);
 
   /* legacy spacing */
@@ -160,10 +177,10 @@
   --spacing-lg: var(--space-6);
   --spacing-xl: var(--space-8);
   --spacing-xxl: var(--space-12);
-  --spacing-section: var(--space-12);
+  --spacing-section: var(--space-16);
 
   /* legacy radius */
-  --rounded-xs: 4px;
+  --rounded-xs: var(--radius-xs);
   --rounded-sm: var(--radius-sm);
   --rounded-md: var(--radius-md);
   --rounded-lg: var(--radius-lg);
@@ -173,11 +190,11 @@
   /* legacy misc */
   --radius: var(--radius-lg);
   --shadow: none;
-  --duration-stream: 0.3s;
+  --duration-stream: 0.5s;
   --navbar-height: 0px;
 
   /* legacy motion */
-  --motion-smooth: var(--ease-out);
+  --motion-smooth: var(--ease-out-expo);
   --motion-silk: var(--ease-smooth);
-  --motion-spring: cubic-bezier(0.34, 1.35, 0.64, 1);
+  --motion-spring: var(--ease-spring);
 }

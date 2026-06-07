@@ -11,9 +11,9 @@ I built a free offline supply chain risk analyzer — looking for feedback from 
 **Text:**
 I'm a developer who got interested in supply chain risk management. I built Saisca — a desktop app that takes Excel/CSV files and automatically detects bullwhip effects, scores node risks, and recommends actions (replenish, reroute, switch supplier, etc.). Runs completely offline on your laptop.
 
-Screenshots: https://github.com/cayincoorts-hue/saisika#readme
-GitHub: https://github.com/cayincoorts-hue/saisika
-Download: https://github.com/cayincoorts-hue/saisika/releases
+Screenshots: https://github.com/cengchenyicheng/saisika#readme
+GitHub: https://github.com/cengchenyicheng/saisika
+Download: https://github.com/cengchenyicheng/saisika/releases
 
 MIT licensed. Would love honest feedback from people who actually work in supply chain.
 
@@ -28,7 +28,7 @@ Show r/opensource: Saisca — offline supply chain risk analysis (Excel → insi
 **Text:**
 Just open-sourced this under MIT. Supply chain risk analyzer that runs fully offline. Drop Excel/CSV → automatic risk scoring → reasoning trails → action recommendations. React + FastAPI + ECharts. Electron desktop app.
 
-https://github.com/cayincoorts-hue/saisika
+https://github.com/cengchenyicheng/saisika
 
 ---
 
@@ -47,7 +47,7 @@ Key engineering decisions:
 - All warnings collected and surfaced (no silent data loss)
 - Full 6-step reasoning trail for every risk score
 
-https://github.com/cayincoorts-hue/saisika
+https://github.com/cengchenyicheng/saisika
 
 ---
 
@@ -63,8 +63,8 @@ Saisca，一个可以本地运行的供应链风险分析工具。丢 Excel/CSV 
 技术栈：React + FastAPI + pandas + ECharts
 完全离线，数据不出本地，MIT 开源
 
-GitHub：https://github.com/cayincoorts-hue/saisika
-下载：https://github.com/cayincoorts-hue/saisika/releases
+GitHub：https://github.com/cengchenyicheng/saisika
+下载：https://github.com/cengchenyicheng/saisika/releases
 
 求供应链/物流/运营方向的朋友试用来给反馈！
 
@@ -75,7 +75,7 @@ GitHub：https://github.com/cayincoorts-hue/saisika
 
 Product Name: Saisca
 Tagline: Offline supply chain risk analyzer — drop Excel, get insights
-Website/URL: https://github.com/cayincoorts-hue/saisika
+Website/URL: https://github.com/cengchenyicheng/saisika
 Description: Same as above
 
 ---

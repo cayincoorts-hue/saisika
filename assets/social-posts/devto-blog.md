@@ -58,8 +58,8 @@ Every warning, every unrecognized column, every duplicate is collected and surfa
 
 ## Try It
 
-- **GitHub:** [github.com/cayincoorts-hue/saisica](https://github.com/cayincoorts-hue/saiska)
-- **Download:** [Releases](https://github.com/cayincoorts-hue/saiska/releases)
+- **GitHub:** [github.com/cengchenyicheng/saisika](https://github.com/cengchenyicheng/saisika)
+- **Download:** [Releases](https://github.com/cengchenyicheng/saisika/releases)
 - **License:** MIT
 
 ---
