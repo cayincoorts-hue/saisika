@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 0 > /tmp/saiska-search-count; echo 0 > /tmp/saiska-edit-count; echo '{\"systemMessage\": \"IRON RULES: 1) Start EVERY response with 兄弟 2) Scan skills before responding 3) Before push: scan internal files 4) Before claiming done: verify 5) UI changes: screenshot → Mimo review 6) New .py: write tests 7) Community files current 8) Bug fails 3x → WebSearch → ask Mimo. Counters reset.\"}'",
+            "command": "echo 0 > /tmp/saiska-search-count; echo 0 > /tmp/saiska-edit-count; echo '{\"systemMessage\": \"IRON RULES: 1) Start EVERY response with 兄弟 2) Scan skills before responding 3) Big new idea → WebSearch first 4) Before push: scan internal files 5) Before claiming done: verify 6) UI changes: screenshot → Mimo review 7) New code: write tests 8) Bug fails 3x → ask Mimo 9) Community files current. Counters reset.\"}'",
             "timeout": 3
           }
         ]
