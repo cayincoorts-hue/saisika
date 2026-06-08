@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"systemMessage\": \"IRON RULES ACTIVE: 1) Every response MUST start with 兄弟 2) Scan available skills before every response (using-superpowers/verification-before-completion/brainstorming/test-driven-development) 3) Before git push: scan for internal files 4) Before claiming done: run verification 5) UI changes: screenshot → Mimo v2.5 review 6) New .py code: write tests 7) Community health files must be current\"}'",
+            "command": "echo '{\"systemMessage\": \"IRON RULES: 1) Start EVERY response with 兄弟 2) Scan skills before responding 3) Before push: scan internal files 4) Before claiming done: verify 5) UI changes: screenshot → Mimo review 6) New .py: write tests 7) Community files current 8) Bug fails 3x → WebSearch → ask Mimo\"}'",
             "timeout": 3
           }
         ]
