@@ -83,6 +83,29 @@
             "statusMessage": "Checking TypeScript..."
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "if": "Write|Edit(.css .tsx .ts)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"UI file changed — remember: screenshot → python3 scripts/review-ui.py for Mimo design review before committing.\", \"continue\": true}'",
+            "timeout": 3,
+            "statusMessage": "Mimo review reminder..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read -r f; if grep -qE 'fonts\\.googleapis|cdn\\.jsdelivr|unpkg\\.com|cdnjs\\.cloudflare' \"$f\" 2>/dev/null; then echo \"{\\\"systemMessage\\\": \\\"CDN/Google Fonts detected in $f — REMOVE immediately. Zero external deps rule.\\\", \\\"continue\\\": true}\"; else echo '{}'; fi; }",
+            "timeout": 5,
+            "statusMessage": "Checking for CDN deps..."
+          }
+        ]
       }
     ],
     "Stop": [
