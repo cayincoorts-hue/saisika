@@ -119,6 +119,24 @@
 
 ---
 
+## ⛔ 铁律：Context 接近满时立即 Handoff（不可跳过）
+
+**当系统触发 auto-compact（上下文窗口满了），必须执行以下流程：**
+
+1. Commit 所有未提交的改动
+2. Push 到 GitHub
+3. 用 `/handoff` 或直接写出当前所有关键状态到 CLAUDE.md
+4. 等下次 session 继续
+
+**标志：**
+- console 出现 "compacting conversation" 或类似提示
+- 响应变慢、被截断
+- PreCompact hook 触发警告
+
+**注意：** 无法直接从 hook 读取 context 百分比，但 auto-compact 触发 = 已经接近满。
+
+---
+
 ## ⛔ 铁律：UI/视觉变更后必须用多模态 AI 审查（不可跳过）
 
 **DeepSeek v4 没有视觉能力。任何涉及 UI 设计、样式、布局的变更完成后，必须：**

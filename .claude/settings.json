@@ -95,6 +95,40 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"CONTEXT WARNING: Auto-compact triggered — context window is full. After compaction: if context still tight, do a handoff to preserve state. Commit any uncommitted work first.\", \"continue\": true}'",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"Manual compact requested — OK to proceed.\", \"continue\": true}'",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"Compacted. If you can no longer see earlier conversation context, initiate a handoff to preserve project state in CLAUDE.md and commit/push all work.\", \"continue\": true}'",
+            "timeout": 3
+          }
+        ]
+      }
     ]
   }
 }
