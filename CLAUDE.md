@@ -136,10 +136,76 @@
 
 ---
 
+## ⛔ 铁律：本地开发与部署流程（不可跳过）
+
+### 启动服务器
+```bash
+pkill -f uvicorn; python3 /Users/cengchenyicheng/saisika/run.py --no-browser &
+curl -s http://localhost:8000/api/health
+```
+
+### 构建前端
+```bash
+cd /Users/cengchenyicheng/saisika/app/frontend && npm run build
+```
+
+### 重启服务器（代码改动后）
+```bash
+kill -9 $(lsof -t -i :8000) 2>/dev/null; sleep 1
+python3 /Users/cengchenyicheng/saisika/run.py --no-browser &
+```
+
+**禁止：** 从不正确的目录运行 npm、用 `python` 代替 `python3`
+
+---
+
+## ⛔ 铁律：VPN/代理与网络（不可跳过）
+
+| 工具 | 需要 VPN？ | 说明 |
+|------|-----------|------|
+| `git push/pull` | ✅ | 走 127.0.0.1:7892 |
+| `gh api/release/discussion` | ❌ | gh CLI 直连 GitHub |
+| WebSearch/WebFetch | ✅ | 需要 VPN |
+
+VPN 离线时：push 用 `gh` 代替，或开启猫猫云。
+
+---
+
+## ⛔ 铁律：零外部 CDN 依赖（不可跳过）
+
+- ❌ Google Fonts、CDN JS/CSS、外部图标库
+- ✅ 系统字体（SF Pro / Segoe UI / PingFang SC）
+- ✅ 内嵌 SVG 图标
+
+---
+
+## ⛔ 铁律：大文件 base64 处理（不可跳过）
+
+大截图（>500KB）不要用 shell curl + base64（会超 argument limit）：
+```python
+import base64, json, urllib.request
+with open('path.png', 'rb') as f:
+    b64 = base64.b64encode(f.read()).decode()
+# urllib.request.Request
+```
+
+---
+
+## ⛔ 铁律：社区推广（无需手动操作）
+
+| 平台 | 方式 |
+|------|------|
+| GitHub Discussions | `gh api graphql` |
+| GitHub Release | `gh release create` |
+| dev.to / HN | 已废弃，不再投入 |
+
+---
+
 ## 变更日志
 
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
+| v1.5 | 2026-06-08 | 兄弟规则、7 铁律 hook 防线、社区健康文件全套、Mimo 多模态审查、测试体系、零外部依赖、VPN 网络规范 |
 | v1.0 | 2026-05-02 | 初始版本 |
 | v1.1 | 2026-05-03 | 决策收口：图片识别、代码复用、优先级公式、流式展示、传播图、开发顺序 |
 | v1.2 | 2026-05-25 | 技术栈调整为纯静态部署、Excel+CSV双输入、数据自动持久化、三层数据流架构 |
