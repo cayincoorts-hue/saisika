@@ -23,7 +23,8 @@
     "ok": "确定",
     "submit": "提交",
     "reset": "重置",
-    "backHome": "返回首页"
+    "backHome": "返回首页",
+    "generatedAt": "生成时间"
   },
   "nav": {
     "navigation": "导航",
@@ -60,7 +61,8 @@
     "uploading": "上传中...",
     "uploadSuccess": "上传成功",
     "uploadFailed": "上传失败",
-    "maxFileSize": "最大文件大小：50MB",
+    "maxFileSize": "单文件最大 50MB",
+    "maxFileCount": "最多 10 个文件",
     "batchLabel": "批次",
     "fileList": "已上传文件",
     "noFiles": "尚未上传文件"

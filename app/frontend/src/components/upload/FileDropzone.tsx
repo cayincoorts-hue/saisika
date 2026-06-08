@@ -8,17 +8,6 @@ interface Props {
   disabled?: boolean;
 }
 
-const FILE_ICONS: Record<string, string> = {
-  csv: '📊',
-  xlsx: '📈',
-  xls: '📈',
-};
-
-function fileIcon(name: string): string {
-  const ext = name.split('.').pop()?.toLowerCase() || '';
-  return FILE_ICONS[ext] || '📄';
-}
-
 export default function FileDropzone({ files, onChange, disabled }: Props) {
   const { t } = useTranslation();
   const [dragover, setDragover] = useState(false);
@@ -60,15 +49,11 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
       const processEntry = (entry: FileSystemEntry): Promise<File[]> => {
         return new Promise(resolve => {
           if (entry.isFile) {
-            (entry as FileSystemFileEntry).file(file => {
-              resolve([file]);
-            });
+            (entry as FileSystemFileEntry).file(file => resolve([file]));
           } else if (entry.isDirectory) {
             const reader = (entry as FileSystemDirectoryEntry).createReader();
             reader.readEntries(entries => {
-              Promise.all(entries.map(processEntry)).then(results => {
-                resolve(results.flat());
-              });
+              Promise.all(entries.map(processEntry)).then(results => resolve(results.flat()));
             });
           } else {
             resolve([]);
@@ -89,8 +74,7 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
 
       if (entries.length > 0) {
         Promise.all(entries.map(processEntry)).then(results => {
-          const all = [...files, ...results.flat(), ...newFiles];
-          onChange(all);
+          onChange([...files, ...results.flat(), ...newFiles]);
         });
         return;
       }
@@ -109,34 +93,38 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
 
   const removeFile = (i: number) => onChange(files.filter((_, idx) => idx !== i));
 
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--cursor-x', `${e.clientX - rect.left}px`);
-    e.currentTarget.style.setProperty('--cursor-y', `${e.clientY - rect.top}px`);
-  }, []);
-
   return (
     <div>
       <div
-        className={`lux-hover upload-dropzone ${dragover ? 'is-active' : ''}`}
+        className={`upload-dropzone ${dragover ? 'is-active' : ''}`}
         onDrop={handleDrop}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
-        onPointerMove={handlePointerMove}
         style={{
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.5 : 1,
         } as CSSProperties}
       >
-        <span className="upload-dropzone-icon">
-          {dragover ? '📥' : '📂'}
-        </span>
+        <div className="upload-dropzone-icon">
+          {dragover ? (
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          ) : (
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+              <polyline points="13 2 13 9 20 9"/>
+            </svg>
+          )}
+        </div>
         <p className="upload-dropzone-text">
           {dragover ? t('upload.dropHere') : t('upload.dragDrop')}
         </p>
         <p className="upload-dropzone-hint">
-          {t('upload.supportedFormats')}
+          {t('upload.supportedFormats')} · {t('upload.maxFileSize')} · {t('upload.maxFileCount')}
         </p>
         <label className="btn btn-outline" style={{ display: 'inline-flex', marginTop: 8 }}>
           {t('upload.selectFile')}
@@ -159,11 +147,11 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
             </span>
             <button
               onClick={() => onChange([])}
-              className="btn-ghost"
               style={{
                 border: 'none', background: 'none',
                 color: 'var(--color-error)', fontSize: 'var(--text-xs)',
                 cursor: 'pointer', fontWeight: 500,
+                fontFamily: 'var(--font-body)',
               }}
               disabled={disabled}
             >
@@ -175,12 +163,17 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
               <div
                 key={`${f.name}-${f.size}-${i}`}
                 className="file-item stagger-item"
-                style={{
-                  '--item-delay': `${120 + i * 50}ms`,
-                } as CSSProperties}
+                style={{ '--item-delay': `${120 + i * 50}ms` } as CSSProperties}
               >
                 <span className="file-item-name">
-                  <span className="file-item-icon">{fileIcon(f.name)}</span>
+                  <span className="file-item-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                  </span>
                   <span>{f.name}</span>
                 </span>
                 <span className="file-item-size">
@@ -192,7 +185,9 @@ export default function FileDropzone({ files, onChange, disabled }: Props) {
                   disabled={disabled}
                   title={t('common.delete')}
                 >
-                  ×
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
                 </button>
               </div>
             ))}

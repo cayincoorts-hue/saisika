@@ -23,7 +23,8 @@
     "ok": "OK",
     "submit": "Submit",
     "reset": "Reset",
-    "backHome": "Back to Home"
+    "backHome": "Back to Home",
+    "generatedAt": "Generated"
   },
   "nav": {
     "navigation": "Navigation",
@@ -60,7 +61,8 @@
     "uploading": "Uploading...",
     "uploadSuccess": "Upload successful",
     "uploadFailed": "Upload failed",
-    "maxFileSize": "Maximum file size: 50MB",
+    "maxFileSize": "Max 50MB per file",
+    "maxFileCount": "Up to 10 files",
     "batchLabel": "Batch",
     "fileList": "Uploaded Files",
     "noFiles": "No files uploaded yet"

@@ -96,6 +96,40 @@
 
 ---
 
+## ⛔ 铁律：UI/视觉变更后必须用多模态 AI 审查（不可跳过）
+
+**DeepSeek v4 没有视觉能力。任何涉及 UI 设计、样式、布局的变更完成后，必须：**
+
+1. 确保 server 运行中，截图保存到 `assets/screenshots/`
+2. 用 Python 脚本调用 `mimo-v2.5` 视觉模型审查截图：
+   ```python
+   import base64, json, urllib.request
+   with open('assets/screenshots/<file>.png', 'rb') as f:
+       b64 = base64.b64encode(f.read()).decode()
+   data = json.dumps({
+       'model': 'mimo-v2.5', 'max_tokens': 800,
+       'messages': [{'role': 'user', 'content': [
+           {'type': 'text', 'text': 'UI/UX review...'},
+           {'type': 'image_url', 'image_url': {'url': f'data:image/png;base64,{b64}'}}
+       ]}]
+   }).encode()
+   req = urllib.request.Request('https://api.xiaomimimo.com/v1/chat/completions',
+       data=data, headers={'Authorization': 'Bearer <MIMO_KEY>', 'Content-Type': 'application/json'})
+   print(json.loads(urllib.request.urlopen(req).read())['choices'][0]['message']['content'])
+   ```
+3. 根据审查反馈修改代码
+4. 重新截图验证
+
+**可用多模态模型：**
+| 模型 | 用途 | API |
+|------|------|-----|
+| `mimo-v2.5` | 截图设计审查 | `api.xiaomimimo.com/v1` |
+| Claude Vision | 备用 | 需要 API key（当前不可用） |
+
+
+
+---
+
 ## 变更日志
 
 | 版本 | 日期 | 变更内容 |
