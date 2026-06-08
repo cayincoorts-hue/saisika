@@ -1,0 +1,89 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"IRON RULES ACTIVE: 1) Every response MUST start with 兄弟 2) Scan available skills before every response (using-superpowers/verification-before-completion/brainstorming/test-driven-development) 3) Before git push: scan for internal files 4) Before claiming done: run verification 5) UI changes: screenshot → Mimo v2.5 review 6) New .py code: write tests 7) Community health files must be current\"}'",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"START WITH 兄弟. SCAN SKILLS. CHECK CLAUDE.md.\"}'",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "if": "Bash(git push *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/cengchenyicheng/saisika && INTERNAL=$(git ls-files | grep -E 'CLAUDE\\.md$|\\.spec$|electron-builder|\\.mcp\\.json$|\\.vscode/|\\.DS_Store|keygen\\.py|saisika/' 2>/dev/null); if [ -n \"$INTERNAL\" ]; then echo \"{\\\"systemMessage\\\": \\\"WARNING: Internal files detected in tracked files:\\\\n$INTERNAL\\\\n\\\\nProceeding but review before public release.\\\", \\\"continue\\\": true}\"; else echo '{}'; fi",
+            "timeout": 10,
+            "statusMessage": "Scanning for internal files..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "if": "Write|Edit(.py)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; python3 -c \"import py_compile; py_compile.compile('$f', doraise=True)\" 2>&1 && echo '{}' || echo \"{\\\"systemMessage\\\": \\\"Python syntax error in $f — fix before committing\\\", \\\"continue\\\": true}\"; }",
+            "timeout": 10,
+            "statusMessage": "Checking Python syntax..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; case \"$f\" in */services/*.py|*/adapters/*.py|*/utils/bilingual.py) TEST=\"tests/test_$(basename $f .py).py\"; if [ ! -f \"$TEST\" ]; then echo \"{\\\"systemMessage\\\": \\\"No test file for $f. Write tests at $TEST before committing.\\\", \\\"continue\\\": true}\"; else echo '{}'; fi;; *) echo '{}';; esac; }",
+            "timeout": 5,
+            "statusMessage": "Checking test coverage..."
+          },
+          {
+            "type": "command",
+            "command": "cd /Users/cengchenyicheng/saisika && python3 -m pytest tests/ -q 2>&1 | tail -3 && echo '{}' || echo \"{\\\"systemMessage\\\": \\\"Tests FAILED — fix before committing.\\\", \\\"continue\\\": true}\"",
+            "timeout": 15,
+            "statusMessage": "Running tests..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "if": "Write|Edit(.tsx .ts)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; case \"$f\" in */app/frontend/*) cd /Users/cengchenyicheng/saisika/app/frontend && npx tsc --noEmit 2>&1 | head -5 && echo '{}' || echo \"{\\\"systemMessage\\\": \\\"TypeScript errors detected — fix before building\\\", \\\"continue\\\": true}\";; *) echo '{}';; esac; }",
+            "timeout": 30,
+            "statusMessage": "Checking TypeScript..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/cengchenyicheng/saisika && CHANGES=$(git status --short 2>/dev/null | wc -l | tr -d ' '); if [ \"$CHANGES\" -gt 0 ]; then echo \"{\\\"systemMessage\\\": \\\"$CHANGES uncommitted file(s) in working tree. Remember to commit before ending session.\\\"}\"; else echo '{}'; fi",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
