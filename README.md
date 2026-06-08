@@ -1,97 +1,94 @@
-# Saisca — Supply Chain Risk Analysis System
+# Saisca — Offline Supply Chain Risk Analyzer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://www.python.org/)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-green.svg)](https://www.python.org/)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)]()
-[![Release](https://img.shields.io/badge/release-v1.4.0-brightgreen.svg)](https://github.com/cayincoorts-hue/saisika/releases)
+[![Release](https://img.shields.io/badge/release-v1.4.1-brightgreen.svg)](https://github.com/cayincoorts-hue/saisika/releases)
+[![Discussions](https://img.shields.io/badge/discussions-welcome-blue.svg)](https://github.com/cayincoorts-hue/saisika/discussions)
+[![CI](https://github.com/cayincoorts-hue/saisika/actions/workflows/ci.yml/badge.svg)](https://github.com/cayincoorts-hue/saisika/actions)
 
-A locally-deployable supply chain risk analysis tool for supply chain managers. Import Excel/CSV, get risk insights, reasoning trails, and actionable recommendations — all offline, no cloud dependency.
-
-> **📹 [Watch Demo (YouTube)](https://youtube.com/)** · **[Bilibili 演示视频](https://bilibili.com/)**
+**Drop in Excel/CSV files. Get risk insights, reasoning trails, and actionable recommendations — all offline. No cloud. No telemetry.**
 
 <p align="center">
-  <img src="assets/screenshots/upload.png" width="30%" alt="Upload Page" />
-  <img src="assets/screenshots/confirm.png" width="30%" alt="Confirm Page" />
-  <img src="assets/screenshots/results.png" width="30%" alt="Results Page" />
+  <img src="assets/screenshots/upload.png" width="30%" alt="Upload" />
+  <img src="assets/screenshots/confirm.png" width="30%" alt="Confirm" />
+  <img src="assets/screenshots/results.png" width="30%" alt="Results" />
 </p>
+
+---
 
 ## What It Does
 
-| Output | Answers the Question |
-|--------|---------------------|
+| Output | Question Answered |
+|--------|------------------|
 | **Risk Trend Chart** | Is risk worsening or improving over time? |
-| **Risk Distribution Chart** | Where is risk concentrated across the supply chain? |
-| **Propagation Timeline** | Where does risk come from and spread to? |
+| **Risk Distribution Chart** | Where is risk concentrated in the network? |
+| **Propagation Timeline** | Where does risk come from, and where is it spreading? |
 | **High-Risk Node Table** | Which nodes need immediate action, in what order? |
-| **Data Confidence** | How reliable is this analysis? What data is missing? |
-| **Domain Insights** | Bullwhip effect, VMI, QR patterns detected? |
+| **Data Confidence Panel** | How reliable is this analysis? What data is missing? |
+| **Domain Insights** | Bullwhip effect? VMI pattern? Quick Response detected? |
 
-Each high-risk node includes a full **6-step reasoning trail**, **risk cause details** (trigger metrics + threshold comparisons), and **structured action recommendations** (replenish / reroute / switch supplier / adjust logistics / investigate / monitor).
+Every high-risk node includes a full **6-step reasoning trail**, risk cause details with threshold comparisons, and structured action recommendations (Replenish / Reroute / Switch Supplier / Adjust Logistics / Investigate / Monitor).
+
+**New in v1.4.1:** Light minimalist UI — clean top navigation, warm monochrome palette. Full English support with zero Chinese strings in EN mode.
 
 ## Quick Start
 
-### Desktop App (Double-click to Launch)
-
-Download the latest `.dmg` from [GitHub Releases](https://github.com/cayincoorts-hue/saisika/releases) → drag to Applications → launch Saisca. (First launch: right-click → Open.)
-
-**Now free and open — no activation code required.**
-
-### Run from Source
+### One Command
 
 ```bash
-git clone https://github.com/cayincoorts-hue/saisika.git
-cd saisika
-pip install -r requirements.txt
-python run.py
+pip install -r requirements.txt && python run.py
 # Open http://localhost:8000
 ```
 
-## Demo Data
+No Node.js setup needed — the frontend is pre-built and served by FastAPI.
 
-`demo_data/demo_scenario/` contains a purpose-built 10-node supply chain simulation (26 weeks × 5 metrics):
+### Desktop App (macOS)
 
-| File | Description |
-|------|-------------|
-| `Sales Order.csv` | Downstream demand (long format: date, node_id, value) |
-| `Production.csv` | Factory output |
-| `Delivery To Distributor.csv` | Distribution center deliveries |
-| `Factory Issue.csv` | Supplier shipments |
-| `Inventory.csv` | Node inventory levels (S002 sharp drop in last 10 weeks) |
-| `Nodes.csv` | Node attributes (name, type, tier, region) |
-| `Edges.csv` | Supply chain relationships (risk links marked) |
-| `Node Types.csv` | Node type descriptions |
-| `README.md` | Scenario design notes |
+Download the `.dmg` from [Releases](https://github.com/cayincoorts-hue/saisika/releases) → drag to Applications → right-click → Open.
 
-**Engineered risk characteristics:**
+**Free and open. No activation code required.**
 
-- S002 East China Parts Supplier → inventory crash + delivery disruption → **high-risk node**
-- P001 Shenzhen Factory → upstream volatility amplification → **bullwhip effect**
-- D001 South China DC → volatility significantly lower than peers → **VMI pattern**
-- R002 Shanghai Retailer → high-frequency small-batch stable demand → **QR pattern**
+### Demo Data
+
+`demo_data/demo_scenario/` contains a 10-node supply chain simulation (26 weeks × 5 metrics). Upload all CSV files to see the full pipeline:
+
+```bash
+# After starting the server:
+curl -X POST http://localhost:8000/api/upload \
+  -F "files=@demo_data/demo_scenario/Nodes.csv" \
+  -F "files=@demo_data/demo_scenario/Sales Order.csv" \
+  -F "files=@demo_data/demo_scenario/Production.csv" \
+  -F "files=@demo_data/demo_scenario/Delivery To Distributor.csv" \
+  -F "files=@demo_data/demo_scenario/Factory Issue.csv"
+curl -X POST "http://localhost:8000/api/analyze?batch_id=YOUR_BATCH_ID&lang=en"
+```
 
 ## Architecture
 
 ```
-User uploads Excel/CSV
+Upload Excel/CSV
   ↓
-excel_adapter      Read file → detect role (fact/node/edge/metadata)
+excel_adapter      Read file → detect role (fact/node/edge)
   ↓
-field_mapper       Wide-table melt → column mapping → tri-state identification
+field_mapper       Wide-table melt → column mapping → tri-state ID
   ↓
-data_merger        Cross-scenario merge → mark duplicate measurement bases
+data_merger        Cross-scenario merge → unified long table
   ↓
-graph_builder      Build supply chain network → infer tier hierarchy
+graph_builder      Build supply chain network → infer hierarchy
   ↓
 risk_engine        Compute risk scores → annotate risk_causes
   ↓
-decision_engine    Classify actions → generate action_type + justification
+decision_engine    Classify actions → action_type + justification
   ↓
-analysis_engine    Assemble 6 result objects (including domain_insights)
+analysis_engine    Assemble 6 result objects + domain_insights
   ↓
-prompt_builder     Generate text conclusions (reads annotations, never raw numbers)
+prompt_builder     Generate text summary (reads labels, never raw numbers)
   ↓
 result_exporter    Output JSON + HTML report
 ```
+
+**Key principle:** Business logic runs once at the data source. Downstream modules consume semantic labels only — never recompute from raw data.
 
 ## Tech Stack
 
@@ -99,75 +96,63 @@ result_exporter    Output JSON + HTML report
 |-------|-----------|
 | Frontend | React + TypeScript + Vite + ECharts + GSAP |
 | Backend | Python + FastAPI + pandas + openpyxl |
-| Graph Layout | Three.js + react-force-graph-3d |
-| LLM (optional) | Ollama (explanation layer only, not risk engine) |
-| Packaging | PyInstaller + Electron + electron-builder |
+| 3D Graph | Three.js + react-force-graph-3d |
 | Theory | SCOR / Bullwhip Effect / VMI / QR / SC-BSC |
+| Packaging | PyInstaller + Electron (macOS .dmg) |
+
+## Privacy & Security
+
+- **All data stored locally** in `data/` directory — never leaves your machine
+- **Zero network requests** — no telemetry, no analytics, no cloud
+- **Offline by design** — works on an air-gapped laptop
+- Security issues? See [SECURITY.md](SECURITY.md)
 
 ## Data Format
 
-The system accepts two fact-table formats:
-
-**Long format** (recommended): `date, node_id, value`
+**Long format** (recommended):
 ```csv
 date,node_id,value
 2026-01-05,S001,99.3
 ```
 
-**Wide format**: rows as dates, columns as node codes
+**Wide format** (auto-melted): rows as dates, columns as nodes
 ```csv
 Date,SOS008L02P,SOS005L04P
 2026-01-05,1355.0,890.2
 ```
 
-Node tables need: `node_id, node_name, node_type`. Edge tables need: `source, target`.
+Node tables: `node_id, node_name, node_type`. Edge tables: `source, target, relation_type`.
 
-## Privacy
+## Contributing
 
-- All data stored locally in `data/` directory
-- No internet connection, no telemetry, no cloud dependency
-- Backend compiled to binary for code logic protection
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, project structure, and PR checklist.
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE).
 
 ---
 
 <details>
 <summary>中文说明</summary>
 
-# Saisca — 供应链风险分析系统
+Saisca 是一款可本地部署的供应链风险分析桌面工具。导入 Excel/CSV 即可获得风险洞察、推理链条和处置建议——全部离线，无需云端。
 
-面向供应链管理者，可本地部署、支持 Excel/CSV 导入的风险分析桌面工具。不依赖云端，数据不出本地。
+### 快速开始
 
-## 分析输出
+```bash
+pip install -r requirements.txt && python run.py
+# 浏览器访问 http://localhost:8000
+```
 
-| 结果 | 回答的问题 |
-|------|-----------|
-| 风险趋势图 | 风险是在加剧还是缓解？ |
-| 风险分布图 | 整体风险集中在哪一层？ |
-| 风险传播时序图 | 风险从哪里来、往哪里扩散？ |
-| 高风险节点表 | 哪些节点需要立即处理、按什么顺序？ |
-| 数据可信度 | 结论有多可信、缺了什么数据？ |
-| 供应链领域洞察 | 是否存在牛鞭效应、VMI、QR 等经典模式？ |
+无需安装 Node.js——前端已预构建，由 FastAPI 直接 serve。
 
-## 快速开始
+### 演示数据
 
-从 [GitHub Releases](https://github.com/cayincoorts-hue/saisika/releases) 下载 `.dmg` → 拖入 Applications → 右键打开。
+`demo_data/demo_scenario/` 含 10 节点供应链模拟数据（26 周 × 5 指标），刻意设计了牛鞭效应、VMI、QR 等经典风险特征。上传后可直接看到完整分析流程。
 
-**现已免费开放，无需激活码。**
+### 隐私
 
-## 演示数据
-
-`demo_data/demo_scenario/` 含 10 节点供应链模拟数据（26 周 × 5 指标），刻意设计了牛鞭效应、VMI、QR 等经典风险特征。
-
-## 隐私
-
-全部数据存本地 `data/` 目录。不联网，无遥测，无云端依赖。
-
-## 许可证
-
-MIT License。详见 [LICENSE](LICENSE)。
+全部数据存本地 `data/` 目录。不联网，无遥测，无云端依赖。适合断网环境使用。
 
 </details>
