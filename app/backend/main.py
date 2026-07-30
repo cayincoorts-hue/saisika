@@ -45,14 +45,22 @@ app = FastAPI(title="Saisca — 供应链风险分析系统", version="1.3.0")
 
 EXEMPT_PREFIXES = ("/api/license", "/api/health", "/docs", "/openapi.json")
 
+# 激活码开关（默认关闭 = 完全放行，所有功能免费）。
+# 如需重新启用激活码门槛，设环境变量 SAISIKA_LICENSE_ENFORCED=1 即可。
+# 决策依据：CLAUDE.md v1.4「先全开放获取用户」。license 代码完整保留，随时可开。
+LICENSE_ENFORCED = os.environ.get("SAISIKA_LICENSE_ENFORCED", "").strip() in ("1", "true", "True")
+
 @app.middleware("http")
 async def license_middleware(request: Request, call_next):
     """拦截未激活的请求。
 
-    API 请求（/api/*）未激活时返回 403。
-    页面请求（/ 和静态资源）放行，让前端激活页面正常显示。
-    health、docs、license 端点始终放行。
+    默认完全放行（LICENSE_ENFORCED=False）。
+    启用后：API 请求（/api/*）未激活时返回 403；页面与静态资源放行。
     """
+    # 默认放行：未启用激活码门槛时直接通过
+    if not LICENSE_ENFORCED:
+        return await call_next(request)
+
     path = request.url.path
 
     # 安全端点始终放行

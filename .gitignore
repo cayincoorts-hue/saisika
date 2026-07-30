@@ -28,3 +28,5 @@ CLAUDE.md
 generate_demo_data.py
 saisika.spec
 docs/
+.claude/settings.local.json
+.claude/scheduled_tasks.json

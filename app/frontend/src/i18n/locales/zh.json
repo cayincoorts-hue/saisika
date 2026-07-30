@@ -146,7 +146,8 @@
     "analyzeNewData": "分析新数据",
     "loadingResult": "加载分析结果...",
     "nodeEdgeCount": "{nodes} 个节点，{edges} 条边",
-    "nodeEdgeCountTruncated": "共 {nodes} 个节点，显示权重最高的 {shown} 条边（总计 {total} 条边）"
+    "nodeEdgeCountTruncated": "共 {nodes} 个节点，显示权重最高的 {shown} 条边（总计 {total} 条边）",
+    "charts": "图表"
   },
   "riskNodeTable": {
     "nodeId": "节点ID",

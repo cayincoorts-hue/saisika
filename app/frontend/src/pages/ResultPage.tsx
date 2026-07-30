@@ -110,21 +110,33 @@ export default function ResultPage() {
       {/* Stat Cards */}
       <div className="stat-grid">
         <div className="stat-card">
-          <div className="stat-card-icon primary">📁</div>
+          <div className="stat-card-icon primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
           <div className="stat-card-body">
             <div className="stat-card-value">{inputSummary.file_count || inputSummary.total_files || '—'}</div>
             <div className="stat-card-label">{t('result.files')}</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-card-icon blue">📊</div>
+          <div className="stat-card-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
           <div className="stat-card-body">
             <div className="stat-card-value">{inputSummary.row_count || '—'}</div>
             <div className="stat-card-label">{t('result.dataRows')}</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-card-icon teal">🔗</div>
+          <div className="stat-card-icon teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M12 12l4-4m-4 4l-4 4"/>
+            </svg>
+          </div>
           <div className="stat-card-body">
             <div className="stat-card-value">{inputSummary.node_count || '—'}</div>
             <div className="stat-card-label">{t('result.nodes')}</div>
@@ -132,7 +144,11 @@ export default function ResultPage() {
         </div>
         {graphData.edges.length > 0 && (
           <div className="stat-card">
-            <div className="stat-card-icon amber">↔️</div>
+            <div className="stat-card-icon amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </div>
             <div className="stat-card-body">
               <div className="stat-card-value">{graphData.edges.length}</div>
               <div className="stat-card-label">{t('result.edges')}</div>

@@ -152,7 +152,10 @@ class RiskEngine:
             scores[nid] = {
                 "risk_score": round(score, 4),
                 "risk_level": level,
-                "priority": round(score * propagation, 4),
+                # Priority = Risk × Propagation（CLAUDE.md 7.2 第一版简化）。
+                # score 已等于 risk × propagation，故 priority 直接取 score，
+                # 不再重复乘 propagation（否则会变成 risk × propagation²）。
+                "priority": round(score, 4),
                 "risk_components": {k: v for k, v in comp.items()
                                     if k in ("volatility_risk", "inventory_risk",
                                              "delivery_delay_risk", "delay_flag_risk")},
@@ -645,6 +648,10 @@ class RiskEngine:
                 "description": "计算四个风险分量的原始值",
                 "detail": {
                     "volatility": f"各指标平均 CV = {components.get('volatility_risk_raw', 'N/A')}（归一化前）",
+                    "inventory_note": (
+                        "第一版：库存健康度暂用波动性作为代理指标"
+                        "（缺独立库存水位输入时）。接入 Inventory 表后将改用真实库存数据。"
+                    ),
                     "cross_scenario": {
                         "_so_prod_ratio": metrics.get("_so_prod_ratio", "N/A"),
                         "_delivery_per_order": metrics.get("_delivery_per_order", "N/A"),

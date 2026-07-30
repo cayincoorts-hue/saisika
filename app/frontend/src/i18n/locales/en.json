@@ -146,7 +146,8 @@
     "analyzeNewData": "Analyze New Data",
     "loadingResult": "Loading analysis results...",
     "nodeEdgeCount": "{nodes} nodes, {edges} edges",
-    "nodeEdgeCountTruncated": "{nodes} nodes, showing top {shown} edges by weight ({total} total)"
+    "nodeEdgeCountTruncated": "{nodes} nodes, showing top {shown} edges by weight ({total} total)",
+    "charts": "Charts"
   },
   "riskNodeTable": {
     "nodeId": "Node ID",
