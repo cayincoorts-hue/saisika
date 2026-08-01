@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-// @ts-expect-error mode.ts is introduced in Task 2.
 import { parseRuntimeMode } from './mode';
 
 describe('parseRuntimeMode', () => {
