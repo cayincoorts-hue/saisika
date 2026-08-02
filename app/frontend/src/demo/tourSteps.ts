@@ -1,5 +1,5 @@
 /**
- * 无声导览步骤定义 — 8 步，总时长约 58 秒。
+ * 无声导览步骤定义 — 8 步，总时长约 34 秒（快速版）。
  *
  * 每一步指向页面上的 [data-tour="..."] 目标（绝不使用像素坐标），
  * 由 DemoTourProvider 负责路由导航、滚动定位与高亮。
@@ -26,56 +26,56 @@ export const tourSteps: TourStep[] = [
     route: '/',
     target: '[data-tour="start-demo"]',
     captionKey: 'tour.homeHero',
-    durationMs: 6000,
+    durationMs: 4000,
   },
   {
     id: 'upload-drop',
     route: '/demo/upload',
     target: '[data-tour="drop-zone"]',
     captionKey: 'tour.uploadDrop',
-    durationMs: 6000,
+    durationMs: 4000,
   },
   {
     id: 'upload-next',
     route: '/demo/upload',
     target: '[data-tour="next-understand"]',
     captionKey: 'tour.uploadNext',
-    durationMs: 4000,
+    durationMs: 3000,
   },
   {
     id: 'understand',
     route: '/demo/understand',
     target: '[data-tour="file-list"]',
     captionKey: 'tour.understand',
-    durationMs: 10000,
+    durationMs: 5000,
   },
   {
     id: 'mapping',
     route: '/demo/mapping',
     target: '[data-tour="mapping-table"]',
     captionKey: 'tour.mapping',
-    durationMs: 10000,
+    durationMs: 5000,
   },
   {
     id: 'analyze-progress',
     route: '/demo/analyze',
     target: '[data-tour="analysis-progress"]',
     captionKey: 'tour.analyzeProgress',
-    durationMs: 7000,
+    durationMs: 4000,
   },
   {
     id: 'result-summary',
     route: '/demo/result',
     target: '[data-tour="result-summary"]',
     captionKey: 'tour.resultSummary',
-    durationMs: 7000,
+    durationMs: 4000,
   },
   {
     id: 'result-download',
     route: '/demo/result',
     target: '[data-tour="result-download"]',
     captionKey: 'tour.resultDownload',
-    durationMs: 8000,
+    durationMs: 5000,
   },
 ];
 

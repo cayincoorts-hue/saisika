@@ -105,9 +105,9 @@ describe('tourSteps definitions', () => {
     });
   });
 
-  it('keeps total duration within 55-70 seconds', () => {
+  it('keeps total duration within 30-70 seconds (fast-paced)', () => {
     const total = tourSteps.reduce((sum, s) => sum + s.durationMs, 0);
-    expect(total).toBeGreaterThanOrEqual(55000);
+    expect(total).toBeGreaterThanOrEqual(30000);
     expect(total).toBeLessThanOrEqual(70000);
   });
 });
