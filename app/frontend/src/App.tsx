@@ -7,6 +7,7 @@ import ConfirmPage from './pages/ConfirmPage';
 import ResultPage from './pages/ResultPage';
 import HistoryPage from './pages/HistoryPage';
 import DemoHomePage from './pages/DemoHomePage';
+import DemoUploadPage from './pages/DemoUploadPage';
 import UnderstandPage from './pages/UnderstandPage';
 import MappingPage from './pages/MappingPage';
 import DemoAnalyzePage from './pages/DemoAnalyzePage';
@@ -25,7 +26,7 @@ export default function App() {
         <AppShell>
           <Routes>
             <Route path="/" element={<DemoHomePage />} />
-            <Route path="/demo/upload" element={<UploadPage />} />
+            <Route path="/demo/upload" element={<DemoUploadPage />} />
             <Route path="/demo/understand" element={<UnderstandPage />} />
             <Route path="/demo/mapping" element={<MappingPage />} />
             <Route path="/demo/analyze" element={<DemoAnalyzePage />} />
