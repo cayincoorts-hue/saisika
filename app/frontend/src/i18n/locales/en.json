@@ -147,6 +147,11 @@
     "loadingResult": "Loading analysis results...",
     "nodeEdgeCount": "{nodes} nodes, {edges} edges",
     "nodeEdgeCountTruncated": "{nodes} nodes, showing top {shown} edges by weight ({total} total)",
+    "tryChangeDemoUnavailable": "“Try Change” relies on the local analysis engine, so it is not available in this web demo. Download the app to use the full feature set locally.",
+    "tryChangeDemoPrefix": "Web demo notice:",
+    "tryChangeDemoLabel": "Try Change (unavailable in web demo)",
+    "tryChangeDemoTooltip": "Scenario editing is not available in the web demo",
+    "tryChangeDownloadLink": "Get the app →",
     "charts": "Charts"
   },
   "riskNodeTable": {
@@ -397,7 +402,7 @@
     "resultReasoning": "Expand any high-risk node to see its full reasoning chain: data sources, computation steps, risk thresholds, triggers, and action basis — every step traceable.",
     "resultDomain": "Domain insights: the engine auto-detects known supply chain patterns — bullwhip effect, VMI inventory, quick response — surfacing hidden fluctuation patterns.",
     "resultChartsTrend": "Risk trend and distribution: how risk evolves over time and how it is spread across nodes, at a glance.",
-    "resultNodes": "Risk node table: risk scores and recommended actions for every node. Try \"Try Change\" to adjust parameters and compare decision impacts.",
+    "resultNodes": "Risk node table: risk scores and recommended actions for every node. \"Try Change\" lets you adjust parameters and compare decision impacts — but it needs the local analysis engine, so download the app to try it.",
     "resultGraph": "Network topology: a 3D view of supply chain relationships. Lines show supply and delivery paths — drag to rotate.",
     "resultTimeline": "Risk propagation timeline: how a failure at one node spreads through the chain, plus data confidence boundaries — what is reliable and what needs more data."
   }

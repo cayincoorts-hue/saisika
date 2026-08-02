@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getScenarioParams, runScenarioCompare } from '../../utils/api';
 import { translateLabel } from '../../utils/labelTranslations';
 import gsap from '../../utils/animations';
+import { isDemoMode } from '../../runtime/mode';
 
 interface Props {
   data: any;
@@ -44,7 +45,7 @@ const tdS: React.CSSProperties = { padding:'9px 8px',fontSize:13,color:'var(--co
 const isS = (ch: boolean): React.CSSProperties => ({ fontSize:12,fontFamily:'var(--font-body)',padding:'3px 5px',border:ch?'1px solid var(--color-primary)':'1px solid var(--color-hairline)',borderRadius:4,background:ch?'rgba(204,120,92,0.06)':'var(--color-canvas)',color:ch?'var(--color-primary)':'var(--color-body)',fontWeight:ch?500:400,outline:'none',textAlign:'center',boxSizing:'border-box' });
 
 export default function RiskNodeTable({ data, batchId, onCompareResult, onBackToNormal }: Props) {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const isZh = i18n.language === 'zh';
   const rl = (l: string) => isZh ? (RL_ZH[l] || l) : (RL_EN[l] || l);
   const pl = (k: string) => isZh ? (PL_ZH[k] || k) : (PL_EN[k] || k);
@@ -191,11 +192,48 @@ export default function RiskNodeTable({ data, batchId, onCompareResult, onBackTo
               {changes.length > 0 && <button onClick={run} disabled={running} style={{ background:'var(--color-primary)',color:'#fff',border:'none',borderRadius:4,height:30,padding:'0 16px',fontSize:13,fontWeight:500,cursor:'pointer' }}>{running ? (isZh ? '计算中...' : 'Calculating...') : (isZh ? '对比运行' : 'Compare')}</button>}
               <button onClick={stopEdit} style={{ background:'none',border:'none',color:'var(--color-muted)',fontSize:18,cursor:'pointer',padding:'0 4px',lineHeight:1 }}>×</button>
             </>
+          ) : isDemoMode ? (
+            <span
+              data-tour="try-change-disabled"
+              title={t('result.tryChangeDemoTooltip')}
+              style={{ display:'inline-flex',alignItems:'center',gap:6,height:36,padding:'0 22px',borderRadius:'var(--rounded-pill)',border:'1px dashed var(--color-muted)',background:'var(--color-surface-soft)',fontFamily:'var(--font-body)',fontSize:14,fontWeight:600,color:'var(--color-muted)',cursor:'not-allowed',userSelect:'none' }}
+            >
+              <span style={{ fontSize:14,lineHeight:1 }}>⛔</span>
+              {t('result.tryChangeDemoLabel')}
+            </span>
           ) : (
             <button onClick={startEdit} style={{ height:36,padding:'0 22px',borderRadius:'var(--rounded-pill)',border:'none',background:'var(--color-primary)',fontFamily:'var(--font-body)',fontSize:14,fontWeight:600,color:'#fff',cursor:'pointer' }}>{isZh ? '尝试更改' : 'Try Change'}</button>
           )}
         </div>
       </div>
+
+      {isDemoMode && !isEditing && (
+        <div
+          data-tour="try-change-notice"
+          style={{
+            background: 'var(--color-surface-soft)',
+            border: '1px solid var(--color-hairline)',
+            borderLeft: '3px solid var(--color-accent-amber)',
+            borderRadius: 6,
+            padding: '10px 14px',
+            marginBottom: 12,
+            fontSize: 13,
+            lineHeight: 1.7,
+            color: 'var(--color-body)',
+          }}
+        >
+          <span style={{ fontWeight: 600, color: 'var(--color-ink)' }}>{t('result.tryChangeDemoPrefix')} </span>
+          {t('result.tryChangeDemoUnavailable')}{' '}
+          <a
+            href="https://github.com/cayincoorts-hue/saisika/releases"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}
+          >
+            {t('result.tryChangeDownloadLink')}
+          </a>
+        </div>
+      )}
 
       {error && <div style={{ background:'var(--color-error)',color:'#fff',padding:'8px 14px',borderRadius:4,fontSize:13,marginBottom:8 }}>{error}</div>}
       {paramsLoading && isEditing && (
