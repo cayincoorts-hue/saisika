@@ -72,6 +72,13 @@ test.describe('Saisca silent demo tour', () => {
     await expect(page.locator('[data-tour="result-summary"]')).toBeVisible();
     await expect(page.locator('[data-tour="result-download"]')).toBeVisible();
 
+    // 网络演示中“尝试更改”为禁用态 + 下载引导（见 RiskNodeTable demo 分支）
+    await expect(page.locator('[data-tour="try-change-disabled"]')).toBeVisible();
+    await expect(page.locator('[data-tour="try-change-notice"]')).toBeVisible();
+    await expect(page.getByText(/前往下载 →|Get the app →/)).toBeVisible();
+    const downloadLink = page.locator('a[href="https://github.com/cayincoorts-hue/saisika/releases"]');
+    await expect(downloadLink).toBeVisible();
+
     // 全程零 API 请求
     expect(forbiddenRequests).toEqual([]);
   });
@@ -97,6 +104,9 @@ test.describe('Saisca silent demo tour', () => {
   test('reloads /demo/result directly and renders', async ({ page }) => {
     await page.goto('/demo/result', { waitUntil: 'networkidle' });
     await expect(page.locator('[data-tour="result-summary"]')).toBeVisible();
+    // 直接刷新结果页：禁用徽标与下载提示仍然可见
+    await expect(page.locator('[data-tour="try-change-disabled"]')).toBeVisible();
+    await expect(page.locator('[data-tour="try-change-notice"]')).toBeVisible();
     expect(forbiddenRequests).toEqual([]);
   });
 
