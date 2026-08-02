@@ -431,6 +431,12 @@ a:hover { text-decoration: underline; }
   .card { padding: var(--space-5); }
 }
 
+/* 横屏提示条：竖屏显示，横屏隐藏（移动端） */
+.landscape-notice { display: none; }
+@media (orientation: portrait) and (max-width: 768px) {
+  .landscape-notice { display: flex !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;
