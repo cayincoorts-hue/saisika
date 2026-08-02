@@ -1,9 +1,9 @@
 /**
- * 无声导览步骤定义 — 8 步，总时长约 34 秒（快速版）。
+ * 无声导览步骤定义 — 14 步（结果页详细版）。
  *
  * 每一步指向页面上的 [data-tour="..."] 目标（绝不使用像素坐标），
  * 由 DemoTourProvider 负责路由导航、滚动定位与高亮。
- * 同页面的多个讲解点已合并为一步，减少重复停留。
+ * 结果页每个内容板块单独一步，能展开的板块通过 action:'expand' 自动展开。
  */
 
 export interface TourStep {
@@ -69,6 +69,49 @@ export const tourSteps: TourStep[] = [
     target: '[data-tour="result-summary"]',
     captionKey: 'tour.resultSummary',
     durationMs: 4000,
+  },
+  {
+    id: 'result-reasoning',
+    route: '/demo/result',
+    target: '[data-tour="result-reasoning"]',
+    captionKey: 'tour.resultReasoning',
+    durationMs: 5000,
+    action: 'expand',
+  },
+  {
+    id: 'result-domain',
+    route: '/demo/result',
+    target: '[data-tour="result-domain"]',
+    captionKey: 'tour.resultDomain',
+    durationMs: 4000,
+  },
+  {
+    id: 'result-charts-trend',
+    route: '/demo/result',
+    target: '[data-tour="result-charts-trend"]',
+    captionKey: 'tour.resultChartsTrend',
+    durationMs: 4000,
+  },
+  {
+    id: 'result-nodes',
+    route: '/demo/result',
+    target: '[data-tour="result-nodes"]',
+    captionKey: 'tour.resultNodes',
+    durationMs: 5000,
+  },
+  {
+    id: 'result-graph',
+    route: '/demo/result',
+    target: '[data-tour="result-graph"]',
+    captionKey: 'tour.resultGraph',
+    durationMs: 5000,
+  },
+  {
+    id: 'result-timeline',
+    route: '/demo/result',
+    target: '[data-tour="result-timeline"]',
+    captionKey: 'tour.resultTimeline',
+    durationMs: 5000,
   },
   {
     id: 'result-download',

@@ -121,17 +121,21 @@ export function DemoTourProvider({
   // ── 目标查找：有限重试，找不到则暂停 ───────────────────────
   // 用函数声明实现递归（声明提升），避免 hooks 自引用 lint 问题。
 
-  function findAndFocus(selector: string, attempt = 0) {
-    const el = document.querySelector<HTMLElement>(selector);
+  function findAndFocus(step: (typeof tourSteps)[number], attempt = 0) {
+    const el = document.querySelector<HTMLElement>(step.target);
     if (el) {
-      focusTarget(selector);
+      focusTarget(step.target);
+      // 步骤声明的动作：派发全局事件，让目标组件自行响应（如展开）
+      if (step.action === 'expand') {
+        window.dispatchEvent(new CustomEvent('saiska:tour-expand'));
+      }
       return;
     }
     if (attempt >= MAX_TARGET_RETRIES) {
       setStatus('paused');
       return;
     }
-    const t = window.setTimeout(() => findAndFocus(selector, attempt + 1), TARGET_RETRY_MS);
+    const t = window.setTimeout(() => findAndFocus(step, attempt + 1), TARGET_RETRY_MS);
     timersRef.current.push(t);
   }
 
@@ -182,7 +186,7 @@ export function DemoTourProvider({
     const step = tourSteps[stepIndex];
     if (!step) return;
     navigate(step.route);
-    const t = window.setTimeout(() => findAndFocus(step.target), 400);
+    const t = window.setTimeout(() => findAndFocus(step), 400);
     return () => {
       window.clearTimeout(t);
       clearTimers();

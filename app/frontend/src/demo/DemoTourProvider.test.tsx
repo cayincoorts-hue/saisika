@@ -94,8 +94,8 @@ describe('DemoTourProvider state machine', () => {
 
 describe('tourSteps definitions', () => {
   it('defines a deterministic sequence with valid targets', () => {
-    expect(tourSteps.length).toBeGreaterThanOrEqual(8);
-    expect(tourSteps.length).toBeLessThanOrEqual(12);
+    expect(tourSteps.length).toBeGreaterThanOrEqual(10);
+    expect(tourSteps.length).toBeLessThanOrEqual(16);
     tourSteps.forEach((step, i) => {
       expect(step.id, `step ${i} id`).toBeTruthy();
       expect(step.route, `step ${i} route`).toBeTruthy();

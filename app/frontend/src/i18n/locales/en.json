@@ -393,6 +393,12 @@
     "exit": "Exit tour",
     "restart": "Restart",
     "understand": "Step 2: File understanding. Saisca identifies whether each table is nodes, facts, or relations, with row and column counts. Confirm and continue.",
-    "mapping": "Step 3: Field mapping. Every column mapping is shown transparently with status and confidence. No black box. Confirm and analyze."
+    "mapping": "Step 3: Field mapping. Every column mapping is shown transparently with status and confidence. No black box. Confirm and analyze.",
+    "resultReasoning": "Expand any high-risk node to see its full reasoning chain: data sources, computation steps, risk thresholds, triggers, and action basis — every step traceable.",
+    "resultDomain": "Domain insights: the engine auto-detects known supply chain patterns — bullwhip effect, VMI inventory, quick response — surfacing hidden fluctuation patterns.",
+    "resultChartsTrend": "Risk trend and distribution: how risk evolves over time and how it is spread across nodes, at a glance.",
+    "resultNodes": "Risk node table: risk scores and recommended actions for every node. Try \"Try Change\" to adjust parameters and compare decision impacts.",
+    "resultGraph": "Network topology: a 3D view of supply chain relationships. Lines show supply and delivery paths — drag to rotate.",
+    "resultTimeline": "Risk propagation timeline: how a failure at one node spreads through the chain, plus data confidence boundaries — what is reliable and what needs more data."
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DemoBadge from '../components/demo/DemoBadge';
+import { useDemoTour } from '../demo/useDemoTour';
 import { demoAnalysisSource } from '../demo/demoAnalysisSource';
 import type { AnalysisProgress } from '../types/analysis';
 
@@ -20,6 +21,7 @@ const STAGE_LABELS: Record<string, string> = {
  */
 export default function DemoAnalyzePage() {
   const navigate = useNavigate();
+  const { status: tourStatus } = useDemoTour();
   const [stages, setStages] = useState<AnalysisProgress[]>([]);
   const [done, setDone] = useState(false);
 
@@ -41,11 +43,11 @@ export default function DemoAnalyzePage() {
   }, []);
 
   useEffect(() => {
-    if (done) {
+    if (done && tourStatus !== 'playing') {
       const timer = setTimeout(() => navigate('/demo/result'), 600);
       return () => clearTimeout(timer);
     }
-  }, [done, navigate]);
+  }, [done, tourStatus, navigate]);
 
   const order = ['structure', 'graph', 'risk', 'domain', 'decision', 'fingerprint'];
 

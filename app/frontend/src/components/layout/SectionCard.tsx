@@ -6,13 +6,15 @@ interface Props {
   children: ReactNode;
   className?: string;
   delay?: number;
+  /** 导览定位标记：渲染为 data-tour="..." */
+  dataTour?: string;
 }
 
-export default function SectionCard({ title, children, className = '', delay = 0 }: Props) {
+export default function SectionCard({ title, children, className = '', delay = 0, dataTour }: Props) {
   const cardRef = useReveal(delay / 1000);
 
   return (
-    <div ref={cardRef} className={`card ${className}`.trim()}>
+    <div ref={cardRef} className={`card ${className}`.trim()} {...(dataTour ? { 'data-tour': dataTour } : {})}>
       {title && (
         <div className="card-header">
           <span className="card-title">{title}</span>
