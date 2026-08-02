@@ -15,6 +15,8 @@ import PropagationTimelineChart from '../components/charts/PropagationTimelineCh
 import DataConfidenceChart from '../components/charts/DataConfidenceChart';
 import CompareView from '../components/scenario/CompareView';
 import { getResults } from '../utils/api';
+import { isDemoMode } from '../runtime/mode';
+import { demoAnalysisSource } from '../demo/demoAnalysisSource';
 
 export default function ResultPage() {
   const { batchId } = useParams<{ batchId: string }>();
@@ -30,6 +32,15 @@ export default function ResultPage() {
   const [compareError, setCompareError] = useState('');
 
   useEffect(() => {
+    if (isDemoMode) {
+      setLoading(true);
+      demoAnalysisSource
+        .getResult('demo')
+        .then(setData)
+        .catch((err: any) => setError(err?.detail || err?.message || t('result.loadingResult')))
+        .finally(() => setLoading(false));
+      return;
+    }
     if (!batchId) return;
     setLoading(true);
     getResults(batchId)
