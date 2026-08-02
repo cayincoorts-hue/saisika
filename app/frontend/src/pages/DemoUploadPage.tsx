@@ -86,6 +86,7 @@ export default function DemoUploadPage() {
           return (
             <div
               key={f.name}
+              data-tour="file-card"
               draggable={!isDropped}
               onDragStart={(e) => handleDragStart(e, f.name)}
               onClick={() => !isDropped && handleClick(f.name)}

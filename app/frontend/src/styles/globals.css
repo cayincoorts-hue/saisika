@@ -438,3 +438,18 @@ a:hover { text-decoration: underline; }
     transition-duration: 1ms !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Silent Tour — focus highlight & dimmed backdrop
+   ═══════════════════════════════════════════════════════════════ */
+.tour-focus {
+  position: relative;
+  z-index: 1200 !important;
+  outline: 3px solid #0f766e;
+  outline-offset: 4px;
+  border-radius: 8px;
+  transition: outline-color 0.3s;
+}
+body.tour-dimmed > *:not(#tour-stage) {
+  filter: brightness(0.9) saturate(0.85);
+}

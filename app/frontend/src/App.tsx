@@ -12,6 +12,9 @@ import UnderstandPage from './pages/UnderstandPage';
 import MappingPage from './pages/MappingPage';
 import DemoAnalyzePage from './pages/DemoAnalyzePage';
 import { isDemoMode } from './runtime/mode';
+import { DemoTourProvider } from './demo/DemoTourProvider';
+import TourCaption from './components/demo/TourCaption';
+import TourControls from './components/demo/TourControls';
 
 export default function App() {
   const [activated, setActivated] = useState(true);
@@ -23,17 +26,21 @@ export default function App() {
   if (isDemoMode) {
     return (
       <BrowserRouter>
-        <AppShell>
-          <Routes>
-            <Route path="/" element={<DemoHomePage />} />
-            <Route path="/demo/upload" element={<DemoUploadPage />} />
-            <Route path="/demo/understand" element={<UnderstandPage />} />
-            <Route path="/demo/mapping" element={<MappingPage />} />
-            <Route path="/demo/analyze" element={<DemoAnalyzePage />} />
-            <Route path="/demo/result" element={<ResultPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AppShell>
+        <DemoTourProvider>
+          <AppShell>
+            <Routes>
+              <Route path="/" element={<DemoHomePage />} />
+              <Route path="/demo/upload" element={<DemoUploadPage />} />
+              <Route path="/demo/understand" element={<UnderstandPage />} />
+              <Route path="/demo/mapping" element={<MappingPage />} />
+              <Route path="/demo/analyze" element={<DemoAnalyzePage />} />
+              <Route path="/demo/result" element={<ResultPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AppShell>
+          <TourCaption />
+          <TourControls />
+        </DemoTourProvider>
       </BrowserRouter>
     );
   }

@@ -168,8 +168,10 @@ export default function ResultPage() {
         )}
       </div>
 
-      <SummaryPanel textSummary={data.text_summary} />
-      <ReasoningPanel data={visuals.high_risk_nodes} />
+      <div data-tour="result-summary">
+        <SummaryPanel textSummary={data.text_summary} />
+        <ReasoningPanel data={visuals.high_risk_nodes} />
+      </div>
 
       {visuals.domain_insights && visuals.domain_insights.status !== 'unavailable' && (
         <SectionCard title={t('domainInsights.title')} delay={200}>
@@ -250,7 +252,9 @@ export default function ResultPage() {
       <SectionCard title={t('result.propagation')} delay={620}><PropagationTimelineChart data={visuals.propagation_timeline} /></SectionCard>
       <SectionCard title={t('result.dataConfidence')} delay={740}><DataConfidenceChart data={visuals.data_confidence} /></SectionCard>
       <CapabilityHintPanel dataConfidence={visuals.data_confidence} />
-      <DownloadPanel batchId={batchId!} hasResults={true} />
+      <div data-tour="result-download">
+        <DownloadPanel batchId={batchId!} hasResults={true} />
+      </div>
     </>
   );
 }
