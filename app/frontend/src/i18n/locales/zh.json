@@ -65,7 +65,10 @@
     "maxFileCount": "最多 10 个文件",
     "batchLabel": "批次",
     "fileList": "已上传文件",
-    "noFiles": "尚未上传文件"
+    "noFiles": "尚未上传文件",
+    "demoNotice": "这是网络演示：仅内置虚拟案例表格，不支持导入你自己的文件。",
+    "demoDownloadHint": "请下载应用在本地使用完整导入功能。",
+    "demoDropHint": "将上方虚拟表格拖到此处，或点击卡片（不支持真实文件拖入）"
   },
   "confirm": {
     "title": "文件理解确认",

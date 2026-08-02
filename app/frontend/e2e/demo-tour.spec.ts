@@ -32,6 +32,30 @@ test.describe('Saisca silent demo tour', () => {
     expect(forbiddenRequests).toEqual([]);
   });
 
+  test('upload page shows demo notice and cannot import real files', async ({ page }) => {
+    await page.goto('/demo/upload', { waitUntil: 'networkidle' });
+    // 演示提示条 + 下载链接
+    await expect(page.locator('[data-tour="demo-upload-notice"]')).toBeVisible();
+    await expect(page.getByText(/不支持导入你自己的文件|cannot import your own files/)).toBeVisible();
+    await expect(page.locator('a[href="https://github.com/cayincoorts-hue/saisika/releases"]')).toBeVisible();
+
+    // 拖入真实文件 → 明确拒绝（而非静默无反应）
+    await page.evaluate(() => {
+      const zone = document.querySelector('[data-tour="drop-zone"]');
+      const dt = new DataTransfer();
+      dt.items.add(new File(['a,b\n1,2'], 'mytable.csv', { type: 'text/csv' }));
+      zone.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }));
+    });
+    await expect(page.getByText(/不支持导入真实文件|does not support importing real files/)).toBeVisible();
+
+    // 虚拟卡片仍可正常导入
+    await page.locator('[data-tour="file-card"]').first().click();
+    await expect(page.getByText(/已导入 1 \/ /)).toBeVisible();
+
+    // 全程零 API 请求
+    expect(forbiddenRequests).toEqual([]);
+  });
+
   test('walks the full tour across all pages', async ({ page }) => {
     // 首页 → 开始展示
     await page.click('[data-tour="start-demo"]');
