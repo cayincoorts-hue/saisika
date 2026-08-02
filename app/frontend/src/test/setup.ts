@@ -21,3 +21,14 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// jsdom 未实现 ResizeObserver
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverMock,
+});

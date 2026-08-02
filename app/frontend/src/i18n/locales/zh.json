@@ -291,7 +291,9 @@
     "isolatedNodes": "{{count}} 个孤立节点未显示",
     "loadError": "3D 渲染模块加载失败",
     "webglHint": "请确认浏览器支持 WebGL",
-    "legendTitle": "图例"
+    "legendTitle": "图例",
+    "staticAria": "供应链网络静态图：节点按层级着色，边表示关系。",
+    "staticLabel": "静态图"
   },
   "dataConfidence": {
     "title": "数据可信度",

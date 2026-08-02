@@ -291,7 +291,9 @@
     "isolatedNodes": "{{count}} isolated nodes not shown",
     "loadError": "3D rendering module failed to load",
     "webglHint": "Please ensure your browser supports WebGL",
-    "legendTitle": "Legend"
+    "legendTitle": "Legend",
+    "staticAria": "Static supply chain network graph: nodes colored by tier, edges show relations.",
+    "staticLabel": "Static"
   },
   "dataConfidence": {
     "title": "Data Confidence",
