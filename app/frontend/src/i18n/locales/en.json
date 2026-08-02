@@ -65,7 +65,10 @@
     "maxFileCount": "Up to 10 files",
     "batchLabel": "Batch",
     "fileList": "Uploaded Files",
-    "noFiles": "No files uploaded yet"
+    "noFiles": "No files uploaded yet",
+    "demoNotice": "This is a web demo: only the built-in virtual case tables are available — you cannot import your own files here.",
+    "demoDownloadHint": "Download the app to use the full import feature locally.",
+    "demoDropHint": "Drag the virtual tables above into the area, or click a card (importing real files is not supported)"
   },
   "confirm": {
     "title": "Review & Confirm",
