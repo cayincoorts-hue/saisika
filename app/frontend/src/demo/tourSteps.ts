@@ -1,8 +1,9 @@
 /**
- * 无声导览步骤定义 — 9 步，总时长约 58 秒。
+ * 无声导览步骤定义 — 8 步，总时长约 58 秒。
  *
  * 每一步指向页面上的 [data-tour="..."] 目标（绝不使用像素坐标），
  * 由 DemoTourProvider 负责路由导航、滚动定位与高亮。
+ * 同页面的多个讲解点已合并为一步，减少重复停留。
  */
 
 export interface TourStep {
@@ -42,39 +43,25 @@ export const tourSteps: TourStep[] = [
     durationMs: 4000,
   },
   {
-    id: 'understand-files',
+    id: 'understand',
     route: '/demo/understand',
     target: '[data-tour="file-list"]',
-    captionKey: 'tour.understandFiles',
-    durationMs: 6000,
+    captionKey: 'tour.understand',
+    durationMs: 10000,
   },
   {
-    id: 'understand-next',
-    route: '/demo/understand',
-    target: '[data-tour="next-mapping"]',
-    captionKey: 'tour.understandNext',
-    durationMs: 4000,
-  },
-  {
-    id: 'mapping-table',
+    id: 'mapping',
     route: '/demo/mapping',
     target: '[data-tour="mapping-table"]',
-    captionKey: 'tour.mappingTable',
-    durationMs: 6000,
-  },
-  {
-    id: 'mapping-analyze',
-    route: '/demo/mapping',
-    target: '[data-tour="confirm-analyze"]',
-    captionKey: 'tour.mappingAnalyze',
-    durationMs: 5000,
+    captionKey: 'tour.mapping',
+    durationMs: 10000,
   },
   {
     id: 'analyze-progress',
     route: '/demo/analyze',
     target: '[data-tour="analysis-progress"]',
     captionKey: 'tour.analyzeProgress',
-    durationMs: 6000,
+    durationMs: 7000,
   },
   {
     id: 'result-summary',

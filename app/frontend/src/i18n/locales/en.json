@@ -383,10 +383,6 @@
     "homeHero": "Welcome to Saisca — offline supply chain risk analysis. In the next 60 seconds we walk you through a full demo.",
     "uploadDrop": "Step 1: Import data. These are the 7 business tables of the built-in virtual case. Drag them into the area below. Data never leaves your machine.",
     "uploadNext": "After dropping the files, click \"Continue\" to move on. No real upload happens.",
-    "understandFiles": "Step 2: File understanding. Saisca identifies whether each table is nodes, facts, or relations, with row and column counts.",
-    "understandNext": "Confirm the recognition is correct, then continue to field mapping.",
-    "mappingTable": "Step 3: Field mapping. Every column mapping is shown transparently, with status and confidence. No black box.",
-    "mappingAnalyze": "Confirm mappings and start analysis. The engine runs structure checks, graph building, risk detection, and domain pattern detection.",
     "analyzeProgress": "Six-stage analysis progress: structure, graph, risk, domain, decision, fingerprint. Every step is reproducible.",
     "resultSummary": "Step 4: Results. Risk summary, high-risk nodes, and recommended actions — all from a traceable rule engine.",
     "resultDownload": "Finally: export your report for sharing or archiving. Demo complete — thanks for watching!",
@@ -395,6 +391,8 @@
     "next": "Next",
     "previous": "Previous",
     "exit": "Exit tour",
-    "restart": "Restart"
+    "restart": "Restart",
+    "understand": "Step 2: File understanding. Saisca identifies whether each table is nodes, facts, or relations, with row and column counts. Confirm and continue.",
+    "mapping": "Step 3: Field mapping. Every column mapping is shown transparently with status and confidence. No black box. Confirm and analyze."
   }
 }
