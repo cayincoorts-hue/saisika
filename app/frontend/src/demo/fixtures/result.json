@@ -1,0 +1,1350 @@
+{
+  "meta": {
+    "version": "v1.3",
+    "generated_at": "",
+    "granularity": "daily",
+    "source_type": "csv",
+    "deterministic_fingerprint": "6f295166065fbdad",
+    "deterministic_note": "本系统采用确定性规则引擎，同一份输入数据在任意机器上产生完全相同的结果。此指纹基于输入数据内容（unified_table + scores + graph 结构）计算，用于验证结果可复现性。"
+  },
+  "input_summary": {
+    "file_count": 8,
+    "row_count": 494,
+    "node_count": 10,
+    "edge_count": 12
+  },
+  "text_summary": {
+    "current_judgment": "当前供应链网络未发现高风险节点，5 个节点处于中风险状态。整体风险水平较低，建议保持现有监控节奏。",
+    "main_causes": "指标波动异常偏高（4 个节点：第0层 1 个，第1层 3 个）；存在历史延迟记录（4 个节点：第0层 2 个，第1层 2 个）；存在较大交期偏差（3 个节点，集中在 第1层）；库存水位严重偏低（3 个节点：第0层 1 个，第1层 2 个）；当前风险主要来自供应链网络结构性因素（2 个节点，集中在 第1层）；该节点波动显著低于同层节点 （CV 0.097 / 同层平均 0.207），符合 VMI 信息共享模式特征（1 个节点，集中在 第0层）；该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.316 / 下游平均 CV 0.187 = 1.7 倍）（1 个节点，集中在 第0层）；该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.284 / 下游平均 CV 0.151 = 1.9 倍）（1 个节点，集中在 第1层）；该节点波动显著低于同层节点 （CV 0.049 / 同层平均 0.112），符合 VMI 信息共享模式特征（1 个节点，集中在 第1层）。",
+    "impact_targets": "影响最显著的节点：\n  1. 节点 P001（中风险，评分 0.558）：库存水位严重偏低、存在历史延迟记录、指标波动异常偏高、该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.284 / 下游平均 CV 0.151 = 1.9 倍），具有较强的网络传播效应，建议动作：补货\n  2. 节点 S002（中风险，评分 0.461）：库存水位严重偏低、存在历史延迟记录、指标波动异常偏高、该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.316 / 下游平均 CV 0.187 = 1.7 倍），具有较强的网络传播效应，建议动作：补货\n  3. 节点 D003（中风险，评分 0.458）：库存水位严重偏低、存在较大交期偏差、指标波动异常偏高，具有较强的网络传播效应，建议动作：补货",
+    "recommended_actions": "当前无高风险节点，建议关注 5 个中风险节点：\n  • P001 → 补货（触发条件：库存风险分 0.8 > 阈值 0.6）\n  • S002 → 补货（触发条件：库存风险分 0.9 > 阈值 0.6）\n  • D003 → 补货（触发条件：库存风险分 0.7 > 阈值 0.6）",
+    "need_more": "以下数据补充后可进一步提升分析完整度：\n  • 库存字段 → 当前影响：库存健康度评估精度受限；补充后可解锁：精确库存风险评估、补货时机建议\n  • 交期偏差字段 → 当前影响：供应商交付可靠性评估精度受限；补充后可解锁：延迟传播风险分析、供应商切换建议"
+  },
+  "visuals": {
+    "risk_trend": {
+      "title": "全网风险趋势",
+      "status": "ok",
+      "x": [
+        "2026-01-05",
+        "2026-01-12",
+        "2026-01-19",
+        "2026-01-26",
+        "2026-02-05",
+        "2026-02-12",
+        "2026-02-19",
+        "2026-02-26",
+        "2026-03-05",
+        "2026-03-12",
+        "2026-03-19",
+        "2026-03-26",
+        "2026-04-05",
+        "2026-04-12",
+        "2026-04-19",
+        "2026-04-26",
+        "2026-05-05",
+        "2026-05-12",
+        "2026-05-19",
+        "2026-05-26",
+        "2026-06-05",
+        "2026-06-12",
+        "2026-06-19",
+        "2026-06-26",
+        "2026-07-05",
+        "2026-07-12"
+      ],
+      "series": [
+        {
+          "name": "平均风险评分",
+          "data": [
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315,
+            0.3315
+          ]
+        },
+        {
+          "name": "最高风险评分",
+          "data": [
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558,
+            0.558
+          ]
+        }
+      ],
+      "annotations": []
+    },
+    "risk_distribution": {
+      "title": "风险节点分布",
+      "status": "ok",
+      "bar": {
+        "categories": [
+          "高风险",
+          "中风险",
+          "低风险"
+        ],
+        "values": [
+          0,
+          5,
+          5
+        ],
+        "colors": [
+          "#e74c3c",
+          "#f39c12",
+          "#27ae60"
+        ]
+      },
+      "donut": {
+        "data": [
+          {
+            "name": "高风险",
+            "value": 0,
+            "percent": 0.0
+          },
+          {
+            "name": "中风险",
+            "value": 5,
+            "percent": 50.0
+          },
+          {
+            "name": "低风险",
+            "value": 5,
+            "percent": 50.0
+          }
+        ]
+      }
+    },
+    "high_risk_nodes": {
+      "title": "高风险节点明细",
+      "status": "ok",
+      "missing_reason": "",
+      "rows": [
+        {
+          "node_id": "P001",
+          "risk_score": 0.558,
+          "risk_level": "medium",
+          "priority": 0.558,
+          "risk_causes": [
+            "库存水位严重偏低",
+            "存在历史延迟记录",
+            "指标波动异常偏高",
+            "该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.284 / 下游平均 CV 0.151 = 1.9 倍）"
+          ],
+          "risk_causes_detail": [
+            {
+              "label": "库存水位严重偏低",
+              "triggered_by": "inventory_risk",
+              "actual_value": 0.8,
+              "threshold": 0.6,
+              "excess_ratio": 33.0
+            },
+            {
+              "label": "存在历史延迟记录",
+              "triggered_by": "delay_flag_risk",
+              "actual_value": 0.9,
+              "threshold": 0.5,
+              "excess_ratio": 80.0
+            },
+            {
+              "label": "指标波动异常偏高",
+              "triggered_by": "volatility_risk",
+              "actual_value": 0.8,
+              "threshold": 0.5,
+              "excess_ratio": 60.0
+            },
+            {
+              "label": "该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.284 / 下游平均 CV 0.151 = 1.9 倍）",
+              "triggered_by": "bullwhip",
+              "actual_value": "CV ratio 1.9",
+              "threshold": "> 1.5",
+              "excess_ratio": ""
+            }
+          ],
+          "recommended_action": "启动补货计划，根据库存消耗速率确定补货批量和优先级。",
+          "action_type": "补货",
+          "action_justification": {
+            "action_type": "补货",
+            "reasons": [
+              "库存风险分 0.8 > 阈值 0.6"
+            ],
+            "alternatives": [
+              "转单（当前网络传播系数 0.9 > 0.7，可考虑同步转单降低传播风险）"
+            ]
+          },
+          "propagation_coefficient": 0.9,
+          "reasoning_trail": {
+            "data_sources": [
+              "Production.csv",
+              "Sales Order.csv"
+            ],
+            "metrics_summary": {
+              "Production": {
+                "mean": 114.22,
+                "std": 32.95,
+                "cv": 0.2885,
+                "data_points": 26,
+                "source_files": [
+                  "Production.csv"
+                ]
+              },
+              "Sales Order": {
+                "mean": 132.97,
+                "std": 37.22,
+                "cv": 0.2799,
+                "data_points": 26,
+                "source_files": [
+                  "Sales Order.csv"
+                ]
+              }
+            },
+            "steps": [
+              {
+                "step": 1,
+                "name": "指标聚合",
+                "description": "从 2 个文件聚合 2 个指标的时序数据",
+                "detail": {
+                  "source_files": [
+                    "Production.csv",
+                    "Sales Order.csv"
+                  ],
+                  "metrics_summary": {
+                    "Production": {
+                      "mean": 114.22,
+                      "std": 32.95,
+                      "cv": 0.2885,
+                      "data_points": 26,
+                      "source_files": [
+                        "Production.csv"
+                      ]
+                    },
+                    "Sales Order": {
+                      "mean": 132.97,
+                      "std": 37.22,
+                      "cv": 0.2799,
+                      "data_points": 26,
+                      "source_files": [
+                        "Sales Order.csv"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "step": 2,
+                "name": "分量计算",
+                "description": "计算四个风险分量的原始值",
+                "detail": {
+                  "volatility": "各指标平均 CV = N/A（归一化前）",
+                  "inventory_note": "第一版：库存健康度暂用波动性作为代理指标（缺独立库存水位输入时）。接入 Inventory 表后将改用真实库存数据。",
+                  "cross_scenario": {
+                    "_so_prod_ratio": 0.8589907497931865,
+                    "_delivery_per_order": "N/A"
+                  }
+                }
+              },
+              {
+                "step": 3,
+                "name": "百分位归一化",
+                "description": "将各分量在所有节点中的排名转换为 0-1 得分",
+                "detail": {
+                  "volatility_risk": 0.8,
+                  "inventory_risk": 0.8,
+                  "delivery_delay_risk": 0.0,
+                  "delay_flag_risk": 0.9
+                }
+              },
+              {
+                "step": 4,
+                "name": "风险加权",
+                "description": "Risk = 0.8×0.30 + 0.8×0.25 + 0.0×0.25 + 0.9×0.20 = 0.6200",
+                "detail": {
+                  "contributions": {
+                    "volatility": 0.24,
+                    "inventory": 0.2,
+                    "delivery_delay": 0.0,
+                    "delay_flag": 0.18
+                  },
+                  "total_risk": 0.62
+                }
+              },
+              {
+                "step": 5,
+                "name": "传播系数",
+                "description": "0.5 + 0.3×(4/4) + 0.2×0.5 = 0.5 + 0.3 + 0.1 = 0.9",
+                "detail": {
+                  "degree": 4,
+                  "max_degree": 4,
+                  "degree_factor": 1.0,
+                  "level": 1,
+                  "max_level": 1,
+                  "position_factor": 0.5
+                }
+              },
+              {
+                "step": 6,
+                "name": "最终评分",
+                "description": "Score = Risk × Propagation = 0.6200 × 0.9000 = 0.5580",
+                "detail": {
+                  "risk": 0.62,
+                  "propagation": 0.9,
+                  "raw_product": 0.558,
+                  "final_score": 0.558
+                }
+              }
+            ],
+            "risk_level_thresholds": {
+              "high": 0.6,
+              "medium": 0.3
+            }
+          }
+        },
+        {
+          "node_id": "S002",
+          "risk_score": 0.4612,
+          "risk_level": "medium",
+          "priority": 0.4612,
+          "risk_causes": [
+            "库存水位严重偏低",
+            "存在历史延迟记录",
+            "指标波动异常偏高",
+            "该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.316 / 下游平均 CV 0.187 = 1.7 倍）"
+          ],
+          "risk_causes_detail": [
+            {
+              "label": "库存水位严重偏低",
+              "triggered_by": "inventory_risk",
+              "actual_value": 0.9,
+              "threshold": 0.6,
+              "excess_ratio": 50.0
+            },
+            {
+              "label": "存在历史延迟记录",
+              "triggered_by": "delay_flag_risk",
+              "actual_value": 0.6,
+              "threshold": 0.5,
+              "excess_ratio": 20.0
+            },
+            {
+              "label": "指标波动异常偏高",
+              "triggered_by": "volatility_risk",
+              "actual_value": 0.9,
+              "threshold": 0.5,
+              "excess_ratio": 80.0
+            },
+            {
+              "label": "该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.316 / 下游平均 CV 0.187 = 1.7 倍）",
+              "triggered_by": "bullwhip",
+              "actual_value": "CV ratio 1.7",
+              "threshold": "> 1.5",
+              "excess_ratio": ""
+            }
+          ],
+          "recommended_action": "启动补货计划，根据库存消耗速率确定补货批量和优先级。",
+          "action_type": "补货",
+          "action_justification": {
+            "action_type": "补货",
+            "reasons": [
+              "库存风险分 0.9 > 阈值 0.6"
+            ],
+            "alternatives": [
+              "转单（当前网络传播系数 0.75 > 0.7，可考虑同步转单降低传播风险）"
+            ]
+          },
+          "propagation_coefficient": 0.75,
+          "reasoning_trail": {
+            "data_sources": [
+              "Factory Issue.csv",
+              "Production.csv",
+              "Sales Order.csv"
+            ],
+            "metrics_summary": {
+              "Factory Issue": {
+                "mean": 90.06,
+                "std": 27.77,
+                "cv": 0.3084,
+                "data_points": 26,
+                "source_files": [
+                  "Factory Issue.csv"
+                ]
+              },
+              "Production": {
+                "mean": 89.73,
+                "std": 30.39,
+                "cv": 0.3387,
+                "data_points": 26,
+                "source_files": [
+                  "Production.csv"
+                ]
+              },
+              "Sales Order": {
+                "mean": 94.46,
+                "std": 28.49,
+                "cv": 0.3017,
+                "data_points": 26,
+                "source_files": [
+                  "Sales Order.csv"
+                ]
+              }
+            },
+            "steps": [
+              {
+                "step": 1,
+                "name": "指标聚合",
+                "description": "从 3 个文件聚合 3 个指标的时序数据",
+                "detail": {
+                  "source_files": [
+                    "Factory Issue.csv",
+                    "Production.csv",
+                    "Sales Order.csv"
+                  ],
+                  "metrics_summary": {
+                    "Factory Issue": {
+                      "mean": 90.06,
+                      "std": 27.77,
+                      "cv": 0.3084,
+                      "data_points": 26,
+                      "source_files": [
+                        "Factory Issue.csv"
+                      ]
+                    },
+                    "Production": {
+                      "mean": 89.73,
+                      "std": 30.39,
+                      "cv": 0.3387,
+                      "data_points": 26,
+                      "source_files": [
+                        "Production.csv"
+                      ]
+                    },
+                    "Sales Order": {
+                      "mean": 94.46,
+                      "std": 28.49,
+                      "cv": 0.3017,
+                      "data_points": 26,
+                      "source_files": [
+                        "Sales Order.csv"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "step": 2,
+                "name": "分量计算",
+                "description": "计算四个风险分量的原始值",
+                "detail": {
+                  "volatility": "各指标平均 CV = N/A（归一化前）",
+                  "inventory_note": "第一版：库存健康度暂用波动性作为代理指标（缺独立库存水位输入时）。接入 Inventory 表后将改用真实库存数据。",
+                  "cross_scenario": {
+                    "_so_prod_ratio": 0.9499258945585434,
+                    "_delivery_per_order": "N/A"
+                  }
+                }
+              },
+              {
+                "step": 3,
+                "name": "百分位归一化",
+                "description": "将各分量在所有节点中的排名转换为 0-1 得分",
+                "detail": {
+                  "volatility_risk": 0.9,
+                  "inventory_risk": 0.9,
+                  "delivery_delay_risk": 0.0,
+                  "delay_flag_risk": 0.6
+                }
+              },
+              {
+                "step": 4,
+                "name": "风险加权",
+                "description": "Risk = 0.9×0.30 + 0.9×0.25 + 0.0×0.25 + 0.6×0.20 = 0.6150",
+                "detail": {
+                  "contributions": {
+                    "volatility": 0.27,
+                    "inventory": 0.225,
+                    "delivery_delay": 0.0,
+                    "delay_flag": 0.12
+                  },
+                  "total_risk": 0.615
+                }
+              },
+              {
+                "step": 5,
+                "name": "传播系数",
+                "description": "0.5 + 0.3×(2/4) + 0.2×0.5 = 0.5 + 0.15 + 0.1 = 0.75",
+                "detail": {
+                  "degree": 2,
+                  "max_degree": 4,
+                  "degree_factor": 0.5,
+                  "level": 0,
+                  "max_level": 1,
+                  "position_factor": 0.5
+                }
+              },
+              {
+                "step": 6,
+                "name": "最终评分",
+                "description": "Score = Risk × Propagation = 0.6150 × 0.7500 = 0.4612",
+                "detail": {
+                  "risk": 0.615,
+                  "propagation": 0.75,
+                  "raw_product": 0.4612,
+                  "final_score": 0.4612
+                }
+              }
+            ],
+            "risk_level_thresholds": {
+              "high": 0.6,
+              "medium": 0.3
+            }
+          }
+        },
+        {
+          "node_id": "D003",
+          "risk_score": 0.4575,
+          "risk_level": "medium",
+          "priority": 0.4575,
+          "risk_causes": [
+            "库存水位严重偏低",
+            "存在较大交期偏差",
+            "指标波动异常偏高"
+          ],
+          "risk_causes_detail": [
+            {
+              "label": "库存水位严重偏低",
+              "triggered_by": "inventory_risk",
+              "actual_value": 0.7,
+              "threshold": 0.6,
+              "excess_ratio": 17.0
+            },
+            {
+              "label": "存在较大交期偏差",
+              "triggered_by": "delivery_delay_risk",
+              "actual_value": 0.9,
+              "threshold": 0.3,
+              "excess_ratio": 200.0
+            },
+            {
+              "label": "指标波动异常偏高",
+              "triggered_by": "volatility_risk",
+              "actual_value": 0.7,
+              "threshold": 0.5,
+              "excess_ratio": 40.0
+            }
+          ],
+          "recommended_action": "启动补货计划，根据库存消耗速率确定补货批量和优先级。",
+          "action_type": "补货",
+          "action_justification": {
+            "action_type": "补货",
+            "reasons": [
+              "库存风险分 0.7 > 阈值 0.6"
+            ],
+            "alternatives": [
+              "转单（当前网络传播系数 0.75 > 0.7，可考虑同步转单降低传播风险）"
+            ]
+          },
+          "propagation_coefficient": 0.75,
+          "reasoning_trail": {
+            "data_sources": [
+              "Delivery To Distributor.csv",
+              "Sales Order.csv"
+            ],
+            "metrics_summary": {
+              "Delivery To Distributor": {
+                "mean": 117.78,
+                "std": 15.57,
+                "cv": 0.1322,
+                "data_points": 26,
+                "source_files": [
+                  "Delivery To Distributor.csv"
+                ]
+              },
+              "Sales Order": {
+                "mean": 121.48,
+                "std": 12.84,
+                "cv": 0.1057,
+                "data_points": 26,
+                "source_files": [
+                  "Sales Order.csv"
+                ]
+              }
+            },
+            "steps": [
+              {
+                "step": 1,
+                "name": "指标聚合",
+                "description": "从 2 个文件聚合 2 个指标的时序数据",
+                "detail": {
+                  "source_files": [
+                    "Delivery To Distributor.csv",
+                    "Sales Order.csv"
+                  ],
+                  "metrics_summary": {
+                    "Delivery To Distributor": {
+                      "mean": 117.78,
+                      "std": 15.57,
+                      "cv": 0.1322,
+                      "data_points": 26,
+                      "source_files": [
+                        "Delivery To Distributor.csv"
+                      ]
+                    },
+                    "Sales Order": {
+                      "mean": 121.48,
+                      "std": 12.84,
+                      "cv": 0.1057,
+                      "data_points": 26,
+                      "source_files": [
+                        "Sales Order.csv"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "step": 2,
+                "name": "分量计算",
+                "description": "计算四个风险分量的原始值",
+                "detail": {
+                  "volatility": "各指标平均 CV = N/A（归一化前）",
+                  "inventory_note": "第一版：库存健康度暂用波动性作为代理指标（缺独立库存水位输入时）。接入 Inventory 表后将改用真实库存数据。",
+                  "cross_scenario": {
+                    "_so_prod_ratio": 0.0,
+                    "_delivery_per_order": 0.9695486436513767
+                  }
+                }
+              },
+              {
+                "step": 3,
+                "name": "百分位归一化",
+                "description": "将各分量在所有节点中的排名转换为 0-1 得分",
+                "detail": {
+                  "volatility_risk": 0.7,
+                  "inventory_risk": 0.7,
+                  "delivery_delay_risk": 0.9,
+                  "delay_flag_risk": 0.0
+                }
+              },
+              {
+                "step": 4,
+                "name": "风险加权",
+                "description": "Risk = 0.7×0.30 + 0.7×0.25 + 0.9×0.25 + 0.0×0.20 = 0.6100",
+                "detail": {
+                  "contributions": {
+                    "volatility": 0.21,
+                    "inventory": 0.175,
+                    "delivery_delay": 0.225,
+                    "delay_flag": 0.0
+                  },
+                  "total_risk": 0.61
+                }
+              },
+              {
+                "step": 5,
+                "name": "传播系数",
+                "description": "0.5 + 0.3×(2/4) + 0.2×0.5 = 0.5 + 0.15 + 0.1 = 0.75",
+                "detail": {
+                  "degree": 2,
+                  "max_degree": 4,
+                  "degree_factor": 0.5,
+                  "level": 1,
+                  "max_level": 1,
+                  "position_factor": 0.5
+                }
+              },
+              {
+                "step": 6,
+                "name": "最终评分",
+                "description": "Score = Risk × Propagation = 0.6100 × 0.7500 = 0.4575",
+                "detail": {
+                  "risk": 0.61,
+                  "propagation": 0.75,
+                  "raw_product": 0.4575,
+                  "final_score": 0.4575
+                }
+              }
+            ],
+            "risk_level_thresholds": {
+              "high": 0.6,
+              "medium": 0.3
+            }
+          }
+        },
+        {
+          "node_id": "P002",
+          "risk_score": 0.342,
+          "risk_level": "medium",
+          "priority": 0.342,
+          "risk_causes": [
+            "存在历史延迟记录"
+          ],
+          "risk_causes_detail": [
+            {
+              "label": "存在历史延迟记录",
+              "triggered_by": "delay_flag_risk",
+              "actual_value": 0.8,
+              "threshold": 0.5,
+              "excess_ratio": 60.0
+            }
+          ],
+          "recommended_action": "评估备选供应商质量与交期记录，启动供应商切换评估流程。",
+          "action_type": "切换供应商",
+          "action_justification": {
+            "action_type": "切换供应商",
+            "reasons": [
+              "历史延迟标记 0.8 > 阈值 0.5"
+            ],
+            "alternatives": [
+              "转单（当前不适用：需先确认替代供应商的交期能力）"
+            ]
+          },
+          "propagation_coefficient": 0.9,
+          "reasoning_trail": {
+            "data_sources": [
+              "Production.csv",
+              "Sales Order.csv"
+            ],
+            "metrics_summary": {
+              "Production": {
+                "mean": 108.85,
+                "std": 11.08,
+                "cv": 0.1018,
+                "data_points": 26,
+                "source_files": [
+                  "Production.csv"
+                ]
+              },
+              "Sales Order": {
+                "mean": 119.85,
+                "std": 9.48,
+                "cv": 0.0791,
+                "data_points": 26,
+                "source_files": [
+                  "Sales Order.csv"
+                ]
+              }
+            },
+            "steps": [
+              {
+                "step": 1,
+                "name": "指标聚合",
+                "description": "从 2 个文件聚合 2 个指标的时序数据",
+                "detail": {
+                  "source_files": [
+                    "Production.csv",
+                    "Sales Order.csv"
+                  ],
+                  "metrics_summary": {
+                    "Production": {
+                      "mean": 108.85,
+                      "std": 11.08,
+                      "cv": 0.1018,
+                      "data_points": 26,
+                      "source_files": [
+                        "Production.csv"
+                      ]
+                    },
+                    "Sales Order": {
+                      "mean": 119.85,
+                      "std": 9.48,
+                      "cv": 0.0791,
+                      "data_points": 26,
+                      "source_files": [
+                        "Sales Order.csv"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "step": 2,
+                "name": "分量计算",
+                "description": "计算四个风险分量的原始值",
+                "detail": {
+                  "volatility": "各指标平均 CV = N/A（归一化前）",
+                  "inventory_note": "第一版：库存健康度暂用波动性作为代理指标（缺独立库存水位输入时）。接入 Inventory 表后将改用真实库存数据。",
+                  "cross_scenario": {
+                    "_so_prod_ratio": 0.9082186065915728,
+                    "_delivery_per_order": "N/A"
+                  }
+                }
+              },
+              {
+                "step": 3,
+                "name": "百分位归一化",
+                "description": "将各分量在所有节点中的排名转换为 0-1 得分",
+                "detail": {
+                  "volatility_risk": 0.4,
+                  "inventory_risk": 0.4,
+                  "delivery_delay_risk": 0.0,
+                  "delay_flag_risk": 0.8
+                }
+              },
+              {
+                "step": 4,
+                "name": "风险加权",
+                "description": "Risk = 0.4×0.30 + 0.4×0.25 + 0.0×0.25 + 0.8×0.20 = 0.3800",
+                "detail": {
+                  "contributions": {
+                    "volatility": 0.12,
+                    "inventory": 0.1,
+                    "delivery_delay": 0.0,
+                    "delay_flag": 0.16
+                  },
+                  "total_risk": 0.38
+                }
+              },
+              {
+                "step": 5,
+                "name": "传播系数",
+                "description": "0.5 + 0.3×(4/4) + 0.2×0.5 = 0.5 + 0.3 + 0.1 = 0.9",
+                "detail": {
+                  "degree": 4,
+                  "max_degree": 4,
+                  "degree_factor": 1.0,
+                  "level": 1,
+                  "max_level": 1,
+                  "position_factor": 0.5
+                }
+              },
+              {
+                "step": 6,
+                "name": "最终评分",
+                "description": "Score = Risk × Propagation = 0.3800 × 0.9000 = 0.3420",
+                "detail": {
+                  "risk": 0.38,
+                  "propagation": 0.9,
+                  "raw_product": 0.342,
+                  "final_score": 0.342
+                }
+              }
+            ],
+            "risk_level_thresholds": {
+              "high": 0.6,
+              "medium": 0.3
+            }
+          }
+        },
+        {
+          "node_id": "S001",
+          "risk_score": 0.3113,
+          "risk_level": "medium",
+          "priority": 0.3113,
+          "risk_causes": [
+            "存在历史延迟记录",
+            "该节点波动显著低于同层节点 （CV 0.097 / 同层平均 0.207），符合 VMI 信息共享模式特征"
+          ],
+          "risk_causes_detail": [
+            {
+              "label": "存在历史延迟记录",
+              "triggered_by": "delay_flag_risk",
+              "actual_value": 0.7,
+              "threshold": 0.5,
+              "excess_ratio": 40.0
+            },
+            {
+              "label": "该节点波动显著低于同层节点 （CV 0.097 / 同层平均 0.207），符合 VMI 信息共享模式特征",
+              "triggered_by": "vmi",
+              "actual_value": "CV ratio 0.47",
+              "threshold": "< 0.5",
+              "excess_ratio": ""
+            }
+          ],
+          "recommended_action": "评估备选供应商质量与交期记录，启动供应商切换评估流程。",
+          "action_type": "切换供应商",
+          "action_justification": {
+            "action_type": "切换供应商",
+            "reasons": [
+              "历史延迟标记 0.7 > 阈值 0.5"
+            ],
+            "alternatives": [
+              "转单（当前不适用：需先确认替代供应商的交期能力）"
+            ]
+          },
+          "propagation_coefficient": 0.75,
+          "reasoning_trail": {
+            "data_sources": [
+              "Factory Issue.csv",
+              "Production.csv",
+              "Sales Order.csv"
+            ],
+            "metrics_summary": {
+              "Factory Issue": {
+                "mean": 110.68,
+                "std": 14.99,
+                "cv": 0.1354,
+                "data_points": 26,
+                "source_files": [
+                  "Factory Issue.csv"
+                ]
+              },
+              "Production": {
+                "mean": 108.67,
+                "std": 9.39,
+                "cv": 0.0864,
+                "data_points": 26,
+                "source_files": [
+                  "Production.csv"
+                ]
+              },
+              "Sales Order": {
+                "mean": 118.83,
+                "std": 8.32,
+                "cv": 0.07,
+                "data_points": 26,
+                "source_files": [
+                  "Sales Order.csv"
+                ]
+              }
+            },
+            "steps": [
+              {
+                "step": 1,
+                "name": "指标聚合",
+                "description": "从 3 个文件聚合 3 个指标的时序数据",
+                "detail": {
+                  "source_files": [
+                    "Factory Issue.csv",
+                    "Production.csv",
+                    "Sales Order.csv"
+                  ],
+                  "metrics_summary": {
+                    "Factory Issue": {
+                      "mean": 110.68,
+                      "std": 14.99,
+                      "cv": 0.1354,
+                      "data_points": 26,
+                      "source_files": [
+                        "Factory Issue.csv"
+                      ]
+                    },
+                    "Production": {
+                      "mean": 108.67,
+                      "std": 9.39,
+                      "cv": 0.0864,
+                      "data_points": 26,
+                      "source_files": [
+                        "Production.csv"
+                      ]
+                    },
+                    "Sales Order": {
+                      "mean": 118.83,
+                      "std": 8.32,
+                      "cv": 0.07,
+                      "data_points": 26,
+                      "source_files": [
+                        "Sales Order.csv"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "step": 2,
+                "name": "分量计算",
+                "description": "计算四个风险分量的原始值",
+                "detail": {
+                  "volatility": "各指标平均 CV = N/A（归一化前）",
+                  "inventory_note": "第一版：库存健康度暂用波动性作为代理指标（缺独立库存水位输入时）。接入 Inventory 表后将改用真实库存数据。",
+                  "cross_scenario": {
+                    "_so_prod_ratio": 0.9144997054615838,
+                    "_delivery_per_order": "N/A"
+                  }
+                }
+              },
+              {
+                "step": 3,
+                "name": "百分位归一化",
+                "description": "将各分量在所有节点中的排名转换为 0-1 得分",
+                "detail": {
+                  "volatility_risk": 0.5,
+                  "inventory_risk": 0.5,
+                  "delivery_delay_risk": 0.0,
+                  "delay_flag_risk": 0.7
+                }
+              },
+              {
+                "step": 4,
+                "name": "风险加权",
+                "description": "Risk = 0.5×0.30 + 0.5×0.25 + 0.0×0.25 + 0.7×0.20 = 0.4150",
+                "detail": {
+                  "contributions": {
+                    "volatility": 0.15,
+                    "inventory": 0.125,
+                    "delivery_delay": 0.0,
+                    "delay_flag": 0.14
+                  },
+                  "total_risk": 0.415
+                }
+              },
+              {
+                "step": 5,
+                "name": "传播系数",
+                "description": "0.5 + 0.3×(2/4) + 0.2×0.5 = 0.5 + 0.15 + 0.1 = 0.75",
+                "detail": {
+                  "degree": 2,
+                  "max_degree": 4,
+                  "degree_factor": 0.5,
+                  "level": 0,
+                  "max_level": 1,
+                  "position_factor": 0.5
+                }
+              },
+              {
+                "step": 6,
+                "name": "最终评分",
+                "description": "Score = Risk × Propagation = 0.4150 × 0.7500 = 0.3113",
+                "detail": {
+                  "risk": 0.415,
+                  "propagation": 0.75,
+                  "raw_product": 0.3113,
+                  "final_score": 0.3113
+                }
+              }
+            ],
+            "risk_level_thresholds": {
+              "high": 0.6,
+              "medium": 0.3
+            }
+          }
+        }
+      ]
+    },
+    "propagation_timeline": {
+      "title": "风险传播网络",
+      "status": "ok",
+      "missing_reason": "",
+      "nodes": [
+        {
+          "id": "S001",
+          "name": "华南原材料供应商",
+          "level": 0,
+          "risk_level": "medium",
+          "color": "#f39c12",
+          "risk_score": 0.3113,
+          "in_degree": 0,
+          "out_degree": 2
+        },
+        {
+          "id": "S002",
+          "name": "华东零部件供应商",
+          "level": 0,
+          "risk_level": "medium",
+          "color": "#f39c12",
+          "risk_score": 0.4612,
+          "in_degree": 0,
+          "out_degree": 2
+        },
+        {
+          "id": "P001",
+          "name": "深圳制造工厂",
+          "level": 1,
+          "risk_level": "medium",
+          "color": "#f39c12",
+          "risk_score": 0.558,
+          "in_degree": 2,
+          "out_degree": 2
+        },
+        {
+          "id": "P002",
+          "name": "苏州组装工厂",
+          "level": 1,
+          "risk_level": "medium",
+          "color": "#f39c12",
+          "risk_score": 0.342,
+          "in_degree": 2,
+          "out_degree": 2
+        },
+        {
+          "id": "D001",
+          "name": "华南区域配送中心",
+          "level": 1,
+          "risk_level": "low",
+          "color": "#27ae60",
+          "risk_score": 0.2295,
+          "in_degree": 2,
+          "out_degree": 2
+        },
+        {
+          "id": "D002",
+          "name": "华东区域配送中心",
+          "level": 1,
+          "risk_level": "low",
+          "color": "#27ae60",
+          "risk_score": 0.255,
+          "in_degree": 1,
+          "out_degree": 1
+        },
+        {
+          "id": "D003",
+          "name": "华北区域配送中心",
+          "level": 1,
+          "risk_level": "medium",
+          "color": "#f39c12",
+          "risk_score": 0.4575,
+          "in_degree": 1,
+          "out_degree": 1
+        },
+        {
+          "id": "R001",
+          "name": "广州零售商A",
+          "level": 1,
+          "risk_level": "low",
+          "color": "#27ae60",
+          "risk_score": 0.0743,
+          "in_degree": 1,
+          "out_degree": 0
+        },
+        {
+          "id": "R002",
+          "name": "上海零售商B",
+          "level": 1,
+          "risk_level": "low",
+          "color": "#27ae60",
+          "risk_score": 0.0,
+          "in_degree": 2,
+          "out_degree": 0
+        },
+        {
+          "id": "R003",
+          "name": "北京零售商C",
+          "level": 1,
+          "risk_level": "low",
+          "color": "#27ae60",
+          "risk_score": 0.2227,
+          "in_degree": 1,
+          "out_degree": 0
+        }
+      ],
+      "edges": [
+        {
+          "source": "S001",
+          "target": "P001",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "S001"
+        },
+        {
+          "source": "S001",
+          "target": "P002",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "S001"
+        },
+        {
+          "source": "S002",
+          "target": "P001",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "S002"
+        },
+        {
+          "source": "S002",
+          "target": "P002",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "S002"
+        },
+        {
+          "source": "P001",
+          "target": "D001",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "P001"
+        },
+        {
+          "source": "P001",
+          "target": "D003",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "P001"
+        },
+        {
+          "source": "P002",
+          "target": "D001",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "P002"
+        },
+        {
+          "source": "P002",
+          "target": "D002",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "P002"
+        },
+        {
+          "source": "D001",
+          "target": "R001",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "D001"
+        },
+        {
+          "source": "D001",
+          "target": "R002",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "D001"
+        },
+        {
+          "source": "D002",
+          "target": "R002",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "D002"
+        },
+        {
+          "source": "D003",
+          "target": "R003",
+          "relation_type": "unknown",
+          "context": "source",
+          "context_value": "D003"
+        }
+      ],
+      "events": [
+        "source"
+      ]
+    },
+    "data_confidence": {
+      "title": "数据可信度",
+      "field_coverage": {
+        "time": {
+          "available": true,
+          "label": "时间字段"
+        },
+        "node_id": {
+          "available": true,
+          "label": "节点标识"
+        },
+        "node_relations": {
+          "available": true,
+          "label": "节点关系"
+        },
+        "risk_metrics": {
+          "available": true,
+          "label": "风险指标"
+        }
+      },
+      "capability_status": {
+        "risk_trend": {
+          "available": true,
+          "label": "风险趋势图"
+        },
+        "risk_distribution": {
+          "available": true,
+          "label": "风险分布图"
+        },
+        "high_risk_nodes": {
+          "available": true,
+          "label": "高风险节点表"
+        },
+        "propagation_timeline": {
+          "available": true,
+          "label": "传播时序图"
+        },
+        "data_confidence": {
+          "available": true,
+          "label": "数据可信度"
+        },
+        "domain_insights": {
+          "available": true,
+          "label": "供应链领域洞察"
+        }
+      },
+      "confidence_level": "high",
+      "messages": [],
+      "supplement_map": [
+        {
+          "missing": "库存字段",
+          "impact": "库存健康度评估精度受限",
+          "unlocks": "精确库存风险评估、补货时机建议"
+        },
+        {
+          "missing": "交期偏差字段",
+          "impact": "供应商交付可靠性评估精度受限",
+          "unlocks": "延迟传播风险分析、供应商切换建议"
+        }
+      ]
+    },
+    "domain_insights": {
+      "title": "供应链领域洞察",
+      "status": "ok",
+      "missing_reason": "",
+      "summary": "2 个节点存在牛鞭效应放大；2 个节点呈现 VMI 信息共享模式特征",
+      "bullwhip_nodes": [
+        {
+          "node_id": "S002",
+          "detail": "该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.316 / 下游平均 CV 0.187 = 1.7 倍）",
+          "triggered_by": "bullwhip",
+          "actual_value": "CV ratio 1.7",
+          "threshold": "> 1.5"
+        },
+        {
+          "node_id": "P001",
+          "detail": "该节点存在牛鞭效应：需求波动沿供应链放大 （上游 CV 0.284 / 下游平均 CV 0.151 = 1.9 倍）",
+          "triggered_by": "bullwhip",
+          "actual_value": "CV ratio 1.9",
+          "threshold": "> 1.5"
+        }
+      ],
+      "vmi_nodes": [
+        {
+          "node_id": "S001",
+          "detail": "该节点波动显著低于同层节点 （CV 0.097 / 同层平均 0.207），符合 VMI 信息共享模式特征",
+          "triggered_by": "vmi",
+          "actual_value": "CV ratio 0.47"
+        },
+        {
+          "node_id": "R002",
+          "detail": "该节点波动显著低于同层节点 （CV 0.049 / 同层平均 0.112），符合 VMI 信息共享模式特征",
+          "triggered_by": "vmi",
+          "actual_value": "CV ratio 0.43"
+        }
+      ],
+      "qr_nodes": []
+    }
+  }
+}
