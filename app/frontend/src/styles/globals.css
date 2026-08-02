@@ -448,7 +448,6 @@ a:hover { text-decoration: underline; }
   outline: 3px solid #0f766e;
   outline-offset: 4px;
   border-radius: 8px;
-  transition: outline-color 0.3s;
 }
 body.tour-dimmed > *:not(#tour-stage) {
   filter: brightness(0.9) saturate(0.85);

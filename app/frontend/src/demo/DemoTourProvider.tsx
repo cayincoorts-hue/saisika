@@ -101,11 +101,17 @@ export function DemoTourProvider({
       el.classList.add('tour-focus');
       focusElRef.current = el;
       if (!isReducedMotion) {
+        // 入场淡入 + 高亮框闪烁 3 下（亮→淡→亮→淡→亮→稳）
         gsap.fromTo(
           el,
           { autoAlpha: 0.85 },
           { autoAlpha: 1, duration: 0.45, ease: 'power2.out', overwrite: 'auto' },
         );
+        gsap.timeline({ repeat: 2, yoyo: false, overwrite: 'auto' })
+          .to(el, { outlineColor: '#0f766e', duration: 0.12, ease: 'none' })
+          .to(el, { outlineColor: 'rgba(15, 118, 110, 0.25)', duration: 0.16, ease: 'none' });
+        // 3 次闪烁结束后，恢复稳定高亮色
+        gsap.to(el, { outlineColor: '#0f766e', duration: 0.25, delay: 1.2, ease: 'none' });
       }
       return true;
     },
