@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -53,6 +53,20 @@ export default function ReasoningPanel({ data }: Props) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [openNodes, setOpenNodes] = useState<Record<string, boolean>>({});
+
+  // 监听导览"展开"请求：自动展开面板 + 展开第一个节点
+  useEffect(() => {
+    const onTourExpand = () => {
+      setExpanded(true);
+      setOpenNodes((prev) => {
+        if (Object.keys(prev).some((k) => prev[k])) return prev;
+        const first = (data?.rows || [])[0]?.node_id;
+        return first ? { ...prev, [first]: true } : prev;
+      });
+    };
+    window.addEventListener('saiska:tour-expand', onTourExpand);
+    return () => window.removeEventListener('saiska:tour-expand', onTourExpand);
+  }, [data]);
 
   if (!data || data.status === 'unavailable' || data.status === 'error') return null;
 

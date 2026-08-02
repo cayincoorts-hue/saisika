@@ -1,6 +1,7 @@
 import { useRef, useCallback, useMemo, useState, useEffect, Component } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as THREE from 'three';
+import StaticNetworkGraph from '../demo/StaticNetworkGraph';
 
 interface GraphNode {
   id: string;
@@ -50,6 +51,28 @@ interface Props {
 
 const LEVEL_COLORS = ['#5db8a6', '#cc785c', '#e8a55a', '#8e8b82'];
 
+/** 检测 WebGL 是否可用（3D 渲染前提） */
+function isWebGLAvailable(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** 检测用户是否偏好减少动效 */
+function prefersReducedMotion(): boolean {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
 class ErrorCatcher extends Component<{ children: React.ReactNode; t: (key: string) => string }, { hasError: boolean }> {
   state = { hasError: false };
   static getDerivedStateFromError() { return { hasError: true }; }
@@ -74,6 +97,24 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
   const fgRef = useRef<any>(null);
   const axisGroupRef = useRef<THREE.Group | null>(null);
   const graphDataRef = useRef<GraphData | null>(null);
+
+  // 能力检测：WebGL 不可用 / reduced-motion / 小屏 → 静态降级
+  const [useStatic, setUseStatic] = useState<boolean>(() => {
+    if (!isWebGLAvailable()) return true;
+    if (prefersReducedMotion()) return true;
+    return typeof window !== 'undefined' && window.innerWidth < 640;
+  });
+  useEffect(() => {
+    const onResize = () => {
+      setUseStatic(() => {
+        if (!isWebGLAvailable()) return true;
+        if (prefersReducedMotion()) return true;
+        return window.innerWidth < 640;
+      });
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -300,6 +341,32 @@ function GraphLoader({ nodes, edges, highlightNodeId, onNodeClick, isolatedCount
       );
     }
   }, [highlightNodeId, centerGraphAtOrigin]);
+
+  if (useStatic) {
+    return (
+      <div ref={containerRef} className="chart-surface" style={{ position: 'relative' }}>
+        <StaticNetworkGraph
+          nodes={nodes}
+          edges={edges}
+          highlightNodeId={highlightNodeId}
+          onNodeClick={onNodeClick}
+          width={size.width}
+          height={520}
+        />
+        {isolatedCount > 0 && (
+          <div style={{
+            position: 'absolute', top: 12, left: 16,
+            fontSize: '0.75rem', color: 'var(--color-muted)',
+            background: 'rgba(250,249,245,0.9)', padding: '6px 12px',
+            borderRadius: 6, pointerEvents: 'none',
+            border: '1px solid var(--color-hairline)',
+          }}>
+            {t('forceGraph3D.isolatedNodes', { count: isolatedCount })}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (loadError) {
     return (

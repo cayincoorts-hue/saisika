@@ -168,11 +168,15 @@ export default function ResultPage() {
         )}
       </div>
 
-      <SummaryPanel textSummary={data.text_summary} />
-      <ReasoningPanel data={visuals.high_risk_nodes} />
+      <div data-tour="result-summary">
+        <SummaryPanel textSummary={data.text_summary} />
+        <div data-tour="result-reasoning">
+          <ReasoningPanel data={visuals.high_risk_nodes} />
+        </div>
+      </div>
 
       {visuals.domain_insights && visuals.domain_insights.status !== 'unavailable' && (
-        <SectionCard title={t('domainInsights.title')} delay={200}>
+        <SectionCard title={t('domainInsights.title')} delay={200} dataTour="result-domain">
           {visuals.domain_insights.status === 'limited' ? (
             <div className="notice notice-info" style={{ marginBottom: 12 }}>
               {visuals.domain_insights.missing_reason || visuals.domain_insights.summary}
@@ -220,9 +224,10 @@ export default function ResultPage() {
         <span className="section-label-line" />
       </div>
 
-      <SectionCard title={t('result.riskTrend')} delay={220}><RiskTrendChart data={visuals.risk_trend} /></SectionCard>
+      <SectionCard title={t('result.riskTrend')} delay={220} dataTour="result-charts-trend"><RiskTrendChart data={visuals.risk_trend} /></SectionCard>
       <SectionCard title={t('result.riskDistribution')} delay={340}><RiskDistributionChart data={visuals.risk_distribution} /></SectionCard>
 
+      <div data-tour="result-nodes">
       <RiskNodeTable
         data={{ rows: allNodesTable }}
         batchId={batchId!}
@@ -232,9 +237,10 @@ export default function ResultPage() {
         onCompareResult={(result: any) => { setCompareResult(result); setCompareLoading(false); setCompareError(''); setViewMode('comparing'); }}
         onBackToNormal={() => {}}
       />
+      </div>
 
       {graphData.nodes.length > 0 && (
-        <SectionCard title={t('result.networkGraph3D')} delay={500}>
+        <SectionCard title={t('result.networkGraph3D')} delay={500} dataTour="result-graph">
           <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: 4 }}>
             {t('result.dragToRotate')} · {t('result.scrollToZoom')} · {t('result.clickForDetail')}
           </p>
@@ -247,10 +253,12 @@ export default function ResultPage() {
         </SectionCard>
       )}
 
-      <SectionCard title={t('result.propagation')} delay={620}><PropagationTimelineChart data={visuals.propagation_timeline} /></SectionCard>
+      <SectionCard title={t('result.propagation')} delay={620} dataTour="result-timeline"><PropagationTimelineChart data={visuals.propagation_timeline} /></SectionCard>
       <SectionCard title={t('result.dataConfidence')} delay={740}><DataConfidenceChart data={visuals.data_confidence} /></SectionCard>
       <CapabilityHintPanel dataConfidence={visuals.data_confidence} />
-      <DownloadPanel batchId={batchId!} hasResults={true} />
+      <div data-tour="result-download">
+        <DownloadPanel batchId={batchId!} hasResults={true} />
+      </div>
     </>
   );
 }

@@ -291,7 +291,9 @@
     "isolatedNodes": "{{count}} isolated nodes not shown",
     "loadError": "3D rendering module failed to load",
     "webglHint": "Please ensure your browser supports WebGL",
-    "legendTitle": "Legend"
+    "legendTitle": "Legend",
+    "staticAria": "Static supply chain network graph: nodes colored by tier, edges show relations.",
+    "staticLabel": "Static"
   },
   "dataConfidence": {
     "title": "Data Confidence",
@@ -376,5 +378,27 @@
     "privacy": "All data stored locally. No internet, no telemetry.",
     "license": "MIT License",
     "version": "Version"
+  },
+  "tour": {
+    "homeHero": "Welcome to Saisca — offline supply chain risk analysis. In the next 60 seconds we walk you through a full demo.",
+    "uploadDrop": "Step 1: Import data. These are the 7 business tables of the built-in virtual case. Drag them into the area below. Data never leaves your machine.",
+    "uploadNext": "After dropping the files, click \"Continue\" to move on. No real upload happens.",
+    "analyzeProgress": "Six-stage analysis progress: structure, graph, risk, domain, decision, fingerprint. Every step is reproducible.",
+    "resultSummary": "Step 4: Results. Risk summary, high-risk nodes, and recommended actions — all from a traceable rule engine.",
+    "resultDownload": "Finally: export your report for sharing or archiving. Demo complete — thanks for watching!",
+    "play": "Play",
+    "pause": "Pause",
+    "next": "Next",
+    "previous": "Previous",
+    "exit": "Exit tour",
+    "restart": "Restart",
+    "understand": "Step 2: File understanding. Saisca identifies whether each table is nodes, facts, or relations, with row and column counts. Confirm and continue.",
+    "mapping": "Step 3: Field mapping. Every column mapping is shown transparently with status and confidence. No black box. Confirm and analyze.",
+    "resultReasoning": "Expand any high-risk node to see its full reasoning chain: data sources, computation steps, risk thresholds, triggers, and action basis — every step traceable.",
+    "resultDomain": "Domain insights: the engine auto-detects known supply chain patterns — bullwhip effect, VMI inventory, quick response — surfacing hidden fluctuation patterns.",
+    "resultChartsTrend": "Risk trend and distribution: how risk evolves over time and how it is spread across nodes, at a glance.",
+    "resultNodes": "Risk node table: risk scores and recommended actions for every node. Try \"Try Change\" to adjust parameters and compare decision impacts.",
+    "resultGraph": "Network topology: a 3D view of supply chain relationships. Lines show supply and delivery paths — drag to rotate.",
+    "resultTimeline": "Risk propagation timeline: how a failure at one node spreads through the chain, plus data confidence boundaries — what is reliable and what needs more data."
   }
 }
