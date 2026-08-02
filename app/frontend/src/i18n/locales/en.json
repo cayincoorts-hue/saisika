@@ -387,6 +387,10 @@
     "license": "MIT License",
     "version": "Version"
   },
+  "landscape": {
+    "notice": "Please rotate your device for the best experience",
+    "rotateHint": "Landscape mode is recommended to avoid layout shifts"
+  },
   "tour": {
     "homeHero": "Welcome to Saisca — offline supply chain risk analysis. In the next 60 seconds we walk you through a full demo.",
     "uploadDrop": "Step 1: Import data. These are the 7 business tables of the built-in virtual case. Drag them into the area below. Data never leaves your machine.",

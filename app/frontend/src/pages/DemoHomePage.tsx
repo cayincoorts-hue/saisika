@@ -1,13 +1,41 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import DemoBadge from '../components/demo/DemoBadge';
 import { useDemoTour } from '../demo/useDemoTour';
 
 export default function DemoHomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { start } = useDemoTour();
 
   return (
     <div style={{ maxWidth: '720px', margin: '0 auto', padding: '48px 24px', textAlign: 'center' }}>
+      {/* 竖屏提示：仅竖屏手机显示，横屏/桌面自动隐藏 */}
+      <div
+        data-tour="landscape-notice"
+        className="landscape-notice"
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          padding: '10px 16px',
+          margin: '0 auto 24px',
+          maxWidth: '520px',
+          background: '#fffbeb',
+          border: '1px solid #fcd34d',
+          borderRadius: '999px',
+          fontSize: '14px',
+          fontWeight: 600,
+          color: '#92400e',
+        }}
+      >
+        <span style={{ fontSize: '18px' }}>📱</span>
+        <span>{t('landscape.notice')}</span>
+        <span style={{ fontWeight: 400, color: '#b45309', marginLeft: '4px' }}>
+          （{t('landscape.rotateHint')}）
+        </span>
+      </div>
+
       <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>
         Saisca <DemoBadge />
       </h1>
