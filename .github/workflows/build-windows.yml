@@ -1,0 +1,50 @@
+name: Build Windows Package
+
+# 触发方式：
+#   1. 在 GitHub 仓库页面 Actions → Build Windows Package → Run workflow（手动）
+#   2. 或推送 v* 标签自动触发
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 后端：PyInstaller 打 Windows 版（必须在 Windows 上打包）
+      - name: Install Python deps
+        run: |
+          pip install -r requirements.txt pyinstaller
+
+      - name: Package backend with PyInstaller
+        run: pyinstaller saisika.spec --noconfirm
+
+      # Electron 壳：打包成 Windows 安装程序
+      - name: Setup Electron
+        working-directory: electron
+        run: |
+          npm ci
+          npx electron-builder --win
+
+      # 上传安装包供下载
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: saisca-windows
+          path: electron/release/*.exe
+          if-no-files-found: error

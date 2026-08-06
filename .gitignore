@@ -19,14 +19,12 @@ dist/
 build/
 electron/release/
 electron/node_modules/
-electron/package-lock.json
 data/license.json
 datasets/
 keygen.py
 CLAUDE.md
 .mcp.json
 generate_demo_data.py
-saisika.spec
 docs/
 .claude/settings.local.json
 .claude/scheduled_tasks.json
